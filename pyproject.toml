@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seprq"
+version = "0.1.0"
+description = "SepRQ / BEST-RQ (50 Hz) SSL speech feature extractors (weights hosted on the Hugging Face Hub)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "SevKod" }]
+dependencies = [
+    "speechbrain>=1.0.3",
+    "hyperpyyaml",
+    "huggingface_hub",
+    "torch",
+    "soundfile",
+]
+
+[project.urls]
+Homepage = "https://huggingface.co/SevKod/SepRQ"
+
+[tool.setuptools.packages.find]
+where = ["src"]
