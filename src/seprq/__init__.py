@@ -1,8 +1,7 @@
 """seprq -- SepRQ / BEST-RQ (50 Hz) SSL speech feature extractors.
 
 The CNN frontend + 12-layer Conformer encoder and the global norm stats are
-downloaded from the Hugging Face Hub (SevKod/SepRQ) on first use; only the
-requested model is fetched. Uses upstream speechbrain (>=1.0.3) only.
+downloaded from the Hugging Face Hub (SevKod/SepRQ).
 
     from seprq import SepRQEncoder
     speech_encoder = SepRQEncoder("SepRQ")     # or "BestRQ_50Hz"
