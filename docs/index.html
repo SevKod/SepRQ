@@ -64,8 +64,11 @@
   <pre><code>from seprq import SepRQEncoder
 
 speech_encoder = SepRQEncoder("SepRQ")          # or "BestRQ_50Hz"
-feats = speech_encoder("utterance.wav")         # torch.Tensor [1, T, 576]</code></pre>
-  <p>Calling the encoder runs <code>forward</code>. It takes a <strong>file path</strong>
+layers = speech_encoder("utterance.wav")        # list of 12 tensors, each [1, T, 576]
+final = layers[-1]                              # last Conformer layer</code></pre>
+  <p>Calling the encoder runs <code>forward</code> and returns the
+     <strong>12 Conformer layer outputs</strong> as a list, each
+     <code>[1, T, 576]</code>. It takes a <strong>file path</strong>
      (any format / sample rate — decoded, downmixed to mono and resampled to
      16&nbsp;kHz for you) or a raw 1-D 16&nbsp;kHz waveform.</p>
 
@@ -78,8 +81,8 @@ feats = speech_encoder("utterance.wav")         # torch.Tensor [1, T, 576]</code
     <tr><td><code>BestRQ_50Hz</code></td>
         <td>BEST-RQ Method&nbsp;B baseline, 50&nbsp;Hz, same reduced training budget.</td></tr>
   </table>
-  <p>Only the requested model is downloaded; both output <code>[1, T, 576]</code>
-     from the final Conformer layer.</p>
+  <p>Only the requested model is downloaded; both return the 12 Conformer layer
+     outputs, each <code>[1, T, 576]</code> at 50&nbsp;Hz.</p>
 
   <div class="note">
     The weights repository is private — authenticate once with
