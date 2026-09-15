@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SepRQ — SSL speech feature extractors</title>
+<title>SepRQ — Self-Supervised Speech Mixture Representation Learning</title>
 <style>
   :root{
     --bg:#0d1117; --panel:#161b22; --border:#30363d; --fg:#e6edf3;
@@ -43,8 +43,9 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>seprq</h1>
-    <p class="tag">Self-supervised speech feature extractors — <strong>SepRQ</strong> &amp; <strong>BEST-RQ (50&nbsp;Hz)</strong>.</p>
+    <h1>SepRQ</h1>
+    <p class="tag">Self-Supervised Speech Mixture Representation Learning Via
+       Mask-Free Multi-Scale Source Separation.</p>
     <div class="badges">
       <a href="https://github.com/SevKod/SepRQ">GitHub</a>
       <a href="https://huggingface.co/SevKod/SepRQ">Hugging Face</a>
@@ -74,13 +75,22 @@ final = layers[-1]                              # last Conformer layer</code></p
 
   <h2>Models</h2>
   <table>
-    <tr><th>name</th><th>description</th></tr>
+    <tr><th>name</th><th>scale</th><th>description</th></tr>
     <tr><td><code>SepRQ</code></td>
+        <td>reduced</td>
         <td>Multi-resolution SepRQ (layers L6/8/10/12, MLP full-utterance, 2 streams).
             Reaches <strong>11.23 SI-SDRi</strong> on separation_stft (Libri2Mix).</td></tr>
     <tr><td><code>BestRQ_50Hz</code></td>
+        <td>reduced</td>
         <td>BEST-RQ Method&nbsp;B baseline, 50&nbsp;Hz, same reduced training budget.</td></tr>
   </table>
+
+  <div class="note">
+    <strong>Only the reduced-scale checkpoints are released for now</strong>
+    (the 33&nbsp;333-step / LibriSpeech <code>train-clean-100</code> training
+    budget). The <strong>full-scale</strong> versions are <strong>TBA</strong>
+    and will be added under the same model names once available.
+  </div>
   <p>Only the requested model is downloaded; both return the 12 Conformer layer
      outputs, each <code>[1, T, 576]</code> at 50&nbsp;Hz.</p>
 
