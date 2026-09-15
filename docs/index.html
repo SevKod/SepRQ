@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>seprq — SSL speech feature extractors</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d; --fg:#e6edf3;
+    --muted:#9198a1; --accent:#6ea8fe; --code:#0b0f14;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#ffffff; --panel:#f6f8fa; --border:#d0d7de; --fg:#1f2328;
+           --muted:#59636e; --accent:#0969da; --code:#f6f8fa; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:64px 24px 96px;}
+  header{margin-bottom:40px;}
+  h1{font-size:44px;margin:0 0 8px;letter-spacing:-1px;}
+  .tag{color:var(--muted);font-size:19px;margin:0 0 24px;}
+  .badges a{display:inline-block;margin-right:8px;margin-bottom:8px;
+    text-decoration:none;color:var(--fg);background:var(--panel);
+    border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:14px;}
+  .badges a:hover{border-color:var(--accent);color:var(--accent);}
+  h2{font-size:22px;margin:44px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  p{color:var(--fg);}
+  a{color:var(--accent);}
+  code{background:var(--code);border:1px solid var(--border);border-radius:5px;
+       padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:10px;
+      padding:16px 18px;overflow-x:auto;}
+  pre code{background:none;border:none;padding:0;font-size:14px;line-height:1.55;}
+  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:15px;}
+  th,td{border:1px solid var(--border);padding:8px 12px;text-align:left;vertical-align:top;}
+  th{background:var(--panel);}
+  .note{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+        border-radius:8px;padding:12px 16px;color:var(--muted);font-size:15px;}
+  footer{margin-top:64px;color:var(--muted);font-size:14px;border-top:1px solid var(--border);padding-top:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>seprq</h1>
+    <p class="tag">Self-supervised speech feature extractors — <strong>SepRQ</strong> &amp; <strong>BEST-RQ (50&nbsp;Hz)</strong>.</p>
+    <div class="badges">
+      <a href="https://github.com/SevKod/SepRQ">GitHub</a>
+      <a href="https://huggingface.co/SevKod/SepRQ">Hugging Face</a>
+      <a href="https://pypi.org/project/seprq/">PyPI</a>
+    </div>
+  </header>
+
+  <p>A CNN frontend + 12-layer Conformer encoder that turns speech into
+     <strong>50&nbsp;Hz, 576-dim</strong> features. Weights are pulled from the
+     Hugging&nbsp;Face Hub on first use. Uses upstream
+     <code>speechbrain&nbsp;&ge;&nbsp;1.0.3</code> only; runs on CPU or GPU.</p>
+
+  <h2>Install</h2>
+  <pre><code>pip install seprq</code></pre>
+
+  <h2>Use</h2>
+  <pre><code>from seprq import SepRQEncoder
+
+speech_encoder = SepRQEncoder("SepRQ")          # or "BestRQ_50Hz"
+feats = speech_encoder("utterance.wav")         # torch.Tensor [1, T, 576]</code></pre>
+  <p>Calling the encoder runs <code>forward</code>. It takes a <strong>file path</strong>
+     (any format / sample rate — decoded, downmixed to mono and resampled to
+     16&nbsp;kHz for you) or a raw 1-D 16&nbsp;kHz waveform.</p>
+
+  <h2>Models</h2>
+  <table>
+    <tr><th>name</th><th>description</th></tr>
+    <tr><td><code>SepRQ</code></td>
+        <td>Multi-resolution SepRQ (layers L6/8/10/12, MLP full-utterance, 2 streams).
+            Reaches <strong>11.23 SI-SDRi</strong> on separation_stft (Libri2Mix).</td></tr>
+    <tr><td><code>BestRQ_50Hz</code></td>
+        <td>BEST-RQ Method&nbsp;B baseline, 50&nbsp;Hz, same reduced training budget.</td></tr>
+  </table>
+  <p>Only the requested model is downloaded; both output <code>[1, T, 576]</code>
+     from the final Conformer layer.</p>
+
+  <div class="note">
+    The weights repository is private — authenticate once with
+    <code>huggingface-cli login</code> (or set <code>HF_TOKEN</code>) before first use.
+  </div>
+
+  <footer>
+    Built on <a href="https://github.com/speechbrain/speechbrain">SpeechBrain</a>.
+    &nbsp;·&nbsp; <a href="https://github.com/SevKod/SepRQ">SevKod/SepRQ</a>
+  </footer>
+</div>
+</body>
+</html>
