@@ -9,7 +9,7 @@ on first use — only the requested model is downloaded. Upstream
 ## Install
 
 ```bash
-pip install speechbrain
+pip install seprq
 # or  from the git repo
 pip install git+https://github.com/SevKod/SepRQ.git    # install straight from GitHub
 ```
