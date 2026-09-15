@@ -1,4 +1,4 @@
-# SepRQ : Self-Supervised Speech Mixture Representation Learning Via Mask-Free, Multi-Scale Source Separation
+# SepRQ : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
 SSL speech feature extractors for **SepRQ** and **BEST-RQ (50 Hz)**. The
 encoder (CNN frontend + 12-layer Conformer) and global norm stats are pulled
