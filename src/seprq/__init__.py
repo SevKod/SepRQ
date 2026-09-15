@@ -5,7 +5,7 @@ downloaded from the Hugging Face Hub (SevKod/SepRQ).
 
     from seprq import SepRQEncoder
     speech_encoder = SepRQEncoder("SepRQ")     # or "BestRQ_50Hz"
-    feats = speech_encoder("audio.wav")         # path -> [1, T, 576]
+    layers = speech_encoder("audio.wav")        # list of 12 Conformer layers, each [1, T, 576]
 """
 import torch
 from hyperpyyaml import load_hyperpyyaml
@@ -14,7 +14,7 @@ from huggingface_hub import hf_hub_download
 SAMPLE_RATE = 16000
 
 __all__ = ["SepRQEncoder", "MODELS", "REPO_ID"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 REPO_ID = "SevKod/SepRQ"
 
@@ -73,7 +73,8 @@ class SepRQEncoder(torch.nn.Module):
     @torch.no_grad()
     def forward(self, audio):
         """audio: path to an audio file, or a 1D 16 kHz waveform (array/tensor).
-        Returns SSL features [1, T, 576] from the final Conformer layer.
+
+        Returns the 12 Conformer layer outputs as a list, each [1, T, 576].
         Call the instance directly: ``speech_encoder(audio)``."""
         if isinstance(audio, (str, bytes)) or hasattr(audio, "__fspath__"):
             audio = self._load(audio)
@@ -82,4 +83,19 @@ class SepRQEncoder(torch.nn.Module):
         wav_lens = torch.tensor([1.0], device=self.device)
         feats = self.melspec(wavs)                        # Fbank [1, T, 80]
         feats = (feats - self.running_mean) / self.running_std   # global norm
-        return self.wrapper(self.cnn(feats), wav_lens)    # [1, T, 576]
+
+        # capture each Conformer layer output via forward hooks
+        outs = []
+
+        def hook(_m, _i, o):
+            outs.append(o[0] if isinstance(o, tuple) else o)
+
+        handles = [layer.register_forward_hook(hook)
+                   for layer in self.wrapper.transformer.encoder.layers]
+        try:
+            self.wrapper(self.cnn(feats), wav_lens)       # runs the 12 layers
+        finally:
+            for h in handles:
+                h.remove()
+
+        return outs                                       # 12 tensors, each [1, T, 576]
