@@ -64,7 +64,8 @@
   <h2>Use</h2>
   <pre><code>from seprq import SepRQEncoder
 
-speech_encoder = SepRQEncoder("SepRQ")          # or "BestRQ_50Hz"
+speech_encoder = SepRQEncoder("SepRQ", scale="reduced")   # model: "SepRQ" / "BestRQ_50Hz"
+                                                          # scale: "reduced" (released) / "full" (TBA)
 layers = speech_encoder("utterance.wav")        # list of 12 tensors, each [1, T, 576]
 final = layers[-1]                              # last Conformer layer</code></pre>
   <p>Calling the encoder runs <code>forward</code> and returns the

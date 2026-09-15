@@ -19,13 +19,15 @@ pip install git+https://github.com/SevKod/SepRQ.git    # install straight from G
 ```python
 from seprq import SepRQEncoder
 
-speech_encoder = SepRQEncoder("SepRQ")         # or "BestRQ_50Hz"
+speech_encoder = SepRQEncoder("SepRQ", scale="reduced")   # model: "SepRQ" / "BestRQ_50Hz"
+                                                          # scale: "reduced" (released) / "full" (TBA)
 layers = speech_encoder("utterance.wav")       # list of 12 tensors, each [1, T, 576]
 final = layers[-1]                             # last Conformer layer
 ```
 
 Calling the encoder runs `forward` and returns the **12 Conformer layer
-outputs** as a list, each `[1, T, 576]`.
+outputs** as a list, each `[1, T, 576]`. Only the **reduced**-scale checkpoints
+are released for now; **full**-scale is TBA.
 
 It accepts a **file path** (any format/sample rate — decoded, downmixed to mono
 and resampled to 16 kHz for you) or a raw 1D 16 kHz waveform (numpy array / tensor).
