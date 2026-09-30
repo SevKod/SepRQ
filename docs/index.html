@@ -53,10 +53,12 @@
     </div>
   </header>
 
-  <p>A CNN frontend + 12-layer Conformer encoder that turns speech into
-     <strong>50&nbsp;Hz, 576-dim</strong> features. Weights are pulled from the
-     Hugging&nbsp;Face Hub on first use. Uses upstream
-     <code>speechbrain&nbsp;&ge;&nbsp;1.0.3</code> only; runs on CPU or GPU.</p>
+  <p>SSL speech feature extractors for <strong>SepRQ</strong> and
+     <strong>BEST-RQ (50&nbsp;Hz)</strong>, tailor-made for cocktail-party speech
+     processing. A CNN frontend + 12-layer Conformer encoder turning speech into
+     <strong>50&nbsp;Hz, 576-dim</strong> features, pulled from the
+     Hugging&nbsp;Face Hub on first use. Requires <strong>PyTorch</strong> and
+     upstream <code>speechbrain&nbsp;&ge;&nbsp;1.0.3</code>; runs on CPU or GPU.</p>
 
   <h2>Install</h2>
   <pre><code>pip install seprq</code></pre>
