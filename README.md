@@ -1,10 +1,10 @@
 # SepRQ : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
-SSL speech feature extractors for **SepRQ** and **BEST-RQ (50 Hz)**,
-tailor-made for cocktail-party speech processing. The encoder (CNN frontend +
-12-layer Conformer) and global norm stats are pulled from the Hugging Face Hub
-([SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ)) on first use. Requires
-**PyTorch** and upstream `speechbrain>=1.0.3`; runs on CPU or GPU.
+🗣️ SSL speech feature extractors for **SepRQ** and **BEST-RQ (50 Hz)**,
+tailor-made for 🍸 cocktail-party speech processing. Pulled from 🤗
+[SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ) and ready to use; returns the
+12 Conformer layer features. Requires **PyTorch** and upstream
+`speechbrain>=1.0.3`; runs on CPU or GPU.
 
 ## Install
 
