@@ -64,8 +64,7 @@
   <h2>Use</h2>
   <pre><code>from seprq import SepRQEncoder
 
-speech_encoder = SepRQEncoder("SepRQ", scale="reduced")   # model: "SepRQ" / "BestRQ_50Hz"
-                                                          # scale: "reduced" (released) / "full" (TBA)
+speech_encoder = SepRQEncoder("SepRQ")          # or "BestRQ_50Hz"
 layers = speech_encoder("utterance.wav")        # list of 12 tensors, each [1, T, 576]
 final = layers[-1]                              # last Conformer layer</code></pre>
   <p>Calling the encoder runs <code>forward</code> and returns the
@@ -76,27 +75,18 @@ final = layers[-1]                              # last Conformer layer</code></p
 
   <h2>Models</h2>
   <table>
-    <tr><th>name</th><th>scale</th><th>description</th></tr>
+    <tr><th>name</th><th>description</th></tr>
     <tr><td><code>SepRQ</code></td>
-        <td>reduced</td>
         <td>Multi-resolution SepRQ (layers L6/8/10/12, MLP full-utterance, 2 streams).
             Reaches <strong>11.23 SI-SDRi</strong> on separation_stft (Libri2Mix).</td></tr>
     <tr><td><code>BestRQ_50Hz</code></td>
-        <td>reduced</td>
-        <td>BEST-RQ Method&nbsp;B baseline, 50&nbsp;Hz, same reduced training budget.</td></tr>
-    <tr><td><code>SepRQ</code></td>
-        <td>full</td>
-        <td>TBA</td></tr>
-    <tr><td><code>BestRQ_50Hz</code></td>
-        <td>full</td>
-        <td>TBA</td></tr>
+        <td>BEST-RQ Method&nbsp;B baseline, 50&nbsp;Hz.</td></tr>
   </table>
 
   <div class="note">
-    <strong>Only the reduced-scale checkpoints are released for now</strong>
-    (the 33&nbsp;333-step / LibriSpeech <code>train-clean-100</code> training
-    budget). The <strong>full-scale</strong> versions are <strong>TBA</strong>
-    and will be added under the same model names once available.
+    The released checkpoints use a reduced training budget (33&nbsp;333 steps on
+    LibriSpeech <code>train-clean-100</code>). Full-scale weights will
+    <strong>replace</strong> these later under the same model names — no code change.
   </div>
   <p>Only the requested model is downloaded; both return the 12 Conformer layer
      outputs, each <code>[1, T, 576]</code> at 50&nbsp;Hz.</p>
