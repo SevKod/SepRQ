@@ -10,8 +10,6 @@ cocktail-party 🍸 speech processing. Pulled from 🤗
 
 ```bash
 pip install seprq
-# or  from the git repo
-pip install git+https://github.com/SevKod/SepRQ.git    # install straight from GitHub
 ```
 
 ## Use
