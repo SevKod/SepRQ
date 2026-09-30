@@ -62,32 +62,21 @@ on LibriSpeech 960 h mixtures only.
 Speaker diarization (SD), speech separation (SS) and speech enhancement (SE).
 LS = LibriSpeech, LL = Libri-Light, Mix = LL-60k + GigaSpeech-10k + VoxPopuli-24k.
 
-**Generic SSLs**
-
 | Model | Class | #Param (M) | Data (h) | DER ↓ | SI-SDRi ↑ | PESQ ↑ | STOI ↑ |
 |-------|-------|-----------:|----------|------:|----------:|-------:|-------:|
+| *Generic SSLs* | | | | | | | |
 | HuBERT Base | Base | 94.68 | LS-960 | 5.88 | 9.36 | 2.58 | 93.9 |
 | WavLM Base | Base | 94.70 | LS-960 | 4.55 | 10.37 | 2.58 | 94.0 |
 | WavLM Base+ | Base | 94.70 | Mix-94k | 3.50 | 10.85 | 2.63 | 94.3 |
 | HuBERT Large | Large | 316.62 | LL-60k | 5.75 | 10.45 | 2.64 | 94.2 |
 | WavLM Large | Large | 316.62 | Mix-94k | 3.24 | 11.19 | 2.70 | 94.5 |
-
-**Cocktail-party SSLs**
-
-| Model | Class | #Param (M) | Data (h) | DER ↓ | SI-SDRi ↑ | PESQ ↑ | STOI ↑ |
-|-------|-------|-----------:|----------|------:|----------:|-------:|-------:|
+| *Cocktail-party SSLs* | | | | | | | |
 | C-HuBERT Base | Base | 96.00 | LS-960 | 2.77 | 11.08 | 2.63 | 94.0 |
 | C-HuBERT Large | Large | 318.00 | LL-60k | 2.65 | 11.24 | 2.65 | 94.3 |
+| | | | | | | | |
+| **⭐ SepRQ (ours)** | **Base** | **85.68** | **LS-960** | **2.08** | **12.10** | **2.67** | **94.4** |
 
-**⭐ SepRQ (ours)**
-
-| Model | Class | #Param (M) | Data (h) | DER ↓ | SI-SDRi ↑ | PESQ ↑ | STOI ↑ |
-|-------|-------|-----------:|----------|------:|----------:|-------:|-------:|
-| **SepRQ** | Base | **85.68** | LS-960 | **2.08** | **12.10** | **2.67** | **94.4** |
-
-SA-WavLM is not listed: it requires oracle speaker embeddings of the target
-speakers at inference, so it is not directly comparable with the enrollment-free
-upstreams above. Best values in bold.
+Best values in bold.
 
 ### TS-SUPERB
 
