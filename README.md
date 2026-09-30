@@ -62,7 +62,7 @@ on LibriSpeech 960 h mixtures only.
 Speaker diarization (SD), speech separation (SS) and speech enhancement (SE).
 LS = LibriSpeech, LL = Libri-Light, Mix = LL-60k + GigaSpeech-10k + VoxPopuli-24k.
 
-| Model | Class | #Param (M) | Data (h) | DER ↓ | SI-SDRi ↑ | PESQ ↑ | STOI ↑ |
+| Model | Class | #Param (M) | Data (h) | SD<br>DER ↓ | SS<br>SI-SDRi ↑ | SE<br>PESQ ↑ | SE<br>STOI ↑ |
 |-------|-------|-----------:|----------|------:|----------:|-------:|-------:|
 | *Generic SSLs* | | | | | | | |
 | HuBERT Base | Base | 94.68 | LS-960 | 5.88 | 9.36 | 2.58 | 93.9 |
@@ -83,7 +83,7 @@ Best values in bold.
 Target speaker extraction (TSE), personalized speech extraction (PSE),
 personalized VAD (PVAD), target-speaker ASR (TS-ASR).
 
-| Upstream | #Param (M) | TSE<br>SI-SDRi ↑ | TSE<br>STOI ↑ | PSE<br>SI-SDRi ↑ | PSE<br>STOI ↑ | PVAD<br>mAP ↑ | TS-ASR<br>WER ↓ (w/o LM) | TS-ASR<br>WER ↓ (w/ LM) |
+| Upstream | #Param (M) | TSE<br>SI-SDRi ↑ | TSE<br>STOI ↑ | PSE<br>SI-SDRi ↑ | PSE<br>STOI ↑ | PVAD<br>mAP ↑ | TS-ASR&nbsp;WER&nbsp;↓<br>(w/o&nbsp;LM) | TS-ASR&nbsp;WER&nbsp;↓<br>(w/&nbsp;LM) |
 |----------|-----------:|----:|----:|----:|----:|----:|----:|----:|
 | HuBERT Base | 94.68 | 9.64 | 87.30 | 8.61 | 79.92 | 94.60 | 36.86 | 30.52 |
 | WavLM Base | 94.70 | 10.26 | 88.40 | 9.65 | 81.57 | 94.40 | 27.82 | 22.68 |
