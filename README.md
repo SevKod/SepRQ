@@ -83,12 +83,13 @@ Best values in bold.
 Target speaker extraction (TSE), personalized speech extraction (PSE),
 personalized VAD (PVAD), target-speaker ASR (TS-ASR).
 
-| Upstream | TSE SI-SDRi ↑ | TSE STOI ↑ | PSE SI-SDRi ↑ | PSE STOI ↑ | PVAD mAP ↑ | TS-ASR WER ↓ (w/o LM) | TS-ASR WER ↓ (w/ LM) |
-|----------|----:|----:|----:|----:|----:|----:|----:|
-| HuBERT Base | 9.64 | 87.30 | 8.61 | 79.92 | 94.60 | 36.86 | 30.52 |
-| WavLM Base | 10.26 | 88.40 | 9.65 | 81.57 | 94.40 | 27.82 | 22.68 |
-| WavLM Base+ | 10.69 | 89.00 | 10.01 | 82.67 | 95.00 | 24.75 | 20.06 |
-| **SepRQ (ours)** | **12.53** | **91.45** | **11.18** | **85.60** | **96.61** | **22.26** | **16.78** |
+| Upstream | #Param (M) | TSE<br>SI-SDRi ↑ | TSE<br>STOI ↑ | PSE<br>SI-SDRi ↑ | PSE<br>STOI ↑ | PVAD<br>mAP ↑ | TS-ASR<br>WER ↓ (w/o LM) | TS-ASR<br>WER ↓ (w/ LM) |
+|----------|-----------:|----:|----:|----:|----:|----:|----:|----:|
+| HuBERT Base | 94.68 | 9.64 | 87.30 | 8.61 | 79.92 | 94.60 | 36.86 | 30.52 |
+| WavLM Base | 94.70 | 10.26 | 88.40 | 9.65 | 81.57 | 94.40 | 27.82 | 22.68 |
+| WavLM Base+ | 94.70 | 10.69 | 89.00 | 10.01 | 82.67 | 95.00 | 24.75 | 20.06 |
+| | | | | | | | | |
+| **⭐ SepRQ (ours)** | **85.68** | **12.53** | **91.45** | **11.18** | **85.60** | **96.61** | **22.26** | **16.78** |
 
 ### Out-of-domain
 
