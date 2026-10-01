@@ -127,8 +127,6 @@ LS = LibriSpeech, LL = Libri-Light, Mix = LL-60k + GigaSpeech-10k + VoxPopuli-24
   </tbody>
 </table>
 
-Best values in bold.
-
 ### TS-SUPERB
 
 Target speaker extraction (TSE), personalized speech extraction (PSE),
