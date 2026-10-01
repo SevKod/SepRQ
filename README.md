@@ -62,19 +62,38 @@ on LibriSpeech 960 h mixtures only.
 Speaker diarization (SD), speech separation (SS) and speech enhancement (SE).
 LS = LibriSpeech, LL = Libri-Light, Mix = LL-60k + GigaSpeech-10k + VoxPopuli-24k.
 
-| Model | Class | #Param (M) | Data (h) | SD<br>DER ↓ | SS<br>SI-SDRi ↑ | SE<br>PESQ ↑ | SE<br>STOI ↑ |
-|-------|-------|-----------:|----------|------:|----------:|-------:|-------:|
-| *Generic SSLs* | | | | | | | |
-| HuBERT Base | Base | 94.68 | LS-960 | 5.88 | 9.36 | 2.58 | 93.9 |
-| WavLM Base | Base | 94.70 | LS-960 | 4.55 | 10.37 | 2.58 | 94.0 |
-| WavLM Base+ | Base | 94.70 | Mix-94k | 3.50 | 10.85 | 2.63 | 94.3 |
-| HuBERT Large | Large | 316.62 | LL-60k | 5.75 | 10.45 | 2.64 | 94.2 |
-| WavLM Large | Large | 316.62 | Mix-94k | 3.24 | 11.19 | 2.70 | 94.5 |
-| *Cocktail-party SSLs* | | | | | | | |
-| C-HuBERT Base | Base | 96.00 | LS-960 | 2.77 | 11.08 | 2.63 | 94.0 |
-| C-HuBERT Large | Large | 318.00 | LL-60k | 2.65 | 11.24 | 2.65 | 94.3 |
-| | | | | | | | |
-| **⭐ SepRQ (ours)** | **Base** | **85.68** | **LS-960** | **2.08** | **12.10** | **2.67** | **94.4** |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Model</th>
+      <th rowspan="2">Class</th>
+      <th rowspan="2">#Param (M)</th>
+      <th rowspan="2">Data (h)</th>
+      <th>SD</th>
+      <th>SS</th>
+      <th colspan="2">SE</th>
+    </tr>
+    <tr>
+      <th>DER ↓</th>
+      <th>SI-SDRi ↑</th>
+      <th>PESQ ↑</th>
+      <th>STOI ↑</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td colspan="8"><i>Generic SSLs</i></td></tr>
+    <tr><td>HuBERT Base</td><td>Base</td><td>94.68</td><td>LS-960</td><td>5.88</td><td>9.36</td><td>2.58</td><td>93.9</td></tr>
+    <tr><td>WavLM Base</td><td>Base</td><td>94.70</td><td>LS-960</td><td>4.55</td><td>10.37</td><td>2.58</td><td>94.0</td></tr>
+    <tr><td>WavLM Base+</td><td>Base</td><td>94.70</td><td>Mix-94k</td><td>3.50</td><td>10.85</td><td>2.63</td><td>94.3</td></tr>
+    <tr><td>HuBERT Large</td><td>Large</td><td>316.62</td><td>LL-60k</td><td>5.75</td><td>10.45</td><td>2.64</td><td>94.2</td></tr>
+    <tr><td>WavLM Large</td><td>Large</td><td>316.62</td><td>Mix-94k</td><td>3.24</td><td>11.19</td><td>2.70</td><td>94.5</td></tr>
+    <tr><td colspan="8"><i>Cocktail-party SSLs</i></td></tr>
+    <tr><td>C-HuBERT Base</td><td>Base</td><td>96.00</td><td>LS-960</td><td>2.77</td><td>11.08</td><td>2.63</td><td>94.0</td></tr>
+    <tr><td>C-HuBERT Large</td><td>Large</td><td>318.00</td><td>LL-60k</td><td>2.65</td><td>11.24</td><td>2.65</td><td>94.3</td></tr>
+    <tr><td colspan="8"></td></tr>
+    <tr><td><b>⭐ SepRQ (ours)</b></td><td><b>Base</b></td><td><b>85.68</b></td><td><b>LS-960</b></td><td><b>2.08</b></td><td><b>12.10</b></td><td><b>2.67</b></td><td><b>94.4</b></td></tr>
+  </tbody>
+</table>
 
 Best values in bold.
 
@@ -96,7 +115,7 @@ personalized VAD (PVAD), target-speaker ASR (TS-ASR).
     <tr>
       <th>SI-SDRi ↑</th><th>STOI ↑</th>
       <th>SI-SDRi ↑</th><th>STOI ↑</th>
-      <th>WER ↓ (w/o LM)</th><th>WER ↓ (w/ LM)</th>
+      <th>WER ↓<br>(w/o LM)</th><th>WER ↓<br>(w/ LM)</th>
     </tr>
   </thead>
   <tbody>
