@@ -1,5 +1,23 @@
 # SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
+<p align="center">
+  <a href="https://www.univ-tln.fr/" title="Université de Toulon"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/univ-toulon.png" height="34" alt="Université de Toulon"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.lis-lab.fr/" title="LIS – Laboratoire d'Informatique et Systèmes"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/lis.png" height="26" alt="LIS"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.cnrs.fr/" title="CNRS"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/cnrs.png" height="40" alt="CNRS"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.centralesupelec.fr/ills" title="ILLS – International Laboratory on Learning Systems"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/ills.png" height="40" alt="ILLS"></a>
+  &nbsp;&nbsp;
+  <a href="https://www.pyannote.ai/" title="pyannoteAI"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/pyannoteai-white.png" height="26" alt="pyannoteAI"></a>
+</p>
+
+<p align="center">
+  🌐 <a href="https://sevkod.github.io/SepRQ/"><b>Website</b></a> &nbsp;·&nbsp;
+  🤗 <a href="https://huggingface.co/SevKod/SepRQ"><b>Hugging Face</b></a> &nbsp;·&nbsp;
+  💻 <a href="https://github.com/SevKod/SepRQ"><b>GitHub</b></a>
+</p>
+
 🗣️ This framework is intended to provide an easy, ready-to-use and strong
 **SepRQ** feature extractor for 🍸 cocktail-party 🍸 and multi-talker
 conversational scenarios 🔀 👥, while also facilitating the use of other feature
@@ -79,13 +97,13 @@ resolutions.*
 
 - **Pseudo source separation** — each separation head predicts the frozen
   BEST-RQ codewords of one clean speaker from the mixture. Utterance-level PIT
-  resolves speaker order, and no offline k-means is needed.
+  resolves speaker order.
 - **Mask-free** — masking can hide exactly the content needed to disentangle a
   mixture. SepRQ predicts units over the full utterance, which uses every frame
   for training.
 - **Multi-resolution** — a separation objective follows every two Conformer
   layers, with frame folding going from 20 ms to 320 ms and one codebook per
-  scale. Inference runs at 50 Hz with the encoder only.
+  scale.
 
 ## 👥 Results — state of the art on multi-speaker benchmarks
 
