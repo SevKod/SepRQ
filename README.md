@@ -1,16 +1,8 @@
-# SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
-
 <p align="center">
-  <a href="https://www.univ-tln.fr/" title="Université de Toulon"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/univ-toulon.png" height="34" alt="Université de Toulon"></a>
-  &nbsp;&nbsp;
-  <a href="https://www.lis-lab.fr/" title="LIS – Laboratoire d'Informatique et Systèmes"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/lis.png" height="26" alt="LIS"></a>
-  &nbsp;&nbsp;
-  <a href="https://www.cnrs.fr/" title="CNRS"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/cnrs.png" height="40" alt="CNRS"></a>
-  &nbsp;&nbsp;
-  <a href="https://www.centralesupelec.fr/ills" title="ILLS – International Laboratory on Learning Systems"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/ills.png" height="40" alt="ILLS"></a>
-  &nbsp;&nbsp;
-  <a href="https://www.pyannote.ai/" title="pyannoteAI"><img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/logos/pyannoteai-white.png" height="26" alt="pyannoteAI"></a>
+  <img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/seprq-logo-card.png" alt="SepRQ" width="760">
 </p>
+
+# SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
 <p align="center">
   🌐 <a href="https://sevkod.github.io/SepRQ/"><b>Website</b></a> &nbsp;·&nbsp;
