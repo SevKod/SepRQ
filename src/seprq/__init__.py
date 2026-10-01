@@ -32,6 +32,7 @@ TORCHAUDIO_BUNDLES = {
     "HuBERT_BASE": "HUBERT_BASE",
     "WavLM_BASE": "WAVLM_BASE",
     "WavLM_BASE_PLUS": "WAVLM_BASE_PLUS",
+    "WavLM_LARGE": "WAVLM_LARGE",  # 24 layers, 1024-dim
 }
 
 
