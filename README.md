@@ -91,7 +91,7 @@ LS = LibriSpeech, LL = Libri-Light, Mix = LL-60k + GigaSpeech-10k + VoxPopuli-24
     <tr><td>C-HuBERT Base</td><td>Base</td><td>96.00</td><td>LS-960</td><td>2.77</td><td>11.08</td><td>2.63</td><td>94.0</td></tr>
     <tr><td>C-HuBERT Large</td><td>Large</td><td>318.00</td><td>LL-60k</td><td>2.65</td><td>11.24</td><td>2.65</td><td>94.3</td></tr>
     <tr><td colspan="8"></td></tr>
-    <tr><td><b>⭐ SepRQ (ours)</b></td><td><b>Base</b></td><td><b>85.68</b></td><td><b>LS-960</b></td><td><b>2.08</b></td><td><b>12.10</b></td><td><b>2.67</b></td><td><b>94.4</b></td></tr>
+    <tr><td><b>⭐ SepRQ ⭐</b></td><td><b>Base</b></td><td><b>85.68</b></td><td><b>LS-960</b></td><td><b>2.08</b></td><td><b>12.10</b></td><td><b>2.67</b></td><td><b>94.4</b></td></tr>
   </tbody>
 </table>
 
@@ -128,7 +128,7 @@ personalized VAD (PVAD), target-speaker ASR (TS-ASR).
     <tr><td>HuBERT Base</td><td>94.68</td><td>9.64</td><td>87.30</td><td>8.61</td><td>79.92</td><td>94.60</td><td>36.86</td><td>30.52</td></tr>
     <tr><td>WavLM Base</td><td>94.70</td><td>10.26</td><td>88.40</td><td>9.65</td><td>81.57</td><td>94.40</td><td>27.82</td><td>22.68</td></tr>
     <tr><td>WavLM Base+</td><td>94.70</td><td>10.69</td><td>89.00</td><td>10.01</td><td>82.67</td><td>95.00</td><td>24.75</td><td>20.06</td></tr>
-    <tr><td><b>⭐ SepRQ (ours)</b></td><td><b>85.68</b></td><td><b>12.53</b></td><td><b>91.45</b></td><td><b>11.18</b></td><td><b>85.60</b></td><td><b>96.61</b></td><td><b>22.26</b></td><td><b>16.78</b></td></tr>
+    <tr><td><b>⭐ SepRQ ⭐</b></td><td><b>85.68</b></td><td><b>12.53</b></td><td><b>91.45</b></td><td><b>11.18</b></td><td><b>85.60</b></td><td><b>96.61</b></td><td><b>22.26</b></td><td><b>16.78</b></td></tr>
   </tbody>
 </table>
 
@@ -142,5 +142,5 @@ EEND diarization on DIHARD 3 and ConvTasNet separation on WSJ0-2/3mix.
 | HuBERT Base | 4.3 / 8.6 / 4.7 | 17.7 | 17.0 | 12.7 |
 | WavLM Base | 4.4 / 8.3 / 4.5 | 17.3 | 17.5 | 13.2 |
 | WavLM Base+ | 4.8 / 7.6 / 4.2 | 16.6 | 18.2 | 13.4 |
-| **SepRQ (2 src)** | 4.9 / 7.4 / 3.8 | **16.1** | **19.8** | 14.5 |
-| **SepRQ (3 src)** | 5.0 / 7.3 / 4.1 | 16.4 | 19.4 | **17.2** |
+| **⭐ SepRQ (2 src) ⭐** | 4.9 / 7.4 / 3.8 | **16.1** | **19.8** | 14.5 |
+| **⭐ SepRQ (3 src) ⭐** | 5.0 / 7.3 / 4.1 | 16.4 | 19.4 | **17.2** |
