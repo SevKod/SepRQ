@@ -15,15 +15,17 @@ from huggingface_hub import hf_hub_download
 SAMPLE_RATE = 16000
 
 __all__ = ["SepRQEncoder", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 REPO_ID = "SevKod/SepRQ"
 
-# SepRQ / BEST-RQ models hosted on the Hub:
-#   name -> (subfolder in the repo, normalize-checkpoint filename). 576-dim @ 50 Hz.
+# SepRQ / BEST-RQ models hosted on the Hub. 576-dim @ 50 Hz.
+#   name -> (subfolder in the repo, normalization). The normalization is either a
+#   normalize-checkpoint filename (global running mean/var) or "sentence" for
+#   per-utterance normalization (no stats file needed).
 MODELS = {
     "SepRQ": ("SepRQ/2_streams", "normalize.ckpt"),
-    "BestRQ_50Hz": ("BestRQ_50Hz", "normalize_running_stats.ckpt"),
+    "BestRQ_50Hz": ("BestRQ_50Hz", "sentence"),
 }
 
 # SepRQ comes in variants trained to separate N speakers -> repo subfolder.
@@ -67,13 +69,12 @@ class SepRQEncoder(torch.nn.Module):
                 raise ValueError(
                     f"streams must be one of {sorted(SEPRQ_STREAMS)}, got {streams!r}"
                 )
-            subdir, norm_name = SEPRQ_STREAMS[streams], "normalize.ckpt"
+            subdir, norm_spec = SEPRQ_STREAMS[streams], "normalize.ckpt"
         else:
-            subdir, norm_name = MODELS[model]  # BestRQ_50Hz (streams is ignored)
+            subdir, norm_spec = MODELS[model]  # BestRQ_50Hz (streams is ignored)
         # Download ONLY the files needed for this model.
         yaml_path = hf_hub_download(repo_id, "seprq_inference.yaml")
         model_ckpt = hf_hub_download(repo_id, f"{subdir}/model.ckpt")
-        norm_ckpt = hf_hub_download(repo_id, f"{subdir}/{norm_name}")
 
         with open(yaml_path) as f:
             hp = load_hyperpyyaml(f)
@@ -86,13 +87,23 @@ class SepRQEncoder(torch.nn.Module):
         torch.nn.ModuleList([self.cnn, self.wrapper]).load_state_dict(
             torch.load(model_ckpt, map_location="cpu")
         )
-        # Global norm stats, kept as buffers so they follow .to()/.cuda() and are
-        # saved/restored with the module's state_dict.
-        norm = torch.load(norm_ckpt, map_location="cpu")
-        self.register_buffer("running_mean", norm["running_mean"].float())
-        self.register_buffer(
-            "running_std", torch.sqrt(norm["running_var"].float() + 1e-5)
-        )
+
+        # Normalization: either global running stats (from a ckpt) or sentence-level.
+        if norm_spec == "sentence":
+            from speechbrain.processing.features import InputNormalization
+
+            self.norm_mode = "sentence"
+            self.normalizer = InputNormalization(norm_type="sentence")
+        else:
+            self.norm_mode = "global"
+            norm = torch.load(
+                hf_hub_download(repo_id, f"{subdir}/{norm_spec}"), map_location="cpu"
+            )
+            # kept as buffers so they follow .to()/.cuda() and are saved in state_dict.
+            self.register_buffer("running_mean", norm["running_mean"].float())
+            self.register_buffer(
+                "running_std", torch.sqrt(norm["running_var"].float() + 1e-5)
+            )
 
     def _init_torchaudio(self, model):
         import torchaudio
@@ -166,7 +177,10 @@ class SepRQEncoder(torch.nn.Module):
             wav_lens = torch.as_tensor(wav_lens, dtype=torch.float32, device=device)
 
         feats = self.melspec(x)                            # Fbank [B, T, 80]
-        feats = (feats - self.running_mean) / self.running_std   # global norm
+        if self.norm_mode == "sentence":
+            feats = self.normalizer(feats, wav_lens)       # per-utterance norm
+        else:
+            feats = (feats - self.running_mean) / self.running_std   # global norm
 
         outs = []
 
