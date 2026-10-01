@@ -174,3 +174,11 @@ EEND diarization on DIHARD 3 and ConvTasNet separation on WSJ0-2/3mix.
     <tr><td><b>⭐ SepRQ (3 src) ⭐</b></td><td><b>5.0 / 7.3 / 4.1</b></td><td><b>16.4</b></td><td><b>19.4</b></td><td><b>17.2</b></td></tr>
   </tbody>
 </table>
+
+## Citation
+
+> 🚧 **TODO** — BibTeX coming soon.
+
+```bibtex
+% TODO: citation to be added
+```
