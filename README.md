@@ -2,12 +2,13 @@
 
 🗣️ SSL speech feature extractors for **SepRQ**, tailor-made for 🍸
 cocktail-party 🍸 speech processing 🔀 👥. Pulled from 🤗
-[SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ) and ready to use; returns the
+[SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); returns the
 12 Conformer layer features. Requires **PyTorch** and upstream
 `speechbrain>=1.0.3`; runs on CPU or GPU.
 
 The main purpose of this framework is to propose a range of SSL models
-tailor-made for cocktail-party and multi-talker conversational scenarios.
+tailor-made for cocktail-party and multi-talker conversational scenarios and
+ready to use.
 
 ---
 
