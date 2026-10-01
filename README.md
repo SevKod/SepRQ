@@ -115,7 +115,7 @@ personalized VAD (PVAD), target-speaker ASR (TS-ASR).
     <tr>
       <th>SI-SDRi ↑</th><th>STOI ↑</th>
       <th>SI-SDRi ↑</th><th>STOI ↑</th>
-      <th>WER ↓<br>(w/o LM)</th><th>WER ↓<br>(w/ LM)</th>
+      <th>WER ↓ (w/o LM)</th><th>WER ↓<br>(w/ LM)</th>
     </tr>
   </thead>
   <tbody>
