@@ -28,23 +28,36 @@ pip install seprq
 import torch
 from seprq import SepRQEncoder
 
-encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz"
+encoder = SepRQEncoder("SepRQ")            # see "Available models" below
 
 # ❄️ frozen feature extraction
 with torch.no_grad():
-    layers = encoder("utterance.wav")      # list of 12 tensors, each [B, T, 576]
+    layers = encoder("utterance.wav")      # list of 12 tensors, each [B, T, D]
 
 # 🔥 fine-tuning (plug into your model)
 encoder.train()
 layers = encoder(wavs, wav_lens)           # wavs: [B, num_samples]
 ```
 
-`forward` returns the **12 Conformer layer outputs** (each `[batch, T, 576]`). It
-accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz) or
-a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
-`[batch, channel, num_samples]`; pass `wav_lens` (`[batch]`) for padded batches.
+`forward` returns the **12 Transformer layer outputs** (each `[batch, T, D]`,
+D = 576 for SepRQ/BEST-RQ, 768 for HuBERT/WavLM). It accepts a **file path** (any
+format/rate — decoded, mono, resampled to 16 kHz) or a **waveform tensor**
+`[num_samples]`, `[batch, num_samples]` or `[batch, channel, num_samples]`; pass
+`wav_lens` (`[batch]`) for padded batches.
 
-The repo is private, so authenticate once: `huggingface-cli login` (or set `HF_TOKEN`).
+**Available models**
+
+| name | source | dim |
+|------|--------|-----|
+| `SepRQ` | 🤗 SevKod/SepRQ | 576 |
+| `BestRQ_50Hz` | 🤗 SevKod/SepRQ | 576 |
+| `HuBERT_BASE` | torchaudio pipelines (torch hub) | 768 |
+| `WavLM_BASE` | torchaudio pipelines (torch hub) | 768 |
+| `WavLM_BASE_PLUS` | torchaudio pipelines (torch hub) | 768 |
+
+The SepRQ / BEST-RQ weights come from the Hub (private — authenticate once with
+`huggingface-cli login` or `HF_TOKEN`); the HuBERT / WavLM baselines are fetched
+from the torchaudio pipelines, nothing extra to host.
 
 ## 🔀 SepRQ — separation as the pretext task
 
