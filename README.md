@@ -22,7 +22,7 @@ ready to use.
 pip install seprq
 ```
 
-## Use
+## Usage (frozen ❄️ or fine-tuned 🔥)
 
 ```python
 import torch
@@ -30,14 +30,13 @@ from seprq import SepRQEncoder
 
 encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz"
 
-# --- frozen feature extraction ---
+# ❄️ frozen feature extraction
 with torch.no_grad():
     layers = encoder("utterance.wav")      # list of 12 tensors, each [B, T, 576]
 
-# --- fine-tuning (plug into your model) ---
+# 🔥 fine-tuning (plug into your model)
 encoder.train()
 layers = encoder(wavs, wav_lens)           # wavs: [B, num_samples]
-loss = my_head(layers[-1]); loss.backward()
 ```
 
 `forward` returns the **12 Conformer layer outputs** (each `[batch, T, 576]`). It
