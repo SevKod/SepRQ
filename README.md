@@ -31,7 +31,7 @@ from seprq import SepRQEncoder
 encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz", "WavLM_BASE", ... (see "Available models" below)
 
 # ❄️ frozen feature extraction
-encoder.eval().requires_grad_(False)
+encoder.requires_grad_(False).eval()
 layers = encoder(wavs)                      # wavs: [B, num_samples]
 
 # 🔥 fine-tuning (plug into your model)
