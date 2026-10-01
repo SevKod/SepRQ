@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seprq"
-version = "0.2.0"
+version = "0.3.0"
 description = "🗣️ SSL speech feature extractors for SepRQ, tailor-made for 🍸 cocktail-party 🍸 speech processing 🔀 👥 — pulled from 🤗 SevKod/SepRQ and ready to use; returns the 12 Conformer layer features."
 readme = "README.md"
 requires-python = ">=3.9"

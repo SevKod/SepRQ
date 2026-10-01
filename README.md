@@ -43,6 +43,13 @@ It accepts a **file path** (any format/rate — decoded, mono, resampled to 16 k
 or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
 `[batch, channel, num_samples]`; pass `wav_lens` (`[batch]`) for padded batches.
 
+SepRQ ships in variants trained to separate a different number of speakers —
+select one with `streams` (default `2`):
+
+```python
+encoder = SepRQEncoder("SepRQ", streams=3)   # 3-speaker variant
+```
+
 **Available models**
 
 | name | layers | dim |
