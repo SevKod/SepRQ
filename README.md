@@ -29,7 +29,7 @@ pip install seprq
 import torch
 from seprq import SepRQEncoder
 
-encoder = SepRQEncoder("SepRQ")            # see "Available models" below
+encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz", "WavLM_BASE", ... (see "Available models" below)
 
 # ❄️ frozen feature extraction
 with torch.no_grad():
