@@ -136,11 +136,31 @@ personalized VAD (PVAD), target-speaker ASR (TS-ASR).
 
 EEND diarization on DIHARD 3 and ConvTasNet separation on WSJ0-2/3mix.
 
-| Upstream | DIHARD 3 FA / MD / SC | DER ↓ | 2mix SDRi ↑ | 3mix SDRi ↑ |
-|----------|-----------------------|------:|------------:|------------:|
-| w/o SSL | 6.1 / 8.1 / 4.9 | 19.3 | 16.4 | 13.1 |
-| HuBERT Base | 4.3 / 8.6 / 4.7 | 17.7 | 17.0 | 12.7 |
-| WavLM Base | 4.4 / 8.3 / 4.5 | 17.3 | 17.5 | 13.2 |
-| WavLM Base+ | 4.8 / 7.6 / 4.2 | 16.6 | 18.2 | 13.4 |
-| **⭐ SepRQ (2 src) ⭐** | 4.9 / 7.4 / 3.8 | **16.1** | **19.8** | 14.5 |
-| **⭐ SepRQ (3 src) ⭐** | 5.0 / 7.3 / 4.1 | 16.4 | 19.4 | **17.2** |
+<table>
+  <thead>
+    <tr>
+      <th rowspan="3">Upstream</th>
+      <th colspan="2">Diarization</th>
+      <th colspan="2">Separation</th>
+    </tr>
+    <tr>
+      <th colspan="2">DIHARD 3</th>
+      <th>WSJ0-2mix</th>
+      <th>WSJ0-3mix</th>
+    </tr>
+    <tr>
+      <th>FA / MD / SC ↓</th>
+      <th>DER ↓</th>
+      <th>SDRi ↑</th>
+      <th>SDRi ↑</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>w/o SSL features</td><td>6.1 / 8.1 / 4.9</td><td>19.3</td><td>16.4</td><td>13.1</td></tr>
+    <tr><td>HuBERT Base</td><td>4.3 / 8.6 / 4.7</td><td>17.7</td><td>17.0</td><td>12.7</td></tr>
+    <tr><td>WavLM Base</td><td>4.4 / 8.3 / 4.5</td><td>17.3</td><td>17.5</td><td>13.2</td></tr>
+    <tr><td>WavLM Base+</td><td>4.8 / 7.6 / 4.2</td><td>16.6</td><td>18.2</td><td>13.4</td></tr>
+    <tr><td><b>⭐ SepRQ (2 src) ⭐</b></td><td><b>4.9 / 7.4 / 3.8</b></td><td><b>16.1</b></td><td><b>19.8</b></td><td><b>14.5</b></td></tr>
+    <tr><td><b>⭐ SepRQ (3 src) ⭐</b></td><td><b>5.0 / 7.3 / 4.1</b></td><td><b>16.4</b></td><td><b>19.4</b></td><td><b>17.2</b></td></tr>
+  </tbody>
+</table>
