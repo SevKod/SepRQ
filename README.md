@@ -2,6 +2,14 @@
   <img src="https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/seprq-logo-card.png" alt="SepRQ" width="760">
 </p>
 
+<p align="center">
+  <a href="https://www.univ-tln.fr/">Université de Toulon</a> ·
+  <a href="https://www.lis-lab.fr/">LIS</a> ·
+  <a href="https://www.cnrs.fr/">CNRS</a> ·
+  <a href="https://www.centralesupelec.fr/ills">ILLS</a> ·
+  <a href="https://www.pyannote.ai/">pyannoteAI</a>
+</p>
+
 # SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
 <p align="center">
