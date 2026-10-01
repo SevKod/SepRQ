@@ -15,7 +15,7 @@ from huggingface_hub import hf_hub_download
 SAMPLE_RATE = 16000
 
 __all__ = ["SepRQEncoder", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 REPO_ID = "SevKod/SepRQ"
 
@@ -25,6 +25,9 @@ MODELS = {
     "SepRQ": ("SepRQ/2_streams", "normalize.ckpt"),
     "BestRQ_50Hz": ("BestRQ_50Hz", "normalize_running_stats.ckpt"),
 }
+
+# SepRQ comes in variants trained to separate N speakers -> repo subfolder.
+SEPRQ_STREAMS = {2: "SepRQ/2_streams", 3: "SepRQ/3_streams"}
 
 # Generic SSL baselines fetched from torchaudio.pipelines (torch hub). 768-dim @ 50 Hz.
 #   name -> torchaudio.pipelines bundle attribute.
@@ -37,14 +40,14 @@ TORCHAUDIO_BUNDLES = {
 
 
 class SepRQEncoder(torch.nn.Module):
-    def __init__(self, model="SepRQ", repo_id=REPO_ID, device=None):
+    def __init__(self, model="SepRQ", streams=2, repo_id=REPO_ID, device=None):
         super().__init__()
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.model_name = model
 
         if model in MODELS:
             self.kind = "seprq"
-            self._init_seprq(model, repo_id)
+            self._init_seprq(model, streams, repo_id)
         elif model in TORCHAUDIO_BUNDLES:
             self.kind = "torchaudio"
             self._init_torchaudio(model)
@@ -58,8 +61,15 @@ class SepRQEncoder(torch.nn.Module):
         self.eval()  # default to eval; call .train() to fine-tune
 
     # ------------------------------------------------------------------ loaders
-    def _init_seprq(self, model, repo_id):
-        subdir, norm_name = MODELS[model]
+    def _init_seprq(self, model, streams, repo_id):
+        if model == "SepRQ":
+            if streams not in SEPRQ_STREAMS:
+                raise ValueError(
+                    f"streams must be one of {sorted(SEPRQ_STREAMS)}, got {streams!r}"
+                )
+            subdir, norm_name = SEPRQ_STREAMS[streams], "normalize.ckpt"
+        else:
+            subdir, norm_name = MODELS[model]  # BestRQ_50Hz (streams is ignored)
         # Download ONLY the files needed for this model.
         yaml_path = hf_hub_download(repo_id, "seprq_inference.yaml")
         model_ckpt = hf_hub_download(repo_id, f"{subdir}/model.ckpt")
