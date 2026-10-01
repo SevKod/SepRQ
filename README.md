@@ -120,8 +120,8 @@ personalized VAD (PVAD), target-speaker ASR (TS-ASR).
       <th colspan="2">WER ↓</th>
     </tr>
     <tr>
-      <th>(w/o LM)</th>
-      <th>(w/ LM)</th>
+      <th style="white-space: nowrap;">(w/o LM)</th>
+      <th style="white-space: nowrap;">(w/ LM)</th>
     </tr>
   </thead>
   <tbody>
