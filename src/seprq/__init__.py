@@ -89,6 +89,8 @@ class SepRQEncoder(torch.nn.Module):
 
         bundle = getattr(torchaudio.pipelines, TORCHAUDIO_BUNDLES[model])
         self.ssl = bundle.get_model()                       # downloaded from torch hub
+        # torchaudio's WavLM attention does not accept a padding mask; HuBERT does.
+        self._supports_mask = not model.startswith("WavLM")
 
     # ------------------------------------------------------------------ helpers
     @staticmethod
@@ -104,9 +106,32 @@ class SepRQEncoder(torch.nn.Module):
             wav = torchaudio.functional.resample(wav, sr, SAMPLE_RATE)
         return wav
 
+    def _coerce_1d(self, a):
+        """One item (path or array/tensor) -> mono 1-D float32 waveform."""
+        if isinstance(a, (str, bytes)) or hasattr(a, "__fspath__"):
+            return self._load(a)
+        t = torch.as_tensor(a, dtype=torch.float32)
+        if t.dim() == 2:                   # [channel, num_samples] -> mono
+            t = t.mean(0)
+        elif t.dim() != 1:
+            raise ValueError("each waveform in the list must be 1-D or [channel, num_samples]")
+        return t
+
     def _as_batch(self, audio):
-        """Accept a path or a waveform of shape [N], [B, N] or [B, C, N]
-        and return a float32 tensor [B, N] on the module's device."""
+        """Return (x, wav_lens) with x a float32 tensor [B, N] on the module's
+        device. A list/tuple of variable-length waveforms (or paths) is padded to
+        the longest one, with wav_lens set accordingly; otherwise wav_lens is None.
+        Accepts a path, or a tensor [N], [B, N] or [B, C, N]."""
+        dev = self._device()
+        if isinstance(audio, (list, tuple)):
+            waves = [self._coerce_1d(a) for a in audio]
+            lengths = torch.tensor([w.shape[-1] for w in waves], dtype=torch.float32)
+            maxlen = int(lengths.max())
+            x = torch.stack([
+                torch.nn.functional.pad(w, (0, maxlen - w.shape[-1])) for w in waves
+            ])
+            return x.to(dev), (lengths / maxlen).to(dev)
+
         if isinstance(audio, (str, bytes)) or hasattr(audio, "__fspath__"):
             audio = self._load(audio)
         x = torch.as_tensor(audio, dtype=torch.float32)
@@ -116,10 +141,10 @@ class SepRQEncoder(torch.nn.Module):
             x = x.mean(1)
         elif x.dim() != 2:                 # expect [B, num_samples] otherwise
             raise ValueError(
-                "audio must be a path or a tensor shaped [num_samples], "
-                "[batch, num_samples] or [batch, channel, num_samples]"
+                "audio must be a path, a list of waveforms/paths, or a tensor "
+                "shaped [num_samples], [batch, num_samples] or [batch, channel, num_samples]"
             )
-        return x.to(self._device())
+        return x.to(dev), None
 
     def _device(self):
         return next(self.parameters()).device
@@ -129,25 +154,32 @@ class SepRQEncoder(torch.nn.Module):
         """Run the encoder and return the 12 Transformer layer outputs as a list,
         each ``[batch, T, D]`` (D = 576 for SepRQ/BEST-RQ, 768 for HuBERT/WavLM).
 
-        audio : a path to an audio file, or a waveform tensor/array shaped
+        audio : a path to an audio file, a waveform tensor/array shaped
             ``[num_samples]``, ``[batch, num_samples]`` or
-            ``[batch, channel, num_samples]`` (multi-channel is averaged to mono).
+            ``[batch, channel, num_samples]`` (multi-channel is averaged to mono),
+            or a **list of variable-length waveforms/paths** -- these are padded
+            to the longest and ``wav_lens`` is computed automatically.
             Tensors are assumed to be 16 kHz.
         wav_lens : optional ``[batch]`` of relative lengths (1.0 = full length),
-            used to build the padding mask for batches of uneven length.
+            used to build the padding mask for batches of uneven length. Overrides
+            the value inferred from a list input.
 
         Gradients flow (no ``torch.no_grad``): put the module in ``train()`` mode
         to fine-tune it or plug it into a larger model."""
-        x = self._as_batch(audio)
+        x, auto_wav_lens = self._as_batch(audio)
         device = x.device
+        if wav_lens is None:
+            wav_lens = auto_wav_lens
 
         if self.kind == "torchaudio":
             lengths = None
-            if wav_lens is not None:
+            if wav_lens is not None and self._supports_mask:
                 wav_lens = torch.as_tensor(wav_lens, dtype=torch.float32, device=device)
                 lengths = (wav_lens * x.shape[1]).round().long()
+            # NOTE: torchaudio WavLM ignores padding masks, so for WavLM a padded
+            # batch attends over the padding -- prefer equal-length batches there.
             feats, _ = self.ssl.extract_features(x, lengths)   # list of layer outputs
-            return feats                                       # [B, T, 768] x 12
+            return feats                                       # [B, T, D] per layer
 
         # --- SepRQ / BEST-RQ path ---
         if wav_lens is None:
