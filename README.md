@@ -1,9 +1,10 @@
 # SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
-🗣️ This framework is intended to provide an easy and ready-to-use **SepRQ**
-feature extractor for 🍸 cocktail-party 🍸 and multi-talker conversational
-scenarios 🔀 👥, while also facilitating the use of other feature extractors
-from the literature.
+🗣️ This framework is intended to provide an easy, ready-to-use and strong
+**SepRQ** feature extractor for 🍸 cocktail-party 🍸 and multi-talker
+conversational scenarios 🔀 👥, while also facilitating the use of other feature
+extractors from the literature. We also release a **BEST-RQ** model trained at
+50 Hz as a valuable contribution to the community.
 
 SepRQ features are pulled from 🤗
 [SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); a call returns the 12
@@ -48,14 +49,14 @@ resampled to 16 kHz) or a **waveform tensor** `[num_samples]`,
 
 **Available models**
 
-| name | source | layers | dim |
-|------|--------|-------:|----:|
-| `SepRQ` | 🤗 SevKod/SepRQ | 12 | 576 |
-| `BestRQ_50Hz` | 🤗 SevKod/SepRQ | 12 | 576 |
-| `HuBERT_BASE` | torchaudio pipelines (torch hub) | 12 | 768 |
-| `WavLM_BASE` | torchaudio pipelines (torch hub) | 12 | 768 |
-| `WavLM_BASE_PLUS` | torchaudio pipelines (torch hub) | 12 | 768 |
-| `WavLM_LARGE` | torchaudio pipelines (torch hub) | 24 | 1024 |
+| name | layers | dim |
+|------|-------:|----:|
+| ⭐ `SepRQ` ⭐ | 12 | 576 |
+| `BestRQ_50Hz` | 12 | 576 |
+| `HuBERT_BASE` | 12 | 768 |
+| `WavLM_BASE` | 12 | 768 |
+| `WavLM_BASE_PLUS` | 12 | 768 |
+| `WavLM_LARGE` | 24 | 1024 |
 
 The SepRQ / BEST-RQ weights come from the Hub (private — authenticate once with
 `huggingface-cli login` or `HF_TOKEN`); the HuBERT / WavLM baselines are fetched
