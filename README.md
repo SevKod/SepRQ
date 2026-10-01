@@ -24,7 +24,7 @@ extractors from the literature. We also release a **BEST-RQ** model trained at
 
 SepRQ features are pulled from 🤗
 [SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); a call returns the 12
-Conformer layer features. Requires **PyTorch** and upstream `speechbrain>=1.0.3`;
+Conformer layer features usable for training or cocktail-party representation analysis. Requires **PyTorch** and upstream `speechbrain>=1.0.3`;
 runs on CPU or GPU.
 
 ---
@@ -57,7 +57,7 @@ features = encoder(wavs)
 
 It accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz)
 or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
-`[batch, channel, num_samples]`; pass `wav_lens` (`[batch]`) for padded batches.
+`[batch, channel, num_samples]`.
 
 SepRQ ships in variants trained to separate a different number of speakers —
 select one with `streams` (default `2`):
