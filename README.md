@@ -1,14 +1,14 @@
 # SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
 
-🗣️ SSL speech feature extractors for **SepRQ**, tailor-made for 🍸
-cocktail-party 🍸 speech processing 🔀 👥. Pulled from 🤗
-[SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); returns the
-12 Conformer layer features. Requires **PyTorch** and upstream
-`speechbrain>=1.0.3`; runs on CPU or GPU.
+🗣️ This framework is intended to provide an easy and ready-to-use **SepRQ**
+feature extractor for 🍸 cocktail-party 🍸 and multi-talker conversational
+scenarios 🔀 👥, while also facilitating the use of other feature extractors
+from the literature.
 
-The main purpose of this framework is to propose a range of SSL models
-tailor-made for cocktail-party and multi-talker conversational scenarios and
-ready to use.
+SepRQ features are pulled from 🤗
+[SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); a call returns the 12
+Conformer layer features. Requires **PyTorch** and upstream `speechbrain>=1.0.3`;
+runs on CPU or GPU.
 
 ---
 
