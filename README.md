@@ -10,8 +10,6 @@
   <a href="https://www.pyannote.ai/">pyannoteAI</a>
 </p>
 
-# SepRQ 🔀 👥 : Self-Supervised Speech Mixture Representation Learning Via Mask-Free Multi-Scale Source Separation
-
 <p align="center">
   🌐 <a href="https://sevkod.github.io/SepRQ/"><b>Website</b></a> &nbsp;·&nbsp;
   🤗 <a href="https://huggingface.co/SevKod/SepRQ"><b>Hugging Face</b></a> &nbsp;·&nbsp;
