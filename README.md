@@ -33,10 +33,29 @@ final = layers[-1]                             # last Conformer layer
 ```
 
 Calling the encoder runs `forward` and returns the **12 Conformer layer
-outputs** as a list, each `[1, T, 576]`.
+outputs** as a list, each `[batch, T, 576]`.
 
 It accepts a **file path** (any format/sample rate — decoded, downmixed to mono
-and resampled to 16 kHz for you) or a raw 1D 16 kHz waveform (numpy array / tensor).
+and resampled to 16 kHz for you) or a **waveform tensor** shaped `[num_samples]`,
+`[batch, num_samples]` or `[batch, channel, num_samples]` (multi-channel is
+averaged to mono; tensors are assumed to be 16 kHz). Pass `wav_lens` (`[batch]`
+relative lengths) for padding-aware batches.
+
+### Fine-tuning
+
+`SepRQEncoder` is a plain `nn.Module` — gradients flow through `forward`, and the
+weights / norm buffers move with `.to()` / `.cuda()` and are saved in
+`state_dict`. Put it in train mode and plug it into your model:
+
+```python
+encoder = SepRQEncoder("SepRQ").train()          # or .to("cuda")
+layers = encoder(wavs, wav_lens)                  # wavs: [B, num_samples]
+feats = torch.stack(layers).mean(0)               # e.g. average the 12 layers
+loss = my_head(feats, targets)
+loss.backward()                                   # updates the encoder too
+```
+Freeze it instead by keeping `.eval()` and wrapping calls in `torch.no_grad()`,
+or `for p in encoder.parameters(): p.requires_grad_(False)`.
 
 The repo is private, so authenticate once: `huggingface-cli login` (or set `HF_TOKEN`).
 
