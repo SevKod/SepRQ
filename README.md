@@ -39,21 +39,23 @@ encoder.train()
 layers = encoder(wavs, wav_lens)           # wavs: [B, num_samples]
 ```
 
-`forward` returns the **12 Transformer layer outputs** (each `[batch, T, D]`,
-D = 576 for SepRQ/BEST-RQ, 768 for HuBERT/WavLM). It accepts a **file path** (any
-format/rate — decoded, mono, resampled to 16 kHz) or a **waveform tensor**
-`[num_samples]`, `[batch, num_samples]` or `[batch, channel, num_samples]`; pass
-`wav_lens` (`[batch]`) for padded batches.
+`forward` returns the **list of Transformer layer outputs** (each `[batch, T, D]`;
+12 layers / D = 576 for SepRQ/BEST-RQ, 12 / 768 for the Base baselines, 24 / 1024
+for WavLM Large). It accepts a **file path** (any format/rate — decoded, mono,
+resampled to 16 kHz) or a **waveform tensor** `[num_samples]`,
+`[batch, num_samples]` or `[batch, channel, num_samples]`; pass `wav_lens`
+(`[batch]`) for padded batches.
 
 **Available models**
 
-| name | source | dim |
-|------|--------|-----|
-| `SepRQ` | 🤗 SevKod/SepRQ | 576 |
-| `BestRQ_50Hz` | 🤗 SevKod/SepRQ | 576 |
-| `HuBERT_BASE` | torchaudio pipelines (torch hub) | 768 |
-| `WavLM_BASE` | torchaudio pipelines (torch hub) | 768 |
-| `WavLM_BASE_PLUS` | torchaudio pipelines (torch hub) | 768 |
+| name | source | layers | dim |
+|------|--------|-------:|----:|
+| `SepRQ` | 🤗 SevKod/SepRQ | 12 | 576 |
+| `BestRQ_50Hz` | 🤗 SevKod/SepRQ | 12 | 576 |
+| `HuBERT_BASE` | torchaudio pipelines (torch hub) | 12 | 768 |
+| `WavLM_BASE` | torchaudio pipelines (torch hub) | 12 | 768 |
+| `WavLM_BASE_PLUS` | torchaudio pipelines (torch hub) | 12 | 768 |
+| `WavLM_LARGE` | torchaudio pipelines (torch hub) | 24 | 1024 |
 
 The SepRQ / BEST-RQ weights come from the Hub (private — authenticate once with
 `huggingface-cli login` or `HF_TOKEN`); the HuBERT / WavLM baselines are fetched
