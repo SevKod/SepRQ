@@ -43,11 +43,9 @@ layers = encoder(wavs)                      # wavs: [B, num_samples]
 `forward` returns the **list of Transformer layer outputs** (each `[batch, T, D]`;
 12 layers / D = 576 for SepRQ/BEST-RQ, 12 / 768 for the Base baselines, 24 / 1024
 for WavLM Large). It accepts a **file path** (any format/rate — decoded, mono,
-resampled to 16 kHz), a **waveform tensor** `[num_samples]`, `[batch, num_samples]`
-or `[batch, channel, num_samples]`, or a **list of variable-length waveforms/paths**
-(padded to the longest, with `wav_lens` computed automatically). You can also pass
-`wav_lens` (`[batch]` relative lengths) explicitly. *(torchaudio WavLM ignores
-padding masks, so prefer equal-length batches for the WavLM models.)*
+resampled to 16 kHz) or a **waveform tensor** `[num_samples]`,
+`[batch, num_samples]` or `[batch, channel, num_samples]`; pass `wav_lens`
+(`[batch]`) for padded batches.
 
 **Available models**
 
