@@ -26,26 +26,22 @@ pip install seprq
 ## Usage (frozen ❄️ or fine-tuned 🔥)
 
 ```python
-import torch
 from seprq import SepRQEncoder
 
 encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz", "WavLM_BASE", ... (see "Available models" below)
 
 # ❄️ frozen feature extraction
-with torch.no_grad():
-    layers = encoder("utterance.wav")      # list of 12 tensors, each [B, T, D]
+encoder.requires_grad_(False)
+layers = encoder(wavs)                      # wavs: [B, num_samples]
 
 # 🔥 fine-tuning (plug into your model)
-encoder.train()
-layers = encoder(wavs)                      # wavs: [B, num_samples]
+encoder.requires_grad_(True).train()
+layers = encoder(wavs)
 ```
 
-`forward` returns the **list of Transformer layer outputs** (each `[batch, T, D]`;
-12 layers / D = 576 for SepRQ/BEST-RQ, 12 / 768 for the Base baselines, 24 / 1024
-for WavLM Large). It accepts a **file path** (any format/rate — decoded, mono,
-resampled to 16 kHz) or a **waveform tensor** `[num_samples]`,
-`[batch, num_samples]` or `[batch, channel, num_samples]`; pass `wav_lens`
-(`[batch]`) for padded batches.
+It accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz)
+or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
+`[batch, channel, num_samples]`; pass `wav_lens` (`[batch]`) for padded batches.
 
 **Available models**
 
