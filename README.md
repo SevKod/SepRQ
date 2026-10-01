@@ -62,44 +62,17 @@ on LibriSpeech 960 h mixtures only.
 Speaker diarization (SD), speech separation (SS) and speech enhancement (SE).
 LS = LibriSpeech, LL = Libri-Light, Mix = LL-60k + GigaSpeech-10k + VoxPopuli-24k.
 
-| Model | Class | #Param (M) | Data (h) | SD<br>DER ↓ | SS<br>SI-SDRi ↑ | SE<br>PESQ ↑ | SE<br>STOI ↑ |
-|-------|-------|-----------:|----------|------:|----------:|-------:|-------:|
-| *Generic SSLs* | | | | | | | |
-| HuBERT Base | Base | 94.68 | LS-960 | 5.88 | 9.36 | 2.58 | 93.9 |
-| WavLM Base | Base | 94.70 | LS-960 | 4.55 | 10.37 | 2.58 | 94.0 |
-| WavLM Base+ | Base | 94.70 | Mix-94k | 3.50 | 10.85 | 2.63 | 94.3 |
-| HuBERT Large | Large | 316.62 | LL-60k | 5.75 | 10.45 | 2.64 | 94.2 |
-| WavLM Large | Large | 316.62 | Mix-94k | 3.24 | 11.19 | 2.70 | 94.5 |
-| *Cocktail-party SSLs* | | | | | | | |
-| C-HuBERT Base | Base | 96.00 | LS-960 | 2.77 | 11.08 | 2.63 | 94.0 |
-| C-HuBERT Large | Large | 318.00 | LL-60k | 2.65 | 11.24 | 2.65 | 94.3 |
-| | | | | | | | |
-| **⭐ SepRQ (ours)** | **Base** | **85.68** | **LS-960** | **2.08** | **12.10** | **2.67** | **94.4** |
-
-Best values in bold.
+![Multi-speaker SUPERB results](https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/tab2_superb.png)
 
 ### TS-SUPERB
 
 Target speaker extraction (TSE), personalized speech extraction (PSE),
 personalized VAD (PVAD), target-speaker ASR (TS-ASR).
 
-| Upstream | #Param (M) | TSE<br>SI-SDRi ↑ | TSE<br>STOI ↑ | PSE<br>SI-SDRi ↑ | PSE<br>STOI ↑ | PVAD<br>mAP ↑ | TS&#8209;ASR&nbsp;WER&nbsp;↓&nbsp;(w/o&nbsp;LM) | TS&#8209;ASR&nbsp;WER&nbsp;↓&nbsp;(w/&nbsp;LM) |
-|----------|-----------:|----:|----:|----:|----:|----:|----:|----:|
-| HuBERT Base | 94.68 | 9.64 | 87.30 | 8.61 | 79.92 | 94.60 | 36.86 | 30.52 |
-| WavLM Base | 94.70 | 10.26 | 88.40 | 9.65 | 81.57 | 94.40 | 27.82 | 22.68 |
-| WavLM Base+ | 94.70 | 10.69 | 89.00 | 10.01 | 82.67 | 95.00 | 24.75 | 20.06 |
-| | | | | | | | | |
-| **⭐ SepRQ (ours)** | **85.68** | **12.53** | **91.45** | **11.18** | **85.60** | **96.61** | **22.26** | **16.78** |
+![TS-SUPERB results](https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/tab3_ts_superb.png)
 
 ### Out-of-domain
 
 EEND diarization on DIHARD 3 and ConvTasNet separation on WSJ0-2/3mix.
 
-| Upstream | DIHARD 3 FA / MD / SC | DER ↓ | 2mix SDRi ↑ | 3mix SDRi ↑ |
-|----------|-----------------------|------:|------------:|------------:|
-| w/o SSL | 6.1 / 8.1 / 4.9 | 19.3 | 16.4 | 13.1 |
-| HuBERT Base | 4.3 / 8.6 / 4.7 | 17.7 | 17.0 | 12.7 |
-| WavLM Base | 4.4 / 8.3 / 4.5 | 17.3 | 17.5 | 13.2 |
-| WavLM Base+ | 4.8 / 7.6 / 4.2 | 16.6 | 18.2 | 13.4 |
-| **SepRQ (2 src)** | 4.9 / 7.4 / 3.8 | **16.1** | **19.8** | 14.5 |
-| **SepRQ (3 src)** | 5.0 / 7.3 / 4.1 | 16.4 | 19.4 | **17.2** |
+![Out-of-domain results](https://raw.githubusercontent.com/SevKod/SepRQ/main/assets/tab4_ood.png)
