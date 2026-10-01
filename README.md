@@ -28,7 +28,7 @@ pip install seprq
 ```python
 from seprq import SepRQEncoder
 
-encoder = SepRQEncoder("SepRQ", streams=2)   # streams=2|3 (SepRQ); or "BestRQ_50Hz", "WavLM_BASE", ... (see below)
+encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz", "WavLM_BASE", ... (see "Available models" below)
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()
@@ -43,19 +43,23 @@ It accepts a **file path** (any format/rate — decoded, mono, resampled to 16 k
 or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
 `[batch, channel, num_samples]`; pass `wav_lens` (`[batch]`) for padded batches.
 
+SepRQ ships in variants trained to separate a different number of speakers —
+select one with `streams` (default `2`):
+
+```python
+encoder = SepRQEncoder("SepRQ", streams=3)   # 3-speaker variant
+```
+
 **Available models**
 
-| name | streams | layers | dim |
-|------|---------|-------:|----:|
-| ⭐ `SepRQ` ⭐ | 2 or 3 | 12 | 576 |
-| `BestRQ_50Hz` | — | 12 | 576 |
-| `HuBERT_BASE` | — | 12 | 768 |
-| `WavLM_BASE` | — | 12 | 768 |
-| `WavLM_BASE_PLUS` | — | 12 | 768 |
-| `WavLM_LARGE` | — | 24 | 1024 |
-
-`streams` only applies to `SepRQ` (pick the 2- or 3-speaker variant); it is
-ignored by the other models.
+| name | layers | dim |
+|------|-------:|----:|
+| ⭐ `SepRQ` ⭐ | 12 | 576 |
+| `BestRQ_50Hz` | 12 | 576 |
+| `HuBERT_BASE` | 12 | 768 |
+| `WavLM_BASE` | 12 | 768 |
+| `WavLM_BASE_PLUS` | 12 | 768 |
+| `WavLM_LARGE` | 24 | 1024 |
 
 The SepRQ / BEST-RQ weights come from the Hub (private — authenticate once with
 `huggingface-cli login` or `HF_TOKEN`); the HuBERT / WavLM baselines are fetched
