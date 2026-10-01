@@ -37,7 +37,7 @@ with torch.no_grad():
 
 # 🔥 fine-tuning (plug into your model)
 encoder.train()
-layers = encoder(wavs, wav_lens)           # wavs: [B, num_samples]
+layers = encoder(wavs)                      # wavs: [B, num_samples]
 ```
 
 `forward` returns the **list of Transformer layer outputs** (each `[batch, T, D]`;
