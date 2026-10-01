@@ -6,6 +6,12 @@ cocktail-party 🍸 speech processing 🔀 👥. Pulled from 🤗
 12 Conformer layer features. Requires **PyTorch** and upstream
 `speechbrain>=1.0.3`; runs on CPU or GPU.
 
+---
+
+👉 Please visit **[https://sevkod.github.io/SepRQ/](https://sevkod.github.io/SepRQ/)** for the full usage and demo.
+
+---
+
 ## Install
 
 ```bash
