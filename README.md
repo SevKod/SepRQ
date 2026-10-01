@@ -105,17 +105,23 @@ personalized VAD (PVAD), target-speaker ASR (TS-ASR).
 <table>
   <thead>
     <tr>
-      <th rowspan="2">Upstream</th>
-      <th rowspan="2">#Param (M)</th>
+      <th rowspan="3">Upstream</th>
+      <th rowspan="3">#Param (M)</th>
       <th colspan="2">TSE</th>
       <th colspan="2">PSE</th>
-      <th rowspan="2">PVAD<br>mAP ↑</th>
+      <th rowspan="3">PVAD<br>mAP ↑</th>
       <th colspan="2">TS-ASR</th>
     </tr>
     <tr>
-      <th>SI-SDRi ↑</th><th>STOI ↑</th>
-      <th>SI-SDRi ↑</th><th>STOI ↑</th>
-      <th>WER ↓ (w/o LM)</th><th>WER ↓<br>(w/ LM)</th>
+      <th rowspan="2">SI-SDRi ↑</th>
+      <th rowspan="2">STOI ↑</th>
+      <th rowspan="2">SI-SDRi ↑</th>
+      <th rowspan="2">STOI ↑</th>
+      <th colspan="2">WER ↓</th>
+    </tr>
+    <tr>
+      <th>(w/o LM)</th>
+      <th>(w/ LM)</th>
     </tr>
   </thead>
   <tbody>
