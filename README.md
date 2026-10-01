@@ -32,7 +32,7 @@ encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz", "WavLM_BASE", ...
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()
-layers = encoder(wavs)                      # wavs: [B, num_samples]
+layers = encoder(wavs)                      # wavs: [B, num_samples] or [B, channel, num_samples]
 
 # 🔥 fine-tuning (plug into your model)
 encoder.requires_grad_(True).train()
