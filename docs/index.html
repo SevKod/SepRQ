@@ -346,7 +346,9 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .metric .ml{font-size:12px;color:var(--ink-2);line-height:1.3}
 .metric .mv{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:22px;letter-spacing:-.02em}
 .metric.na .mv{font-size:14px;font-family:Inter;font-weight:600;color:var(--ink-3)}
-@media (max-width:640px){.metric{margin-left:0}}
+.metric.sample{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--bg-2))}
+.metric.sample .ml{color:var(--accent-strong,var(--accent))}
+@media (max-width:640px){.metric{margin-left:0}.metric.sample{margin-left:0}}
 
 .panel-label{font:700 11.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px}
 .io{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
@@ -1144,7 +1146,7 @@ function renderDemo() {
 
   // OUTPUT
   const outKey = `${mix.id}|${up.id}|${task.id}|${state.cmp}`;
-  if (keys["blk-out"] !== outKey) { setHTML("blk-out", outKey, outputHTML(mix, up, task, set, cmpUp)); if (task.kind === "text") loadASR(renderToken); }
+  if (keys["blk-out"] !== outKey) { setHTML("blk-out", outKey, outputHTML(mix, up, task, set, cmpUp)); if (task.kind === "text") loadASR(renderToken); fillSampleMetrics(task, mix.id); }
 
   // reproduce snippet
   const upArg = { seprq: '"SepRQ"', seprq_k2: '"SepRQ", streams=2', seprq_k3: '"SepRQ", streams=3', hubert: '"HuBERT_BASE"', wavlm: '"WavLM_BASE"', wavlmplus: '"WavLM_BASE_PLUS"' }[up.id];
@@ -1161,6 +1163,21 @@ function renderDemo() {
 }
 
 let renderToken = 0;
+function fmtSample(task, m) {
+  if (!m) return "—";
+  if (task.id === "sd") return (m.der != null ? m.der + "%" : "—");
+  if (task.id === "se") return (m.pesq != null ? m.pesq.toFixed(2) + " / " + (m.stoi * 100).toFixed(1) : "—");
+  return (m.si_sdri != null ? m.si_sdri.toFixed(2) + " dB" : "—");
+}
+function fillSampleMetrics(task, mixId) {
+  document.querySelectorAll("#blk-out .samp").forEach(async (el) => {
+    const up = el.dataset.up;
+    try {
+      const r = await fetch(`${ROOT}/outputs/${up}/${task.id}/${mixId}/metrics.json`, { cache: "no-store" });
+      el.textContent = r.ok ? fmtSample(task, await r.json()) : "—";
+    } catch { el.textContent = "—"; }
+  });
+}
 function outputHTML(mix, up, task, set, cmpUp) {
   renderToken++;
   const models = cmpUp ? [up, cmpUp] : [up];
@@ -1180,10 +1197,24 @@ function outputHTML(mix, up, task, set, cmpUp) {
         <div class="ml">Paper result<br>${esc(task.metric.label)} · ${esc(task.dataset)}</div>
         <div class="mv">${val(up) ? esc(val(up)) + esc(task.metric.unit) : "not reported"}</div>
       </div>`;
+  const hasSample = (task.kind === "audio") || task.id === "sd";
+  const sampLab = task.id === "sd" ? "DER ↓" : task.id === "se" ? "PESQ / STOI" : "SI-SDRi ↑";
+  const sampleBox = !hasSample ? "" : (cmpUp
+    ? `<div class="metric sample" title="Score on the selected sample">
+        <div class="ml">This sample<br>${esc(sampLab)}</div>
+        <div class="mvs">${models.map(u => `<div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>
+          <span class="mv samp" data-up="${esc(u.id)}">…</span></div>`).join("")}</div>
+      </div>`
+    : `<div class="metric sample" title="Score on the selected sample">
+        <div class="ml">This sample<br>${esc(sampLab)}</div>
+        <div class="mv samp" data-up="${esc(up.id)}">…</div>
+      </div>`);
+
   let html = `<div class="out-h">
       <span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
       <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span>
       ${metricBox}
+      ${sampleBox}
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
 
