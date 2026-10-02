@@ -814,6 +814,9 @@ const INPUT_SETS = {
   wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: placeholder("w3m", "3-spk mixture") },
   voicebank:      { label: "VoiceBank-DEMAND", noun: "noisy speech", items: [{ id: "p232_001", title: "Noisy clip 1", meta: "p232 · 1.7s" }, { id: "p232_211", title: "Noisy clip 2", meta: "p232 · 1.4s" }, { id: "p257_008", title: "Noisy clip 3", meta: "p257 · 5.6s" }, { id: "p257_210", title: "Noisy clip 4", meta: "p257 · 2.5s" }, { id: "p257_410", title: "Noisy clip 5", meta: "p257 · 3.6s" }] },
   sparselibrimix: { label: "SparseLibriMix",   noun: "sparse mixture", items: placeholder("slm", "Sparse mixture") },
+  tse_in:         { label: "Libri2Mix (min · mix_clean)", noun: "mixture", items: [{ id: "1188-133604-0025_4992-23283-0016", title: "Mixture 1", meta: "2 speakers · 4.5s" }, { id: "1995-1837-0025_5142-36377-0017", title: "Mixture 2", meta: "2 speakers · 4.7s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Mixture 3", meta: "2 speakers · 3.8s" }, { id: "5683-32866-0012_121-121726-0001", title: "Mixture 4", meta: "2 speakers · 5.9s" }, { id: "6930-76324-0027_5683-32879-0011", title: "Mixture 5", meta: "2 speakers · 8.3s" }] },
+  slm_in:         { label: "SparseLibriMix (test · 2 spk)", noun: "sparse mixture", items: [{ id: "mix_0000001", title: "Sparse mixture 1", meta: "2 speakers · 8.2s" }, { id: "mix_0000002", title: "Sparse mixture 2", meta: "2 speakers · 6.5s" }, { id: "mix_0000003", title: "Sparse mixture 3", meta: "2 speakers · 5.6s" }, { id: "mix_0000004", title: "Sparse mixture 4", meta: "2 speakers · 4.7s" }, { id: "mix_0000005", title: "Sparse mixture 5", meta: "2 speakers · 11.6s" }] },
+  tsasr_in:       { label: "Libri2Mix (max · mix_clean)", noun: "mixture", items: [{ id: "260-123440-0017_7729-102255-0008", title: "Mixture 1", meta: "2 speakers · 19.1s" }, { id: "4446-2271-0014_3570-5694-0003", title: "Mixture 2", meta: "2 speakers · 19.0s" }, { id: "7176-88083-0005_672-122797-0022", title: "Mixture 3", meta: "2 speakers · 19.0s" }, { id: "8230-279154-0017_8224-274384-0004", title: "Mixture 4", meta: "2 speakers · 20.6s" }, { id: "8463-294828-0013_8224-274381-0004", title: "Mixture 5", meta: "2 speakers · 21.3s" }] },
 };
 
 const UPSTREAMS = [
@@ -845,15 +848,15 @@ const TASKS = [
   { id: "se", inputs: "voicebank", api: "enhancement", group: "SUPERB", name: "Speech enhancement", short: "SE", kind: "audio", streams: 1, dataset: "VoiceBank-DEMAND",
     labels: ["Enhanced", "Clean reference"],
     metric: { label: "PESQ ↑ / STOI ↑", unit: "", values: { hubert: "2.58 / 93.9", wavlm: "2.58 / 94.0", wavlmplus: "2.63 / 94.3", seprq: "2.67 / 94.4" } } },
-  { id: "tse", inputs: "libri2mix", api: "target-speaker-extraction", group: "TS-SUPERB", name: "Target speaker extraction", short: "TSE", kind: "audio", streams: 1, enroll: true, dataset: "Libri2Mix",
+  { id: "tse", inputs: "tse_in", api: "target-speaker-extraction", group: "TS-SUPERB", name: "Target speaker extraction", short: "TSE", kind: "audio", streams: 1, enroll: true, dataset: "Libri2Mix",
     labels: ["Extracted target", "Target reference"],
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "9.64", wavlm: "10.26", wavlmplus: "10.69", seprq: "12.53" } } },
-  { id: "pse", inputs: "sparselibrimix", api: "personalized-extraction", group: "TS-SUPERB", name: "Personalized speech extraction", short: "PSE", kind: "audio", streams: 1, enroll: true, dataset: "SparseLibriMix",
+  { id: "pse", inputs: "slm_in", api: "personalized-extraction", group: "TS-SUPERB", name: "Personalized speech extraction", short: "PSE", kind: "audio", streams: 1, enroll: true, dataset: "SparseLibriMix",
     labels: ["Extracted target", "Target reference"],
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "8.61", wavlm: "9.65", wavlmplus: "10.01", seprq: "11.18" } } },
-  { id: "pvad", inputs: "sparselibrimix", api: "personalized-vad", group: "TS-SUPERB", name: "Personalized VAD", short: "PVAD", kind: "activation", streams: 1, enroll: true, dataset: "SparseLibriMix",
+  { id: "pvad", inputs: "slm_in", api: "personalized-vad", group: "TS-SUPERB", name: "Personalized VAD", short: "PVAD", kind: "activation", streams: 1, enroll: true, dataset: "SparseLibriMix",
     metric: { label: "mAP ↑", unit: "", values: { hubert: "94.60", wavlm: "94.40", wavlmplus: "95.00", seprq: "96.61" } } },
-  { id: "tsasr", inputs: "libri2mix", api: "target-speaker-asr", group: "TS-SUPERB", name: "Target-speaker ASR", short: "TS-ASR", kind: "text", enroll: true, dataset: "Libri2Mix",
+  { id: "tsasr", inputs: "tsasr_in", api: "target-speaker-asr", group: "TS-SUPERB", name: "Target-speaker ASR", short: "TS-ASR", kind: "text", enroll: true, dataset: "Libri2Mix",
     metric: { label: "WER ↓ (w/o LM / w/ LM)", unit: "", values: { hubert: "36.86% / 30.52%", wavlm: "27.82% / 22.68%", wavlmplus: "24.75% / 20.06%", seprq: "22.26% / 16.78%" } } },
   /* Out-of-domain: EEND diarization on DIHARD 3 (multi-domain conversational recordings) */
   { id: "dh3", inputs: "dihard3", api: "diarization-dihard3", group: "Out-of-domain", name: "Speaker diarization", short: "SD", kind: "activation", streams: 0, dataset: "DIHARD 3 · EEND", seprqVariants: [2, 3], seprqDefault: 2,
