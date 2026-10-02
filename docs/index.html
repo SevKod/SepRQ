@@ -348,7 +348,9 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .metric.na .mv{font-size:14px;font-family:Inter;font-weight:600;color:var(--ink-3)}
 .metric.sample{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--bg-2))}
 .metric.sample .ml{color:var(--accent-strong,var(--accent))}
-@media (max-width:640px){.metric{margin-left:0}.metric.sample{margin-left:0}}
+.metrics-wrap{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap;align-items:stretch}
+.metrics-wrap .metric{margin-left:0}
+@media (max-width:640px){.metric,.metrics-wrap{margin-left:0}}
 
 .panel-label{font:700 11.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px}
 .io{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
@@ -1213,8 +1215,7 @@ function outputHTML(mix, up, task, set, cmpUp) {
   let html = `<div class="out-h">
       <span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
       <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span>
-      ${metricBox}
-      ${sampleBox}
+      <div class="metrics-wrap">${metricBox}${sampleBox}</div>
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
 
