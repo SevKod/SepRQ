@@ -369,7 +369,8 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .pair>div{padding:14px;min-width:0}
 .pair>div+div{border-left:1px solid var(--line)}
 @media (max-width:760px){.pair{grid-template-columns:1fr}.pair>div+div{border-left:0;border-top:1px solid var(--line)}}
-.side-l{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.side-l{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:4px}
+.side-l .lbl{white-space:nowrap}
 .side-l .pill{font:700 10.5px "JetBrains Mono",ui-monospace,monospace;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.04em}
 .pill.est{background:var(--accent-soft);color:var(--accent-ink)}
 .pill.ref{background:#E6EEF8;color:#355C92}
@@ -1198,7 +1199,7 @@ function outputHTML(mix, up, task, set, cmpUp) {
         <div class="mv">${val(up) ? esc(val(up)) + esc(task.metric.unit) : "not reported"}</div>
       </div>`;
   const hasSample = (task.kind === "audio") || task.id === "sd";
-  const sampLab = task.id === "sd" ? "DER ↓" : task.id === "se" ? "PESQ / STOI" : "SI-SDRi ↑";
+  const sampLab = task.id === "sd" ? "DER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
   const sampleBox = !hasSample ? "" : (cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
@@ -1235,10 +1236,10 @@ function outputHTML(mix, up, task, set, cmpUp) {
       html += `<div class="stream">
           <div class="stream-h"><span class="bar" style="background:${task.enroll ? SPK[0] : SPK[i - 1]}"></span>${title}</div>
           <div class="pair${cmpUp ? " three" : ""}">
-            ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>${esc(estL)}${mb(u)}</div>
+            ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span><span class="lbl">${esc(estL)}</span>${mb(u)}</div>
               ${imgSlot(PATHS.out(u.id, task.id, mix.id, f.mel), u.name + " · estimated mel-spectrogram")}
               ${audioSlot(PATHS.out(u.id, task.id, mix.id, f.wav))}</div>`).join("")}
-            <div><div class="side-l"><span class="pill ref">Ref</span>${esc(refL)}</div>
+            <div><div class="side-l"><span class="pill ref">Ref</span><span class="lbl">${esc(refL)}</span></div>
               ${imgSlot(PATHS.ref(task.id, mix.id, f.mel), "reference mel-spectrogram")}
               ${audioSlot(PATHS.ref(task.id, mix.id, f.wav))}</div>
           </div>
