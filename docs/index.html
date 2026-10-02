@@ -1217,15 +1217,14 @@ function outputHTML(mix, up, task, set, cmpUp) {
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
 
-  // input to listen to, above the outputs
-  html += `<div class="out-in${task.enroll ? " with-enroll" : ""}">
-      <div class="box"><h4><span class="sw" style="background:var(--accent)"></span>Input ${esc(set.noun)}<span class="who">${esc(mix.title)}</span></h4>
-        ${imgSlot(PATHS.mixtureMel(task.inputs, mix.id), set.noun + " mel-spectrogram", "8/1")}
-        ${audioSlot(PATHS.mixture(task.inputs, mix.id))}</div>
-      ${task.enroll ? `<div class="box"><h4><span class="sw" style="background:var(--spk1)"></span>Enrollment<span class="who">target speaker</span></h4>
+  // enrollment only (target-speaker tasks); the input mixture lives in the Input panel
+  if (task.enroll) {
+    html += `<div class="out-in with-enroll">
+      <div class="box"><h4><span class="sw" style="background:var(--spk1)"></span>Enrollment<span class="who">target speaker</span></h4>
         ${imgSlot(PATHS.enrollMel(task.inputs, mix.id), "enrollment mel-spectrogram", "4/1")}
-        ${audioSlot(PATHS.enrollment(task.inputs, mix.id))}</div>` : ""}
+        ${audioSlot(PATHS.enrollment(task.inputs, mix.id))}</div>
     </div>`;
+  }
 
   if (task.kind === "audio") {
     const [estL, refL] = task.labels || ["Estimated", "Reference source"];
