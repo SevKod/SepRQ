@@ -389,6 +389,8 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .aslot .ph .play{width:24px;height:24px;border-radius:50%;background:var(--line-2);display:grid;place-items:center;flex:none}
 .aslot .ph span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:normal}
 
+.act-stream .slot{min-height:0}
+.act-stream .slot.loaded img{max-height:150px;object-fit:contain;background:#fff}
 .act{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 .axis{display:flex;justify-content:space-between;font:11px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-3);padding:4px 2px 0}
 
@@ -1218,12 +1220,15 @@ function outputHTML(mix, up, task, set, cmpUp) {
     const F = PATHS.files.activation;
     const what = task.id === "pvad" ? "target-speaker activation" : "speaker activations";
     const ratio = task.id === "pvad" ? "8/1" : "6/1";
-    html += `<div class="act">
-        ${models.map(u => `<div class="box"><h4>${PILL(pillCls(u), u.name)}Predicted ${what}${mb(u)}</h4>
-          ${imgSlot(PATHS.out(u.id, task.id, mix.id, F.out), u.name + " · predicted " + what, ratio)}</div>`).join("")}
-        <div class="box"><h4>${PILL("ref", "Ref")}Reference annotation</h4>
-          ${imgSlot(PATHS.ref(task.id, mix.id, F.ref), "reference annotation", ratio)}</div>
-      </div>`;
+    html += `<div class="io"><div class="stream act-stream">
+        <div class="stream-h"><span class="bar" style="background:var(--spk1)"></span>${task.id === "pvad" ? "Target-speaker activation" : "Speaker activations"}</div>
+        <div class="pair${cmpUp ? " three" : ""}">
+          ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>Predicted${mb(u)}</div>
+            ${imgSlot(PATHS.out(u.id, task.id, mix.id, F.out), u.name + " · predicted " + what, "3/1")}</div>`).join("")}
+          <div><div class="side-l"><span class="pill ref">Ref</span>Reference annotation</div>
+            ${imgSlot(PATHS.ref(task.id, mix.id, F.ref), "reference annotation", "3/1")}</div>
+        </div>
+      </div></div>`;
   } else if (task.kind === "text") {
     const F = PATHS.files.text;
     html += `<div class="tcols" style="--n:${models.length + 1}">
