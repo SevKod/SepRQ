@@ -577,7 +577,7 @@ footer .sp{margin-left:auto}
     <div class="sec-head">
       <span class="kicker">Interactive demo</span>
       <h2>Hear what each upstream can do</h2>
-      <p>Pick a downstream task first: it sets the evaluation dataset the inputs come from. Then choose an input and a frozen upstream SSL model. Each output sits next to its reference.</p>
+      <p>Pick a downstream task. Then choose an input and a frozen upstream SSL model.</p>
     </div>
 
     <div class="card demo">
@@ -879,7 +879,7 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const state = { idx: 0, up: "seprq", task: "ss2", cmp: "wavlmplus", qsTab: "features" };  // comparison on by default (can be switched off)
+const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features" };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlmplus" : "seprq");
 
 /* ---------- tiny python highlighter ---------- */
