@@ -293,11 +293,11 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .ds-facts dd{margin:3px 0 0;font-size:14px;font-weight:500}
 .ds-facts dd b{font-family:"Bricolage Grotesque",Inter,sans-serif;font-size:19px;font-weight:800}
 .ds-facts .pfact dd{display:grid;gap:7px;margin-top:7px}
-.pv{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-radius:10px;padding:8px 11px;border:1.5px solid}
+.pv{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:nowrap;border-radius:10px;padding:8px 11px;border:1.5px solid}
 .pv.est{background:var(--accent-softer);border-color:var(--accent);color:var(--accent-ink)}
 .pv.cmp{background:var(--cmp-soft);border-color:var(--cmp);color:var(--cmp)}
-.pv-n{font:700 11.5px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.04em}
-.pv-v{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
+.pv-n{flex:0 0 auto;font:700 11.5px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.04em}
+.pv-v{flex:1 1 auto;text-align:right;white-space:nowrap;font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:16px;letter-spacing:-.01em;color:var(--ink)}
 .pv-v.na{font:600 13px Inter,sans-serif;color:var(--ink-3)}
 .ds-change{appearance:none;cursor:pointer;margin-top:14px;font:600 13px Inter,sans-serif;color:var(--accent-ink);background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px}
 /* arrows */
@@ -1221,14 +1221,7 @@ function outputHTML(mix, up, task, set, cmpUp) {
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
 
-  // enrollment only (target-speaker tasks); the input mixture lives in the Input panel
-  if (task.enroll) {
-    html += `<div class="out-in with-enroll">
-      <div class="box"><h4><span class="sw" style="background:var(--spk1)"></span>Enrollment<span class="who">target speaker</span></h4>
-        ${imgSlot(PATHS.enrollMel(task.inputs, mix.id), "enrollment mel-spectrogram", "4/1")}
-        ${audioSlot(PATHS.enrollment(task.inputs, mix.id))}</div>
-    </div>`;
-  }
+  // the enrollment and input mixture live in the Input panel, not here
 
   if (task.kind === "audio") {
     const [estL, refL] = task.labels || ["Estimated", "Reference source"];
