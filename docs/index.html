@@ -369,7 +369,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .pair>div{padding:14px;min-width:0}
 .pair>div+div{border-left:1px solid var(--line)}
 @media (max-width:760px){.pair{grid-template-columns:1fr}.pair>div+div{border-left:0;border-top:1px solid var(--line)}}
-.side-l{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:4px;min-height:44px}
+.side-l{font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;row-gap:4px}
 .side-l .lbl{white-space:nowrap}
 .side-l .pill{font:700 10.5px "JetBrains Mono",ui-monospace,monospace;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.04em}
 .pill.est{background:var(--accent-soft);color:var(--accent-ink)}
@@ -843,7 +843,7 @@ const TASKS = [
   { id: "ss2", inputs: "l2m_sep", api: "separation-2spk", group: "SUPERB", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "Libri2Mix",
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "9.36", wavlm: "10.37", wavlmplus: "10.85", seprq: "12.10" } } },
   { id: "se", inputs: "voicebank", api: "enhancement", group: "SUPERB", name: "Speech enhancement", short: "SE", kind: "audio", streams: 1, dataset: "VoiceBank-DEMAND",
-    labels: ["Enhanced speech", "Clean reference"],
+    labels: ["Enhanced", "Clean reference"],
     metric: { label: "PESQ ↑ / STOI ↑", unit: "", values: { hubert: "2.58 / 93.9", wavlm: "2.58 / 94.0", wavlmplus: "2.63 / 94.3", seprq: "2.67 / 94.4" } } },
   { id: "tse", inputs: "libri2mix", api: "target-speaker-extraction", group: "TS-SUPERB", name: "Target speaker extraction", short: "TSE", kind: "audio", streams: 1, enroll: true, dataset: "Libri2Mix",
     labels: ["Extracted target", "Target reference"],
