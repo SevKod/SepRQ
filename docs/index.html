@@ -1185,9 +1185,7 @@ function outputHTML(mix, up, task, set, cmpUp) {
   const models = cmpUp ? [up, cmpUp] : [up];
   const pillCls = (u) => (u === up ? "est" : "cmp");
   const val = (u) => task.metric.values[u.id];
-  const mb = (u) => val(u)
-    ? `<span class="mb" title="Paper · ${esc(task.metric.label)} · ${esc(task.dataset)}">${esc(val(u))}${esc(task.metric.unit)}</span>`
-    : `<span class="mb na" title="Not reported in the paper">n/r</span>`;
+  const mb = (u) => `<span class="mb samp" data-up="${esc(u.id)}" title="This sample">…</span>`;
   const upName = (u) => (u.ours ? `<b>${esc(u.name)}</b>` : esc(u.name));
   const metricBox = cmpUp
     ? `<div class="metric" title="${esc(task.metric.note || "Reported in the paper")}">
