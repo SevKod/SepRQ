@@ -406,6 +406,14 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .w-ins{background:#FFD1CC;border-radius:4px;padding:0 2px}
 .w-del{background:#FFD1CC;border-radius:4px;padding:0 2px;text-decoration:line-through}
 .wer-line{font-size:13px;color:var(--ink-2);margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.ovctl{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.ovlab{font-size:13px;color:var(--ink-2);margin-bottom:8px}
+.ovlab b{color:var(--accent);font-size:14px}
+.ovhint{color:var(--ink-3);font-weight:400;font-size:12px}
+.ovrange{width:100%;accent-color:var(--accent);cursor:pointer;margin:0}
+.ovticks{display:flex;justify-content:space-between;margin-top:5px;font:600 11px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-3)}
+.ovticks span{cursor:pointer;padding:2px 5px;border-radius:5px;transition:color .12s,background .12s}
+.ovticks span.on{color:var(--accent);background:var(--accent-softer)}
 .legend-sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 
 .repro{margin-top:22px}
@@ -517,7 +525,7 @@ footer .sp{margin-left:auto}
           <span>Copy</span>
         </button>
       </div>
-      <div class="install-note">Requires PyTorch and <code>speechbrain ≥ 1.0.3</code> · CPU or GPU · weights fetched from the Hugging Face Hub on first use</div>
+      <div class="install-note">Requires PyTorch and <code>speechbrain ≥ 1.0.3</code></div>
     </div>
 
     <div class="links">
@@ -807,16 +815,16 @@ const placeholder = (prefix, title, n = 5) =>
   Array.from({ length: n }, (_, i) => ({ id: `${prefix}${i + 1}`, title: `${title} ${i + 1}`, meta: "TODO · speakers / duration" }));
 const INPUT_SETS = {
   libri2mix:      { label: "Libri2Mix",        noun: "mixture",      items: placeholder("l2m", "Mixture") },
-  l2m_sep:        { label: "Libri2Mix (min · mix_clean)", noun: "mixture", items: [{ id: "1089-134686-0000_121-127105-0031", title: "Mixture 1", meta: "2 speakers · 10.4s" }, { id: "237-126133-0014_3729-6852-0037", title: "Mixture 2", meta: "2 speakers · 5.9s" }, { id: "4507-16021-0050_2961-961-0003", title: "Mixture 3", meta: "2 speakers · 3.9s" }, { id: "672-122797-0073_1580-141084-0004", title: "Mixture 4", meta: "2 speakers · 8.2s" }, { id: "8463-287645-0013_5142-33396-0037", title: "Mixture 5", meta: "2 speakers · 3.6s" }] },
-  l2m_diar:       { label: "Libri2Mix (max · mix_both)", noun: "recording", items: [{ id: "1320-122617-0002_8455-210777-0028", title: "Recording 1", meta: "2 speakers · 13.6s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Recording 2", meta: "2 speakers · 5.2s" }, { id: "4507-16021-0053_2300-131720-0005", title: "Recording 3", meta: "2 speakers · 8.1s" }, { id: "6829-68771-0032_1995-1837-0014", title: "Recording 4", meta: "2 speakers · 12.5s" }, { id: "7127-75947-0019_1089-134691-0018", title: "Recording 5", meta: "2 speakers · 3.9s" }] },
+  l2m_sep:        { label: "Libri2Mix", noun: "mixture", items: [{ id: "1089-134686-0000_121-127105-0031", title: "Mixture 1", meta: "2 speakers · 10.4s" }, { id: "237-126133-0014_3729-6852-0037", title: "Mixture 2", meta: "2 speakers · 5.9s" }, { id: "4507-16021-0050_2961-961-0003", title: "Mixture 3", meta: "2 speakers · 3.9s" }, { id: "672-122797-0073_1580-141084-0004", title: "Mixture 4", meta: "2 speakers · 8.2s" }, { id: "8463-287645-0013_5142-33396-0037", title: "Mixture 5", meta: "2 speakers · 3.6s" }] },
+  l2m_diar:       { label: "Libri2Mix", noun: "recording", items: [{ id: "1320-122617-0002_8455-210777-0028", title: "Recording 1", meta: "2 speakers · 13.6s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Recording 2", meta: "2 speakers · 5.2s" }, { id: "4507-16021-0053_2300-131720-0005", title: "Recording 3", meta: "2 speakers · 8.1s" }, { id: "6829-68771-0032_1995-1837-0014", title: "Recording 4", meta: "2 speakers · 12.5s" }, { id: "7127-75947-0019_1089-134691-0018", title: "Recording 5", meta: "2 speakers · 3.9s" }] },
   dihard3:        { label: "DIHARD 3",         noun: "recording",    items: placeholder("dh3", "Recording") },
   wsj0_2mix:      { label: "WSJ0-2mix",        noun: "2-spk mixture", items: placeholder("w2m", "2-spk mixture") },
   wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: placeholder("w3m", "3-spk mixture") },
   voicebank:      { label: "VoiceBank-DEMAND", noun: "noisy speech", items: [{ id: "p232_001", title: "Noisy clip 1", meta: "p232 · 1.7s" }, { id: "p232_211", title: "Noisy clip 2", meta: "p232 · 1.4s" }, { id: "p257_008", title: "Noisy clip 3", meta: "p257 · 5.6s" }, { id: "p257_210", title: "Noisy clip 4", meta: "p257 · 2.5s" }, { id: "p257_410", title: "Noisy clip 5", meta: "p257 · 3.6s" }] },
   sparselibrimix: { label: "SparseLibriMix",   noun: "sparse mixture", items: placeholder("slm", "Sparse mixture") },
-  tse_in:         { label: "Libri2Mix (min · mix_clean)", noun: "mixture", items: [{ id: "1188-133604-0025_4992-23283-0016", title: "Mixture 1", meta: "2 speakers · 4.5s" }, { id: "1995-1837-0025_5142-36377-0017", title: "Mixture 2", meta: "2 speakers · 4.7s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Mixture 3", meta: "2 speakers · 3.8s" }, { id: "5683-32866-0012_121-121726-0001", title: "Mixture 4", meta: "2 speakers · 5.9s" }, { id: "6930-76324-0027_5683-32879-0011", title: "Mixture 5", meta: "2 speakers · 8.3s" }] },
-  slm_in:         { label: "SparseLibriMix (test · 2 spk)", noun: "sparse mixture", items: [{ id: "mix_0000001", title: "Sparse mixture 1", meta: "2 speakers · 8.2s" }, { id: "mix_0000002", title: "Sparse mixture 2", meta: "2 speakers · 6.5s" }, { id: "mix_0000003", title: "Sparse mixture 3", meta: "2 speakers · 5.6s" }, { id: "mix_0000004", title: "Sparse mixture 4", meta: "2 speakers · 4.7s" }, { id: "mix_0000005", title: "Sparse mixture 5", meta: "2 speakers · 11.6s" }] },
-  tsasr_in:       { label: "Libri2Mix (max · mix_clean)", noun: "mixture", items: [{ id: "260-123440-0017_7729-102255-0008", title: "Mixture 1", meta: "2 speakers · 19.1s" }, { id: "4446-2271-0014_3570-5694-0003", title: "Mixture 2", meta: "2 speakers · 19.0s" }, { id: "7176-88083-0005_672-122797-0022", title: "Mixture 3", meta: "2 speakers · 19.0s" }, { id: "8230-279154-0017_8224-274384-0004", title: "Mixture 4", meta: "2 speakers · 20.6s" }, { id: "8463-294828-0013_8224-274381-0004", title: "Mixture 5", meta: "2 speakers · 21.3s" }] },
+  tse_in:         { label: "Libri2Mix", noun: "mixture", items: [{ id: "1188-133604-0025_4992-23283-0016", title: "Mixture 1", meta: "2 speakers · 4.5s" }, { id: "1995-1837-0025_5142-36377-0017", title: "Mixture 2", meta: "2 speakers · 4.7s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Mixture 3", meta: "2 speakers · 3.8s" }, { id: "5683-32866-0012_121-121726-0001", title: "Mixture 4", meta: "2 speakers · 5.9s" }, { id: "6930-76324-0027_5683-32879-0011", title: "Mixture 5", meta: "2 speakers · 8.3s" }] },
+  slm_in:         { label: "SparseLibriMix", noun: "sparse mixture", items: [{ id: "mix_0000001", title: "Sparse mixture 1", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000002", title: "Sparse mixture 2", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000003", title: "Sparse mixture 3", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000004", title: "Sparse mixture 4", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000005", title: "Sparse mixture 5", meta: "2 speakers · adjustable overlap" }] },
+  tsasr_in:       { label: "Libri2Mix", noun: "mixture", items: [{ id: "260-123440-0017_7729-102255-0008", title: "Mixture 1", meta: "2 speakers · 19.1s" }, { id: "4446-2271-0014_3570-5694-0003", title: "Mixture 2", meta: "2 speakers · 19.0s" }, { id: "7176-88083-0005_672-122797-0022", title: "Mixture 3", meta: "2 speakers · 19.0s" }, { id: "8230-279154-0017_8224-274384-0004", title: "Mixture 4", meta: "2 speakers · 20.6s" }, { id: "8463-294828-0013_8224-274381-0004", title: "Mixture 5", meta: "2 speakers · 21.3s" }] },
 };
 
 const UPSTREAMS = [
@@ -851,10 +859,10 @@ const TASKS = [
   { id: "tse", inputs: "tse_in", api: "target-speaker-extraction", group: "TS-SUPERB", name: "Target speaker extraction", short: "TSE", kind: "audio", streams: 1, enroll: true, dataset: "Libri2Mix",
     labels: ["Extracted target", "Target reference"],
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "9.64", wavlm: "10.26", wavlmplus: "10.69", seprq: "12.53" } } },
-  { id: "pse", inputs: "slm_in", api: "personalized-extraction", group: "TS-SUPERB", name: "Personalized speech extraction", short: "PSE", kind: "audio", streams: 1, enroll: true, dataset: "SparseLibriMix",
+  { id: "pse", inputs: "slm_in", api: "personalized-extraction", group: "TS-SUPERB", name: "Personalized speech extraction", short: "PSE", kind: "audio", streams: 1, enroll: true, dataset: "SparseLibriMix", overlaps: [0, 20, 40, 60],
     labels: ["Extracted target", "Target reference"],
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "8.61", wavlm: "9.65", wavlmplus: "10.01", seprq: "11.18" } } },
-  { id: "pvad", inputs: "slm_in", api: "personalized-vad", group: "TS-SUPERB", name: "Personalized VAD", short: "PVAD", kind: "activation", streams: 1, enroll: true, dataset: "SparseLibriMix",
+  { id: "pvad", inputs: "slm_in", api: "personalized-vad", group: "TS-SUPERB", name: "Personalized VAD", short: "PVAD", kind: "activation", streams: 1, enroll: true, dataset: "SparseLibriMix", overlaps: [0, 20, 40, 60],
     metric: { label: "mAP ↑", unit: "", values: { hubert: "94.60", wavlm: "94.40", wavlmplus: "95.00", seprq: "96.61" } } },
   { id: "tsasr", inputs: "tsasr_in", api: "target-speaker-asr", group: "TS-SUPERB", name: "Target-speaker ASR", short: "TS-ASR", kind: "text", enroll: true, dataset: "Libri2Mix",
     metric: { label: "WER ↓ (w/o LM / w/ LM)", unit: "", values: { hubert: "36.86% / 30.52%", wavlm: "27.82% / 22.68%", wavlmplus: "24.75% / 20.06%", seprq: "22.26% / 16.78%" } } },
@@ -887,8 +895,10 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features" };  // comparison on by default (can be switched off)
+const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features", ov: 0 };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlmplus" : "seprq");
+/* Sparse tasks (SparseLibriMix) carry an overlap dimension; assets live in an ov<NN> subfolder. */
+const ovSuffix = (task) => (task.overlaps ? "/ov" + String(state.ov).padStart(2, "0") : "");
 
 /* ---------- tiny python highlighter ---------- */
 function hl(code) {
@@ -1068,27 +1078,35 @@ function renderDemo() {
   const setId = task.inputs, set = INPUT_SETS[setId];
   const idx = Math.min(state.idx, set.items.length - 1);
   const mix = set.items[idx];
+  if (!task.overlaps) state.ov = 0;
+  const mp = mix.id + ovSuffix(task);  // per-overlap asset folder for sparse tasks
   const focused = document.activeElement?.closest?.("[data-idx],[data-up],[data-task],[data-cmp],[data-cmp-toggle]");
   const fsel = focused ? Object.entries(focused.dataset).map(([k, v]) => `[data-${k.replace(/[A-Z]/g, c => "-" + c.toLowerCase())}="${v}"]`).join("") : null;
   $("#flow").classList.toggle("has-enroll", !!task.enroll);
 
   // INPUT
   $(".a1 .al").textContent = set.noun;
-  setHTML("blk-mix", `${setId}|${mix.id}`, `
+  const ovSlider = task.overlaps ? `
+      <div class="ovctl">
+        <div class="ovlab">Speaker overlap <b>${state.ov}%</b> <span class="ovhint">— same mixture rendered at each SparseLibriMix overlap level</span></div>
+        <input type="range" class="ovrange" min="0" max="${task.overlaps[task.overlaps.length - 1]}" step="20" value="${state.ov}" aria-label="Speaker overlap percentage" data-ov-slider>
+        <div class="ovticks">${task.overlaps.map(o => `<span${o === state.ov ? ' class="on"' : ""} data-ov="${o}">${o}%</span>`).join("")}</div>
+      </div>` : "";
+  setHTML("blk-mix", `${setId}|${mix.id}|${state.ov}`, `
     <div class="blk-h"><span class="stepn">2</span><span class="bt">Input</span><span class="bs ds">${esc(set.label)}</span></div>
     <div class="rows" role="group" aria-label="Inputs from ${esc(set.label)}">
       ${set.items.map((m, i) => `<button class="row" aria-pressed="${i === idx}" data-idx="${i}">
         ${miniWave(i + 1)}<span class="nm">${esc(m.title)}<small>${esc(m.meta)}</small></span></button>`).join("")}
     </div>
     <div class="sel-media"><div class="lbl">Mel-spectrogram · ${esc(mix.title)}</div>
-      ${imgSlot(PATHS.mixtureMel(setId, mix.id), set.noun + " mel-spectrogram", "3/1")}
-      ${audioSlot(PATHS.mixture(setId, mix.id))}</div>`);
+      ${imgSlot(PATHS.mixtureMel(setId, mp), set.noun + " mel-spectrogram", "3/1")}
+      ${audioSlot(PATHS.mixture(setId, mp))}${ovSlider}</div>`);
 
   // ENROLLMENT (target-speaker tasks)
-  if (task.enroll) setHTML("blk-enr", `${setId}|${mix.id}`, `
+  if (task.enroll) setHTML("blk-enr", `${setId}|${mix.id}|${state.ov}`, `
     <div class="blk-h"><span class="dot" style="background:var(--spk1)"></span><span class="bt">Enrollment</span><span class="bs">target speaker</span></div>
-    ${imgSlot(PATHS.enrollMel(setId, mix.id), "enrollment mel-spectrogram", "3/1")}
-    ${audioSlot(PATHS.enrollment(setId, mix.id))}`);
+    ${imgSlot(PATHS.enrollMel(setId, mp), "enrollment mel-spectrogram", "3/1")}
+    ${audioSlot(PATHS.enrollment(setId, mp))}`);
 
   // UPSTREAM: SepRQ choices (orange) on top, baselines to compare with (purple) below
   const cmpUp = state.cmp ? UPS.find(u => u.id === state.cmp) : null;
@@ -1151,8 +1169,8 @@ function renderDemo() {
     <button class="ds-change" data-goto="task-pick">Change task ↑</button>`);
 
   // OUTPUT
-  const outKey = `${mix.id}|${up.id}|${task.id}|${state.cmp}`;
-  if (keys["blk-out"] !== outKey) { setHTML("blk-out", outKey, outputHTML(mix, up, task, set, cmpUp)); if (task.kind === "text") loadASR(renderToken); fillSampleMetrics(task, mix.id); }
+  const outKey = `${mix.id}|${up.id}|${task.id}|${state.cmp}|${state.ov}`;
+  if (keys["blk-out"] !== outKey) { setHTML("blk-out", outKey, outputHTML(mix, up, task, set, cmpUp, mp)); if (task.kind === "text") loadASR(renderToken); fillSampleMetrics(task, mp); }
 
   // reproduce snippet
   const upArg = { seprq: '"SepRQ"', seprq_k2: '"SepRQ", streams=2', seprq_k3: '"SepRQ", streams=3', hubert: '"HuBERT_BASE"', wavlm: '"WavLM_BASE"', wavlmplus: '"WavLM_BASE_PLUS"' }[up.id];
@@ -1184,8 +1202,9 @@ function fillSampleMetrics(task, mixId) {
     } catch { el.textContent = "—"; }
   });
 }
-function outputHTML(mix, up, task, set, cmpUp) {
+function outputHTML(mix, up, task, set, cmpUp, mp) {
   renderToken++;
+  mp = mp || mix.id;
   const models = cmpUp ? [up, cmpUp] : [up];
   const pillCls = (u) => (u === up ? "est" : "cmp");
   const val = (u) => task.metric.values[u.id];
@@ -1233,11 +1252,11 @@ function outputHTML(mix, up, task, set, cmpUp) {
           <div class="stream-h"><span class="bar" style="background:${task.enroll ? SPK[0] : SPK[i - 1]}"></span>${title}</div>
           <div class="pair${cmpUp ? " three" : ""}">
             ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span><span class="lbl">${esc(estL)}</span>${mb(u)}</div>
-              ${imgSlot(PATHS.out(u.id, task.id, mix.id, f.mel), u.name + " · estimated mel-spectrogram")}
-              ${audioSlot(PATHS.out(u.id, task.id, mix.id, f.wav))}</div>`).join("")}
+              ${imgSlot(PATHS.out(u.id, task.id, mp, f.mel), u.name + " · estimated mel-spectrogram")}
+              ${audioSlot(PATHS.out(u.id, task.id, mp, f.wav))}</div>`).join("")}
             <div><div class="side-l"><span class="pill ref">Ref</span><span class="lbl">${esc(refL)}</span></div>
-              ${imgSlot(PATHS.ref(task.id, mix.id, f.mel), "reference mel-spectrogram")}
-              ${audioSlot(PATHS.ref(task.id, mix.id, f.wav))}</div>
+              ${imgSlot(PATHS.ref(task.id, mp, f.mel), "reference mel-spectrogram")}
+              ${audioSlot(PATHS.ref(task.id, mp, f.wav))}</div>
           </div>
         </div>`;
     }
@@ -1250,19 +1269,19 @@ function outputHTML(mix, up, task, set, cmpUp) {
         <div class="stream-h"><span class="bar" style="background:var(--spk1)"></span>${task.id === "pvad" ? "Target-speaker activation" : "Speaker activations"}</div>
         <div class="pair${cmpUp ? " three" : ""}">
           ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>Predicted${mb(u)}</div>
-            ${imgSlot(PATHS.out(u.id, task.id, mix.id, F.out), u.name + " · predicted " + what, "3/1")}</div>`).join("")}
+            ${imgSlot(PATHS.out(u.id, task.id, mp, F.out), u.name + " · predicted " + what, "3/1")}</div>`).join("")}
           <div><div class="side-l"><span class="pill ref">Ref</span>Reference annotation</div>
-            ${imgSlot(PATHS.ref(task.id, mix.id, F.ref), "reference annotation", "3/1")}</div>
+            ${imgSlot(PATHS.ref(task.id, mp, F.ref), "reference annotation", "3/1")}</div>
         </div>
       </div></div>`;
   } else if (task.kind === "text") {
     const F = PATHS.files.text;
     html += `<div class="tcols" style="--n:${models.length + 1}">
         ${models.map((u, k) => `<div class="box"><h4>${PILL(pillCls(u), u.name)}Recognized text${mb(u)}</h4>
-          ${textSlot("asr-hyp-" + k, PATHS.out(u.id, task.id, mix.id, F.out))}
+          ${textSlot("asr-hyp-" + k, PATHS.out(u.id, task.id, mp, F.out))}
           <div class="wer-line" id="asr-stats-${k}"></div></div>`).join("")}
         <div class="box"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
-          ${textSlot("asr-ref", PATHS.ref(task.id, mix.id, F.ref))}</div>
+          ${textSlot("asr-ref", PATHS.ref(task.id, mp, F.ref))}</div>
       </div>`;
   }
   return html;
@@ -1271,6 +1290,8 @@ function outputHTML(mix, up, task, set, cmpUp) {
 document.addEventListener("click", (e) => {
   const g = e.target.closest("[data-goto]");
   if (g) { const t = document.getElementById(g.dataset.goto); t.scrollIntoView({ behavior: "smooth", block: "center" }); t.querySelector("[aria-pressed=true]")?.focus({ preventScroll: true }); return; }
+  const ov = e.target.closest("[data-ov]");
+  if (ov) { state.ov = +ov.dataset.ov; renderDemo(); return; }
   const b = e.target.closest("[data-idx],[data-up],[data-task],[data-cmp],[data-cmp-toggle]"); if (!b) return;
   if (b.dataset.idx) state.idx = +b.dataset.idx;
   if (b.dataset.cmp) state.cmp = state.cmp === b.dataset.cmp ? null : b.dataset.cmp;
@@ -1284,6 +1305,16 @@ document.addEventListener("click", (e) => {
   renderDemo();
 });
 
+
+/* ---------- overlap slider ---------- */
+document.addEventListener("input", (e) => {
+  const s = e.target.closest("[data-ov-slider]");
+  if (!s) return;
+  const v = +s.value;
+  if (v === state.ov) return;
+  state.ov = v;
+  renderDemo();
+});
 
 /* ---------- nav shadow ---------- */
 const nav = $("#nav");
