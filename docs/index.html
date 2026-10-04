@@ -1307,7 +1307,18 @@ document.addEventListener("click", (e) => {
 
 
 /* ---------- overlap slider ---------- */
+// while dragging: update the label + ticks live, without rebuilding the slider
 document.addEventListener("input", (e) => {
+  const s = e.target.closest("[data-ov-slider]");
+  if (!s) return;
+  const ctl = s.closest(".ovctl");
+  if (!ctl) return;
+  const b = ctl.querySelector(".ovlab b");
+  if (b) b.textContent = s.value + "%";
+  ctl.querySelectorAll(".ovticks span").forEach(sp => sp.classList.toggle("on", +sp.dataset.ov === +s.value));
+});
+// on release (mouseup / keyboard commit): swap the assets for the chosen overlap
+document.addEventListener("change", (e) => {
   const s = e.target.closest("[data-ov-slider]");
   if (!s) return;
   const v = +s.value;
