@@ -166,6 +166,15 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .task-ids{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .task-ids code{font-size:12px;background:var(--bg-2);border:1px solid var(--line);color:var(--ink);padding:3px 7px;border-radius:7px}
 .planned{margin-top:16px;font-size:13px;color:var(--ink-3);border-top:1px dashed var(--line-2);padding-top:12px}
+.qs-ups{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 12px 2px}
+.qs-up-grp{display:inline-flex;align-items:center;gap:8px;padding:4px 7px 4px 11px;border-radius:9px;border:1.5px solid rgba(240,122,26,.55);background:rgba(240,122,26,.12)}
+.qs-up-grp .qs-up-nm{font:700 12.5px "JetBrains Mono",ui-monospace,monospace;color:#FFB36B}
+.qs-up-grp .seg{display:inline-flex;gap:2px;background:rgba(0,0,0,.28);border-radius:7px;padding:2px}
+.qs-up-grp .seg-b{font:600 12px Inter,sans-serif;color:#FFCFA0;background:transparent;border:0;padding:4px 10px;border-radius:6px;cursor:pointer}
+.qs-up-grp .seg-b[aria-pressed=true]{background:var(--accent);color:#fff}
+.qs-up{font:600 12.5px Inter,sans-serif;color:#C9BEF0;background:rgba(107,91,181,.18);border:1.5px solid rgba(107,91,181,.55);padding:7px 12px;border-radius:9px;cursor:pointer}
+.qs-up[aria-pressed=true]{background:var(--cmp);color:#fff;border-color:var(--cmp)}
+.qs-up:hover,.qs-up-grp .seg-b:hover{filter:brightness(1.14)}
 
 /* ---------- demo ---------- */
 .demo{padding:26px}
@@ -577,6 +586,7 @@ footer .sp{margin-left:auto}
           <button class="tab" role="tab" aria-selected="false" data-tab="task">Run a task <span class="badge">Soon</span></button>
           <button class="copy" data-copy-from="qs-code" aria-label="Copy code">Copy</button>
         </div>
+        <div class="qs-ups" id="qs-ups"></div>
         <pre class="code" id="qs-code"></pre>
       </div>
       <aside class="card qs-side" id="qs-side"></aside>
@@ -617,7 +627,7 @@ footer .sp{margin-left:auto}
     <div class="sec-head">
       <span class="kicker">Checkpoints</span>
       <h2>Available models</h2>
-      <p>Pass any of these names to <code>SepRQEncoder</code>. Only the requested model is downloaded, and every model returns its per-layer features.</p>
+      <p>Pass any of these names to <code>SepRQEncoder</code>. Only the requested model is downloaded, and every model returns its <b>per-layer features</b>.</p>
     </div>
     <div class="card tcard" style="padding-top:8px">
       <div class="tscroll">
@@ -895,7 +905,7 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features", ov: 0 };  // comparison on by default (can be switched off)
+const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features", qsUp: "seprq_k2", ov: 0 };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlmplus" : "seprq");
 /* Sparse tasks (SparseLibriMix) carry an overlap dimension; assets live in an ov<NN> subfolder. */
 const ovSuffix = (task) => (task.overlaps ? "/ov" + String(state.ov).padStart(2, "0") : "");
@@ -928,56 +938,78 @@ document.addEventListener("click", (e) => {
 });
 
 /* ---------- quickstart ---------- */
-const SNIPPETS = {
-  features:
+const QS_UPS = [
+  { id: "seprq_k2", code: "SepRQ",            name: "SepRQ",      tag: "2 spk", streams: 2, ours: true },
+  { id: "seprq_k3", code: "SepRQ",            name: "SepRQ",      tag: "3 spk", streams: 3, ours: true },
+  { id: "hubert",    code: "HuBERT_BASE",     name: "HuBERT" },
+  { id: "wavlm",     code: "WavLM_BASE",      name: "WavLM Base" },
+  { id: "wavlmplus", code: "WavLM_BASE_PLUS", name: "WavLM Base+" },
+];
+const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
+
+const snipFeatures = (u) =>
 `from seprq import SepRQEncoder
 
-# "SepRQ", or "BestRQ_50Hz", "WavLM_BASE", ... (see "Available models")
-encoder = SepRQEncoder("SepRQ", streams=2)  # or streams=3
+# "${u.code}" — see "Available models" for every name
+encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u.code}"`})
 
 # ❄️ frozen feature extraction
-# wavs: [B, num_samples] or [B, channel, num_samples]
+# wavs: [B, num_samples] or [B, channel, num_samples], or a file path
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
-features = encoder(wavs)`,
-  task:
-`from seprq import SepRQPipeline   # planned API, subject to change
+features = encoder(wavs)`;
 
-# Pick a downstream task: SepRQ runs the task end to end
-separator = SepRQPipeline("separation-2spk", upstream="SepRQ")
-sources = separator("mixture.wav")          # list of waveforms, one per speaker
+const snipTask = (u) => {
+  const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
+  return `from seprq import SepRQPipeline
+
+# ${u.name}: run a downstream task end to end
+separator = SepRQPipeline("separation-2spk", ${up})
+sources = separator("mixture.wav")          # one waveform per speaker
 
 # Target-speaker tasks take an enrollment utterance
-asr = SepRQPipeline("target-speaker-asr", upstream="SepRQ")
+asr = SepRQPipeline("target-speaker-asr", ${up})
 text = asr("mixture.wav", enrollment="speaker.wav")
 
 # Diarization returns frame-level speaker activations
-diar = SepRQPipeline("diarization", upstream="SepRQ")
-activations = diar("mixture.wav")           # [T, num_speakers]`,
+diar = SepRQPipeline("diarization", ${up})
+activations = diar("mixture.wav")           # [T, num_speakers]`;
 };
+
+const SNIPPETS = { features: snipFeatures, task: snipTask };
 const SIDES = {
-  features: `<h3>What you get</h3>
+  features: `<h3>How to use</h3>
     <ul>
       <li>Accepts a <b>file path</b> in any format or sample rate. It is decoded, downmixed to mono and resampled to 16 kHz for you.</li>
-      <li>Or a <b>waveform tensor</b>: <code>[num_samples]</code>, <code>[batch, num_samples]</code> or <code>[batch, channel, num_samples]</code>.</li>
-      <li>Returns the per-layer features (12 Conformer layers for SepRQ), usable frozen ❄️ or fine-tuned 🔥.</li>
+      <li>Accepts a <b>waveform tensor</b>: <code>[num_samples]</code>, <code>[batch, num_samples]</code> or <code>[batch, channel, num_samples]</code> — or a <code>file_path</code> — downmixed to mono and resampled to 16 kHz.</li>
+      <li>Returns the <b>per-layer features</b> (12 Conformer layers for SepRQ), usable frozen ❄️ or fine-tuned 🔥.</li>
       <li>SepRQ comes in 2- and 3-speaker variants: pick one with <code>streams</code> (default <code>2</code>).</li>
-      <li>Runs on CPU or GPU.</li>
     </ul>`,
   task: `<h3>Downstream tasks</h3>
     <ul>
       <li>Choose a task by name. The matching downstream head is downloaded next to the upstream.</li>
       <li>Target-speaker tasks take an <code>enrollment</code> utterance.</li>
-      <li>Swap <code>upstream=</code> for <code>"HuBERT_BASE"</code>, <code>"WavLM_BASE"</code> or <code>"WavLM_BASE_PLUS"</code> to compare.</li>
+      <li>Select an upstream above to compare SepRQ with HuBERT or WavLM.</li>
     </ul>
-    <div class="task-ids">${TASKS.map(t => `<code>${t.api}</code>`).join("")}</div>
-    <div class="planned">This interface is on the roadmap. Names and signatures may change before release.</div>`,
+    <div class="task-ids">${TASKS.map(t => `<code>${t.api}</code>`).join("")}</div>`,
 };
+function qsUpsHTML() {
+  const cur = state.qsUp;
+  const seprq = `<div class="qs-up-grp ours"><span class="qs-up-nm">SepRQ</span>
+      <span class="seg">${QS_UPS.filter(u => u.ours).map(u => `<button class="seg-b" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.tag)}</button>`).join("")}</span></div>`;
+  const others = QS_UPS.filter(u => !u.ours).map(u => `<button class="qs-up" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.name)}</button>`).join("");
+  return seprq + others;
+}
 function renderQS() {
   document.querySelectorAll('.qs-grid .tab').forEach(t => t.setAttribute("aria-selected", t.dataset.tab === state.qsTab));
-  $("#qs-code").innerHTML = hl(SNIPPETS[state.qsTab]);
+  $("#qs-ups").innerHTML = qsUpsHTML();
+  $("#qs-code").innerHTML = hl(SNIPPETS[state.qsTab](qsUp()));
   $("#qs-side").innerHTML = SIDES[state.qsTab];
 }
 document.querySelectorAll('.qs-grid .tab').forEach(t => t.addEventListener("click", () => { state.qsTab = t.dataset.tab; renderQS(); }));
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-qsup]"); if (!b) return;
+  state.qsUp = b.dataset.qsup; renderQS();
+});
 
 /* ---------- decorative waveforms ---------- */
 function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
