@@ -991,11 +991,11 @@ function qsUpsHTML() {
   return seprq + others;
 }
 const qsDownsHTML = () => QS_DOWNS.map(d => `<button class="qs-down" data-qsdown="${d.id}" aria-pressed="${d.id === state.qsDown}">${esc(d.label)}</button>`).join("");
-const pickUp = `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>`;
+const pickUp = () => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>`;
 
 function sideFeatures() {
   return `<h3>How to use</h3>
-    ${pickUp}
+    ${pickUp()}
     <ul>
       <li>Accepts a <b>waveform tensor</b>: <code>[num_samples]</code>, <code>[batch, num_samples]</code> or <code>[batch, channel, num_samples]</code> — or a <code>file_path</code> — downmixed to mono and resampled to 16 kHz.</li>
       <li>Returns the <b>per-layer features</b> (12 Conformer layers for SepRQ), usable frozen ❄️ or fine-tuned 🔥.</li>
