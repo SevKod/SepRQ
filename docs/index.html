@@ -156,7 +156,7 @@ section.block{padding:72px 0 8px}
 .code-top .copy.done{background:#3E9A6A;color:#fff}
 pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);font-size:14px;line-height:1.7;tab-size:4}
 .t-c{color:#9C8470;font-style:italic}.t-s{color:#FFC48A}.t-k{color:#FF8E4D;font-weight:500}.t-n{color:#F7D774}.t-f{color:#9BD3FF}
-.qs-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.qs-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:stretch}
 @media (max-width:900px){.qs-grid{grid-template-columns:minmax(0,1fr)}}
 .qs-side{padding:22px}
 .qs-side h3{font-size:19px;margin-bottom:10px}
@@ -175,7 +175,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .qs-up-grp .seg-b{font:600 11.5px Inter,sans-serif;color:var(--accent-ink);background:transparent;border:0;padding:3px 9px;border-radius:6px;cursor:pointer}
 .qs-up-grp .seg-b[aria-pressed=true]{background:var(--accent);color:#fff}
 .qs-up{font:600 12px Inter,sans-serif;color:var(--cmp);background:var(--cmp-soft);border:1.5px solid transparent;padding:6px 11px;border-radius:9px;cursor:pointer}
-.qs-up[aria-pressed=true]{border-color:var(--cmp);background:#fff;box-shadow:0 0 0 2px var(--cmp-soft)}
+.qs-up[aria-pressed=true]{background:var(--cmp);color:#fff;border-color:var(--cmp)}
 .qs-down{font:600 12px Inter,sans-serif;color:var(--ink-2);background:var(--bg-2);border:1.5px solid var(--line);padding:6px 11px;border-radius:9px;cursor:pointer}
 .qs-down[aria-pressed=true]{border-color:var(--accent);background:var(--accent-softer);color:var(--accent-ink)}
 .qs-up:hover,.qs-down:hover,.qs-up-grp .seg-b:hover{filter:brightness(.97)}
@@ -433,7 +433,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .repro pre.code{font-size:13.5px;padding:18px 20px}
 
 /* ---------- method ---------- */
-.fig{padding:18px;overflow:hidden}
+.fig{padding:18px;overflow:hidden;margin:0}
 .fig img{display:block;width:100%;height:auto;border-radius:8px}
 .fig figcaption{font-size:13.5px;color:var(--ink-2);margin-top:12px;padding:0 4px}
 .pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
@@ -450,14 +450,15 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .tcard{padding:20px 0 8px}
 .tcard h3{font-size:18px;padding:0 20px}
 .tcard .cap{font-size:13px;color:var(--ink-3);padding:4px 20px 12px}
+.tables-2 .tcard .cap{min-height:3.1em}
 .tscroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
 th,td{padding:9px 14px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
 th:first-child,td:first-child{text-align:left;padding-left:20px}
 th:last-child,td:last-child{padding-right:20px}
-thead th{font-size:12px;font-weight:600;color:var(--ink-2);background:var(--bg);border-bottom:1px solid var(--line-2)}
-thead tr.grp th{font:700 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);border-bottom:0;padding-bottom:0;text-align:center}
-tbody tr.sub td{font:700 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-softer);padding-top:7px;padding-bottom:7px}
+thead th{font-size:12px;font-weight:600;color:var(--ink-2);background:var(--bg);border-bottom:1px solid var(--line-2);text-align:center}
+thead tr.grp th{font:800 13px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);border-bottom:0;padding-bottom:2px;text-align:center}
+tbody tr.sub td{font:700 12.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-softer);padding-top:8px;padding-bottom:8px}
 tbody tr.ours td{background:#FFF4E8;font-weight:600}
 tbody tr.ours td:first-child{font-weight:800;box-shadow:inset 3px 0 0 var(--accent)}
 tbody tr:last-child td{border-bottom:0}
@@ -994,7 +995,6 @@ function sideFeatures() {
   return `<h3>How to use</h3>
     ${pickUp}
     <ul>
-      <li>Accepts a <b>file path</b> in any format or sample rate. It is decoded, downmixed to mono and resampled to 16 kHz for you.</li>
       <li>Accepts a <b>waveform tensor</b>: <code>[num_samples]</code>, <code>[batch, num_samples]</code> or <code>[batch, channel, num_samples]</code> — or a <code>file_path</code> — downmixed to mono and resampled to 16 kHz.</li>
       <li>Returns the <b>per-layer features</b> (12 Conformer layers for SepRQ), usable frozen ❄️ or fine-tuned 🔥.</li>
       <li>SepRQ comes in 2- and 3-speaker variants: pick one with <code>streams</code> (default <code>2</code>).</li>

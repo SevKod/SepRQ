@@ -103,10 +103,9 @@ resolutions.*
   layers, with frame folding going from 20 ms to 320 ms and one codebook per
   scale.
 
-## 👥 Results — state of the art on multi-speaker benchmarks
+## 👥 Results
 
-Frozen upstreams with SUPERB / TS-SUPERB downstream heads. SepRQ is pre-trained
-on LibriSpeech 960 h mixtures only.
+Frozen upstreams with SUPERB / TS-SUPERB downstream heads.
 
 ### Multi-speaker SUPERB
 
