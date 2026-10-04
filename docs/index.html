@@ -1190,6 +1190,7 @@ let renderToken = 0;
 function fmtSample(task, m) {
   if (!m) return "—";
   if (task.id === "sd") return (m.der != null ? m.der + "%" : "—");
+  if (task.id === "pvad") return (m.map != null ? (m.map * 100).toFixed(1) + "%" : "—");
   if (task.id === "se") return (m.pesq != null ? m.pesq.toFixed(2) + " / " + (m.stoi * 100).toFixed(1) : "—");
   return (m.si_sdri != null ? m.si_sdri.toFixed(2) + " dB" : "—");
 }
@@ -1220,8 +1221,8 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
         <div class="ml">Paper result<br>${esc(task.metric.label)} · ${esc(task.dataset)}</div>
         <div class="mv">${val(up) ? esc(val(up)) + esc(task.metric.unit) : "not reported"}</div>
       </div>`;
-  const hasSample = (task.kind === "audio") || task.id === "sd";
-  const sampLab = task.id === "sd" ? "DER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
+  const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad";
+  const sampLab = task.id === "sd" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
   const sampleBox = !hasSample ? "" : (cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
