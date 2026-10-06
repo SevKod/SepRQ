@@ -8,6 +8,8 @@ pipelines (torch hub) -- nothing extra to host.
     encoder = SepRQEncoder("SepRQ")        # SepRQ / BestRQ_50Hz / HuBERT_BASE / WavLM_BASE / WavLM_BASE_PLUS
     layers = encoder("audio.wav")           # list of the 12 Transformer-layer outputs
 """
+import os
+
 import torch
 from hyperpyyaml import load_hyperpyyaml
 from huggingface_hub import hf_hub_download
@@ -113,11 +115,35 @@ class SepRQEncoder(torch.nn.Module):
 
     # ------------------------------------------------------------------ helpers
     @staticmethod
+    def _local_path(path):
+        """Return a local file path. A Hugging Face file URL is downloaded first."""
+        path = os.fspath(path)
+        if not isinstance(path, str) or not path.startswith(("http://", "https://")):
+            return path
+        from urllib.parse import urlparse
+
+        parts = urlparse(path).path.strip("/").split("/")
+        # https://huggingface.co/<ns>/<repo>/blob|resolve/<rev>/<file>
+        if urlparse(path).netloc == "huggingface.co" and len(parts) >= 5 and parts[2] in ("blob", "resolve"):
+            from huggingface_hub import hf_hub_download
+
+            return hf_hub_download(
+                f"{parts[0]}/{parts[1]}", "/".join(parts[4:]), revision=parts[3]
+            )
+        import tempfile
+        import urllib.request
+
+        suffix = os.path.splitext(parts[-1])[1] if parts else ".wav"
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            urllib.request.urlretrieve(path, tmp.name)
+            return tmp.name
+
+    @staticmethod
     def _load(path):
         """Load an audio file -> mono 16 kHz float32 waveform [samples]."""
         import soundfile as sf
 
-        data, sr = sf.read(path, dtype="float32", always_2d=True)  # [samp, ch]
+        data, sr = sf.read(SepRQEncoder._local_path(path), dtype="float32", always_2d=True)  # [samp, ch]
         wav = torch.from_numpy(data).mean(1)                       # mono
         if sr != SAMPLE_RATE:
             import torchaudio
