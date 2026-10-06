@@ -993,10 +993,9 @@ const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
 const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
 
 const snipFeatures = (u) =>
-`from huggingface_hub import hf_hub_download
-from seprq import SepRQEncoder
+`from seprq import SepRQEncoder
 
-path = hf_hub_download("SevKod/SepRQ", "examples/sample_mixture.wav")
+path = "path/to/wav"
 
 # "${u.code}" — see "Available models" for every name
 encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u.code}"`})
