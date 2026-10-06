@@ -1347,8 +1347,8 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
   let html = `<div class="out-h">
       <span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
       <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span>
-      ${lmToggle}
       ${sampleBox}
+      ${lmToggle}
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
 
