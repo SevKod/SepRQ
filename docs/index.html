@@ -349,7 +349,9 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .out-in{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;margin-bottom:14px}
 .out-in.with-enroll{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 @media (max-width:760px){.out-in.with-enroll{grid-template-columns:minmax(0,1fr)}}
-.out-h{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-bottom:14px}
+.out-h{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 16px;margin-bottom:14px}
+.out-h-l{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.out-h-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px}
 .out-h .bt{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:19px;letter-spacing:-.02em}
 .out-h .path{font-size:14px;color:var(--ink-2);flex:1 1 220px;min-width:0}
 .out-h .path b{color:var(--ink)}
@@ -433,7 +435,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .lmtbl td+td{border-left:1px solid var(--line)}
 .lmtbl .pill{font-size:11px}
 .lmtbl .mv{font-weight:700;font-size:15px;color:var(--ink)}
-.lmbar{width:100%;display:flex;align-items:center;gap:10px;margin:0}
+.lmbar{display:inline-flex;align-items:center;gap:10px;margin:0}
 .lmbar-l{font:600 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .lmseg{display:inline-flex;gap:3px;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:3px}
 .lmseg-b{appearance:none;cursor:pointer;font:600 12.5px Inter,sans-serif;color:var(--ink-2);background:transparent;border:0;padding:5px 14px;border-radius:7px;transition:background .15s,color .15s}
@@ -1345,10 +1347,12 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
       </div></div>` : "";
 
   let html = `<div class="out-h">
-      <span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
-      <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span>
+      <div class="out-h-l">
+        <div class="out-h-title"><span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
+          <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span></div>
+        ${lmToggle}
+      </div>
       ${sampleBox}
-      ${lmToggle}
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
 
