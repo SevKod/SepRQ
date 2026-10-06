@@ -420,14 +420,20 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .w-del{background:#FFD1CC;border-radius:4px;padding:0 2px;text-decoration:line-through}
 .wer-line{font-size:13px;color:var(--ink-2);margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .lmtag{font:600 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
-.lmtbl{border-collapse:collapse;margin-top:6px;font-size:13px}
-.lmtbl th,.lmtbl td{padding:5px 12px;text-align:center;border:2.5px solid var(--accent-soft)}
-.lmtbl thead th{font-weight:600}
-.lmtbl tbody th{font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);text-align:left}
+.lmtbl{border-collapse:separate;border-spacing:0;margin-top:8px;font-size:13px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.lmtbl th,.lmtbl td{padding:8px 16px;text-align:center}
+.lmtbl thead th{background:var(--bg-2);font-weight:600;border-bottom:1px solid var(--line)}
+.lmtbl thead th:first-child{background:transparent;border-bottom:0}
+.lmtbl tbody th{font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);text-align:left;border-right:1px solid var(--line)}
+.lmtbl tbody tr:last-child th,.lmtbl tbody tr:last-child td{border-top:1px solid var(--line)}
+.lmtbl td+td{border-left:1px solid var(--line)}
 .lmtbl .pill{font-size:11px}
-.lmtbl .mv{font-weight:600}
-.refspan{grid-row:1 / span 2;align-self:start}
-@media (max-width:860px){.refspan{grid-column:auto !important;grid-row:auto !important}}
+.lmtbl .mv{font-weight:700;font-size:15px;color:var(--ink)}
+.lmbar{display:flex;align-items:center;gap:12px;margin:14px 0 2px}
+.lmbar-l{font:600 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.lmseg{display:inline-flex;gap:3px;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.lmseg-b{appearance:none;cursor:pointer;font:600 12.5px Inter,sans-serif;color:var(--ink-2);background:transparent;border:0;padding:5px 14px;border-radius:7px;transition:background .15s,color .15s}
+.lmseg-b[aria-pressed=true]{background:var(--accent);color:#fff}
 .ovctl{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .ovlab{font-size:13px;color:var(--ink-2);margin-bottom:8px}
 .ovlab b{color:var(--accent);font-size:14px}
@@ -920,7 +926,7 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation-2spk", ov: 0 };  // comparison on by default (can be switched off)
+const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation-2spk", ov: 0, lm: 0 };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlmplus" : "seprq");
 /* Sparse tasks (SparseLibriMix) carry an overlap dimension; assets live in an ov<NN> subfolder. */
 const ovSuffix = (task) => (task.overlaps ? "/ov" + String(state.ov).padStart(2, "0") : "");
@@ -1094,27 +1100,38 @@ async function fetchText(src) {
 }
 async function loadASR(token) {
   const refEl = $("#asr-ref");
-  const hyps = [...document.querySelectorAll('[id^="asr-hyp-"]')];
-  const res = await Promise.allSettled([fetchText(refEl.dataset.src), ...hyps.map(h => fetchText(h.dataset.src))]);
+  const boxes = [...document.querySelectorAll('[id^="asr-hyp-"]')];
+  // normalize each box's src to its base (w/o LM) file, then build both variants
+  const srcOf = (el, lm) => (el.dataset.src || "").replace("hypothesis_lm.txt", "hypothesis.txt")
+    .replace(/hypothesis\.txt$/, lm ? "hypothesis_lm.txt" : "hypothesis.txt");
+  const jobs = [fetchText(refEl.dataset.src)];
+  boxes.forEach(el => jobs.push(fetchText(srcOf(el, 0)), fetchText(srcOf(el, 1))));
+  const res = await Promise.allSettled(jobs);
   if (token !== renderToken) return;
   const miss = (el, what) => { el.classList.add("missing"); el.innerHTML = `<b>Placeholder · ${what}</b>${esc(el.dataset.src)}`; };
   const ref = res[0];
   ref.status === "fulfilled" ? (refEl.textContent = ref.value) : miss(refEl, "reference transcript");
-  hyps.forEach((hypEl, idx) => {
-    const hyp = res[idx + 1];
+  const alignHyp = (val) => align(ref.value.split(/\s+/), val.split(/\s+/));
+  boxes.forEach((hypEl, i) => {
+    const noRes = res[1 + i * 2], lmRes = res[2 + i * 2];
+    const upId = hypEl.dataset.up, shown = hypEl.dataset.lm;
     const stats = document.getElementById(hypEl.id.replace("asr-hyp", "asr-stats"));
-    const upId = hypEl.dataset.up, lm = hypEl.dataset.lm;
-    const cell = () => (upId != null ? document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="${lm}"]`) : []);
-    if (hyp.status !== "fulfilled") { miss(hypEl, "transcription output"); if (stats) stats.innerHTML = ""; cell().forEach(s => { s.textContent = "—"; }); return; }
-    if (ref.status !== "fulfilled") { hypEl.textContent = hyp.value; if (stats) stats.innerHTML = ""; return; }
-    const a = align(ref.value.split(/\s+/), hyp.value.split(/\s+/));
+    const setCell = (lm, txt) => document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="${lm}"]`).forEach(s => { s.textContent = txt; });
+    // fill both WER-table cells regardless of which mode is displayed
+    [[0, noRes], [1, lmRes]].forEach(([lm, r]) => {
+      setCell(lm, (r.status === "fulfilled" && ref.status === "fulfilled")
+        ? (100 * alignHyp(r.value).errors / Math.max(1, alignHyp(r.value).n)).toFixed(1) + "%" : "—");
+    });
+    // render the recognized text for the selected mode only
+    const shownRes = shown === "1" ? lmRes : noRes;
+    if (shownRes.status !== "fulfilled") { miss(hypEl, "transcription output"); if (stats) stats.innerHTML = ""; return; }
+    if (ref.status !== "fulfilled") { hypEl.textContent = shownRes.value; if (stats) stats.innerHTML = ""; return; }
+    const a = alignHyp(shownRes.value);
     hypEl.innerHTML = a.ops.map(o => o.t === "ok" ? esc(o.h)
       : o.t === "sub" ? `<span class="w-sub" title="reference: ${esc(o.r)}">${esc(o.h)}</span>`
       : o.t === "ins" ? `<span class="w-ins" title="insertion">${esc(o.h)}</span>`
       : `<span class="w-del" title="deletion">${esc(o.r)}</span>`).join(" ");
     const c = (t) => a.ops.filter(o => o.t === t).length;
-    const wer = (100 * a.errors / Math.max(1, a.n)).toFixed(1) + "%";
-    cell().forEach(s => { s.textContent = wer; });
     if (stats) stats.innerHTML = `<span><i class="legend-sw" style="background:#FFE0B8"></i>${c("sub")} sub.</span>
       <span><i class="legend-sw" style="background:#FFD1CC"></i>${c("ins")} ins.</span>
       <span><i class="legend-sw" style="background:#E7E0D6"></i>${c("del")} del.</span>`;
@@ -1139,7 +1156,7 @@ function renderDemo() {
   const mix = set.items[idx];
   if (!task.overlaps) state.ov = 0;
   const mp = mix.id + ovSuffix(task);  // per-overlap asset folder for sparse tasks
-  const focused = document.activeElement?.closest?.("[data-idx],[data-up],[data-task],[data-cmp],[data-cmp-toggle]");
+  const focused = document.activeElement?.closest?.("[data-idx],[data-up],[data-task],[data-cmp],[data-cmp-toggle],[data-lm-toggle]");
   const fsel = focused ? Object.entries(focused.dataset).map(([k, v]) => `[data-${k.replace(/[A-Z]/g, c => "-" + c.toLowerCase())}="${v}"]`).join("") : null;
   $("#flow").classList.toggle("has-enroll", !!task.enroll);
 
@@ -1366,14 +1383,16 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
           <div class="txt" id="asr-hyp-${k}-${lm}" data-src="${esc(src)}" data-up="${esc(u.id)}" data-lm="${lm}"><span style="color:var(--ink-3)">Loading…</span></div>
           <div class="wer-line" id="asr-stats-${k}-${lm}"></div></div>`;
     };
-    const cols = models.length + 1;
-    const woRow = models.map((u, k) => hypBox(u, k, 0)).join("");   // row 1: w/o LM
-    const lmRow = models.map((u, k) => hypBox(u, k, 1)).join("");   // row 2: w/ LM
-    html += `<div class="tcols" style="--n:${cols}">
-        ${woRow}
-        <div class="box refspan" style="grid-column:${cols}"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
+    const lm = state.lm;
+    const toggle = `<div class="lmseg" role="group" aria-label="Decoding mode">
+        <button class="lmseg-b" data-lm-toggle="0" aria-pressed="${lm === 0}">w/o LM</button>
+        <button class="lmseg-b" data-lm-toggle="1" aria-pressed="${lm === 1}">w/ LM</button>
+      </div>`;
+    html += `<div class="lmbar"><span class="lmbar-l">Decoder</span>${toggle}</div>
+      <div class="tcols" style="--n:${models.length + 1}">
+        ${models.map((u, k) => hypBox(u, k, lm)).join("")}
+        <div class="box"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
           ${textSlot("asr-ref", PATHS.ref(task.id, mp, F.ref))}</div>
-        ${lmRow}
       </div>`;
   }
   return html;
@@ -1384,6 +1403,8 @@ document.addEventListener("click", (e) => {
   if (g) { const t = document.getElementById(g.dataset.goto); t.scrollIntoView({ behavior: "smooth", block: "center" }); t.querySelector("[aria-pressed=true]")?.focus({ preventScroll: true }); return; }
   const ov = e.target.closest("[data-ov]");
   if (ov) { state.ov = +ov.dataset.ov; renderDemo(); return; }
+  const lmb = e.target.closest("[data-lm-toggle]");
+  if (lmb) { state.lm = +lmb.dataset.lmToggle; renderDemo(); return; }
   const b = e.target.closest("[data-idx],[data-up],[data-task],[data-cmp],[data-cmp-toggle]"); if (!b) return;
   if (b.dataset.idx) state.idx = +b.dataset.idx;
   if (b.dataset.cmp) state.cmp = state.cmp === b.dataset.cmp ? null : b.dataset.cmp;
