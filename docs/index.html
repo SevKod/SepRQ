@@ -129,10 +129,12 @@ code,pre,.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,mo
 .affils{font-size:13px;color:var(--ink-3);margin-top:4px}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;text-align:left;box-shadow:var(--shadow)}
+.stat{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 16px;text-align:left;box-shadow:var(--shadow)}
 .stat .v{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:30px;letter-spacing:-.03em;color:var(--ink)}
 .stat .v small{font-size:16px;font-weight:700;color:var(--accent-ink);margin-left:3px}
-.stat .v small.mk{color:var(--ink);margin-left:7px}
+.stat .v small.mk{color:var(--ink);margin-left:7px;font-size:inherit;font-weight:800;letter-spacing:-.03em}
+.stat:has(.sota){padding-top:36px}
+.stat .sota{position:absolute;top:10px;left:12px;font:700 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--accent);padding:2px 7px;border-radius:6px;line-height:1.4}
 .stat .l{font-size:13px;color:var(--ink-2);line-height:1.4;margin-top:2px}
 @media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.stat .v{font-size:25px}}
 
@@ -596,8 +598,8 @@ footer .sp{margin-left:auto}
     <div class="stats">
       <div class="stat"><div class="v">85.68<small>M</small></div><div class="l">inference parameters, 50 Hz frame rate</div></div>
       <div class="stat"><div class="v">12.10<small>dB</small></div><div class="l">SI-SDRi, SUPERB speech separation (Libri2Mix)</div></div>
-      <div class="stat"><div class="v">2.08<small>%</small> <small class="mk">DER</small></div><div class="l">SUPERB speaker diarization (Libri2Mix)</div></div>
-      <div class="stat"><div class="v">16.78<small>%</small> <small class="mk">WER</small></div><div class="l">TS-SUPERB target-speaker ASR (Libri2Mix)</div></div>
+      <div class="stat"><span class="sota">SOTA</span><div class="v">2.08<small>%</small> <small class="mk">DER</small></div><div class="l">SUPERB speaker diarization (Libri2Mix)</div></div>
+      <div class="stat"><span class="sota">SOTA</span><div class="v">16.78<small>%</small> <small class="mk">WER</small></div><div class="l">TS-SUPERB target-speaker ASR (Libri2Mix)</div></div>
     </div>
   </div>
 </header>
