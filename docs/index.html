@@ -1324,28 +1324,16 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
   const upName = (u) => (u.ours ? `<b>${esc(u.name)}</b>` : esc(u.name));
   const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad" || task.id === "dh3" || task.id === "tsasr";
   const sampLab = task.id === "sd" || task.id === "dh3" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "tsasr" ? "WER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
-  // --- TS-ASR: 2x2 WER table (this-sample), clean style ---
-  const werTable = (label, cls, cellFn) => `<div class="metric ${cls}" title="${esc(label)}">
-        <div class="ml">${esc(label)}<br>WER ↓</div>
-        <table class="lmtbl">
-          <thead><tr><th></th>${models.map(u => `<th><span class="pill ${pillCls(u)}">${esc(u.name)}</span></th>`).join("")}</tr></thead>
-          <tbody>
-            <tr><th>w/o LM</th>${models.map(u => `<td>${cellFn(u, 0)}</td>`).join("")}</tr>
-            <tr><th>w/ LM</th>${models.map(u => `<td>${cellFn(u, 1)}</td>`).join("")}</tr>
-          </tbody>
-        </table>
-      </div>`;
-  const sampleBox = !hasSample ? "" : (task.id === "tsasr"
-    ? werTable("This sample", "sample", (u, lm) => `<span class="mv samp" data-up="${esc(u.id)}" data-lm="${lm}">…</span>`)
-    : cmpUp
+  const lmAttr = task.id === "tsasr" ? ` data-lm="${state.lm}"` : "";
+  const sampleBox = !hasSample ? "" : (cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
         <div class="mvs">${models.map(u => `<div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>
-          <span class="mv samp" data-up="${esc(u.id)}">…</span></div>`).join("")}</div>
+          <span class="mv samp" data-up="${esc(u.id)}"${lmAttr}>…</span></div>`).join("")}</div>
       </div>`
     : `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
-        <div class="mv samp" data-up="${esc(up.id)}">…</div>
+        <div class="mv samp" data-up="${esc(up.id)}"${lmAttr}>…</div>
       </div>`);
   const lmToggle = task.id === "tsasr" ? `<div class="lmbar"><span class="lmbar-l">Decoder</span>
       <div class="lmseg" role="group" aria-label="Decoding mode">
