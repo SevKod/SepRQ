@@ -994,18 +994,16 @@ const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
 
 const snipFeatures = (u) =>
 `from huggingface_hub import hf_hub_download
-import torchaudio
 from seprq import SepRQEncoder
 
 path = hf_hub_download("SevKod/SepRQ", "examples/sample_mixture.wav")
-wav, _ = torchaudio.load(path)
 
 # "${u.code}" — see "Available models" for every name
 encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u.code}"`})
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
-features = encoder(wav)`;
+features = encoder(path)`;
 
 const snipTask = (u, d) => {
   const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
