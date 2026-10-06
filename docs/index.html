@@ -1002,7 +1002,7 @@ encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
-wav, _ = torchaudio.load(hf_hub_download("SevKod/SepRQ", "examples/libri2mix_mixture.wav"))
+wav, _ = torchaudio.load(hf_hub_download("SevKod/SepRQ", "examples/sample_mixture.wav"))
 features = encoder(wav)`;
 
 const snipTask = (u, d) => {
