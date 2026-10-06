@@ -351,6 +351,8 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 @media (max-width:760px){.out-in.with-enroll{grid-template-columns:minmax(0,1fr)}}
 .out-h{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 16px;margin-bottom:14px}
 .out-h-l{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.out-h-l.has-dec{align-self:stretch}
+.out-h-l.has-dec .lmbar{margin:auto}
 .out-h-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px}
 .out-h .bt{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:19px;letter-spacing:-.02em}
 .out-h .path{font-size:14px;color:var(--ink-2);flex:1 1 220px;min-width:0}
@@ -435,10 +437,10 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .lmtbl td+td{border-left:1px solid var(--line)}
 .lmtbl .pill{font-size:11px}
 .lmtbl .mv{font-weight:700;font-size:15px;color:var(--ink)}
-.lmbar{display:inline-flex;align-items:center;gap:10px;margin:0}
-.lmbar-l{font:600 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
-.lmseg{display:inline-flex;gap:3px;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:3px}
-.lmseg-b{appearance:none;cursor:pointer;font:600 12.5px Inter,sans-serif;color:var(--ink-2);background:transparent;border:0;padding:5px 14px;border-radius:7px;transition:background .15s,color .15s}
+.lmbar{display:inline-flex;align-items:center;gap:12px;margin:0}
+.lmbar-l{font:600 12px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.lmseg{display:inline-flex;gap:4px;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:4px}
+.lmseg-b{appearance:none;cursor:pointer;font:600 14.5px Inter,sans-serif;color:var(--ink-2);background:transparent;border:0;padding:8px 20px;border-radius:9px;transition:background .15s,color .15s}
 .lmseg-b[aria-pressed=true]{background:var(--accent);color:#fff}
 .ovctl{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .ovlab{font-size:13px;color:var(--ink-2);margin-bottom:8px}
@@ -1347,7 +1349,7 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
       </div></div>` : "";
 
   let html = `<div class="out-h">
-      <div class="out-h-l">
+      <div class="out-h-l${lmToggle ? " has-dec" : ""}">
         <div class="out-h-title"><span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
           <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span></div>
         ${lmToggle}
