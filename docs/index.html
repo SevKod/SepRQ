@@ -939,8 +939,8 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlmplus", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation-2spk", ov: 0, lm: 0 };  // comparison on by default (can be switched off)
-const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlmplus" : "seprq");
+const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlm", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation-2spk", ov: 0, lm: 0 };  // comparison on by default (can be switched off)
+const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlm" : "seprq");
 /* Sparse tasks (SparseLibriMix) carry an overlap dimension; assets live in an ov<NN> subfolder. */
 const ovSuffix = (task) => (task.overlaps ? "/ov" + String(state.ov).padStart(2, "0") : "");
 
@@ -975,9 +975,11 @@ document.addEventListener("click", (e) => {
 const QS_UPS = [
   { id: "seprq_k2", code: "SepRQ",            name: "SepRQ",      tag: "2 spk", streams: 2, ours: true },
   { id: "seprq_k3", code: "SepRQ",            name: "SepRQ",      tag: "3 spk", streams: 3, ours: true },
+  { id: "bestrq",    code: "BestRQ_50Hz",     name: "BestRQ" },
   { id: "hubert",    code: "HuBERT_BASE",     name: "HuBERT" },
   { id: "wavlm",     code: "WavLM_BASE",      name: "WavLM Base" },
   { id: "wavlmplus", code: "WavLM_BASE_PLUS", name: "WavLM Base+" },
+  { id: "wavlmlarge", code: "WavLM_LARGE",    name: "WavLM Large" },
 ];
 const QS_DOWNS = [
   { id: "separation-2spk",            label: "Separation",      enroll: false, var: "sources",     ret: "# one waveform per speaker" },
@@ -1162,7 +1164,7 @@ function renderDemo() {
   const UPS = upstreamsFor(task);
   state.up = normUp(state.up, task);
   if (!UPS.find(u => u.id === state.up && u.ours)) state.up = normUp("seprq", task);
-  if (state.cmp && !UPS.find(u => u.id === state.cmp && !u.ours)) state.cmp = "wavlmplus";
+  if (state.cmp && !UPS.find(u => u.id === state.cmp && !u.ours)) state.cmp = "wavlm";
   const up = UPS.find(u => u.id === state.up);
   const setId = task.inputs, set = INPUT_SETS[setId];
   const idx = Math.min(state.idx, set.items.length - 1);
