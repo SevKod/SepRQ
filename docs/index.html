@@ -833,7 +833,7 @@ const INPUT_SETS = {
   libri2mix:      { label: "Libri2Mix",        noun: "mixture",      items: placeholder("l2m", "Mixture") },
   l2m_sep:        { label: "Libri2Mix", noun: "mixture", items: [{ id: "1089-134686-0000_121-127105-0031", title: "Mixture 1", meta: "2 speakers · 10.4s" }, { id: "237-126133-0014_3729-6852-0037", title: "Mixture 2", meta: "2 speakers · 5.9s" }, { id: "4507-16021-0050_2961-961-0003", title: "Mixture 3", meta: "2 speakers · 3.9s" }, { id: "672-122797-0073_1580-141084-0004", title: "Mixture 4", meta: "2 speakers · 8.2s" }, { id: "8463-287645-0013_5142-33396-0037", title: "Mixture 5", meta: "2 speakers · 3.6s" }] },
   l2m_diar:       { label: "Libri2Mix", noun: "recording", items: [{ id: "1320-122617-0002_8455-210777-0028", title: "Recording 1", meta: "2 speakers · 13.6s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Recording 2", meta: "2 speakers · 5.2s" }, { id: "4507-16021-0053_2300-131720-0005", title: "Recording 3", meta: "2 speakers · 8.1s" }, { id: "6829-68771-0032_1995-1837-0014", title: "Recording 4", meta: "2 speakers · 12.5s" }, { id: "7127-75947-0019_1089-134691-0018", title: "Recording 5", meta: "2 speakers · 3.9s" }] },
-  dihard3:        { label: "DIHARD 3",         noun: "recording",    items: placeholder("dh3", "Recording") },
+  dihard3:        { label: "DIHARD 3",         noun: "recording",    items: [{ id: "broadcast_interview", title: "Broadcast interview", meta: "2 speakers · DIHARD3 dev" }, { id: "court", title: "Court", meta: "2 speakers · DIHARD3 dev" }, { id: "cts", title: "Telephone (CTS)", meta: "2 speakers · DIHARD3 dev" }, { id: "meeting", title: "Meeting", meta: "3 speakers · DIHARD3 dev" }, { id: "restaurant", title: "Restaurant", meta: "6 speakers · DIHARD3 dev" }] },
   wsj0_2mix:      { label: "WSJ0-2mix",        noun: "2-spk mixture", items: [{ id: "050a0501_1.7783_442o030z_-1.7783", title: "2-spk mixture 1", meta: "2 speakers · 4.4s" }, { id: "050a0502_1.3461_440o030j_-1.3461", title: "2-spk mixture 2", meta: "2 speakers · 4.9s" }, { id: "050a0502_1.463_420a010o_-1.463", title: "2-spk mixture 3", meta: "2 speakers · 4.9s" }, { id: "050a0502_1.9707_440c020w_-1.9707", title: "2-spk mixture 4", meta: "2 speakers · 4.9s" }, { id: "050a0504_2.4414_443o0313_-2.4414", title: "2-spk mixture 5", meta: "2 speakers · 5.6s" }] },
   wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: [{ id: "050a0503_1.202_053c0107_-1.202_441c020h_0", title: "3-spk mixture 1", meta: "3 speakers · 5.6s" }, { id: "050a0503_1.2607_446c0203_-1.2607_22go010a_0", title: "3-spk mixture 2", meta: "3 speakers · 3.9s" }, { id: "050a0504_0.34233_447c0210_-0.34233_22ga010q_0", title: "3-spk mixture 3", meta: "3 speakers · 5.6s" }, { id: "050a0504_0.71133_446c020g_-0.71133_421c020s_0", title: "3-spk mixture 4", meta: "3 speakers · 5.6s" }, { id: "050a0504_2.2121_446o0306_-2.2121_052a050b_0", title: "3-spk mixture 5", meta: "3 speakers · 4.6s" }] },
   voicebank:      { label: "VoiceBank-DEMAND", noun: "noisy speech", items: [{ id: "p232_001", title: "Noisy clip 1", meta: "p232 · 1.7s" }, { id: "p232_211", title: "Noisy clip 2", meta: "p232 · 1.4s" }, { id: "p257_008", title: "Noisy clip 3", meta: "p257 · 5.6s" }, { id: "p257_210", title: "Noisy clip 4", meta: "p257 · 2.5s" }, { id: "p257_410", title: "Noisy clip 5", meta: "p257 · 3.6s" }] },
@@ -1236,6 +1236,7 @@ function fmtSample(task, m) {
   if (!m) return "—";
   if (task.id === "sd") return (m.der != null ? m.der + "%" : "—");
   if (task.id === "pvad") return (m.map != null ? (m.map * 100).toFixed(1) + "%" : "—");
+  if (task.id === "dh3") return (m.der != null ? m.der + "%" : "—");
   if (task.id === "se") return (m.pesq != null ? m.pesq.toFixed(2) + " / " + (m.stoi * 100).toFixed(1) : "—");
   return (m.si_sdri != null ? m.si_sdri.toFixed(2) + " dB" : "—");
 }
@@ -1266,8 +1267,8 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
         <div class="ml">Paper result<br>${esc(task.metric.label)} · ${esc(task.dataset)}</div>
         <div class="mv">${val(up) ? esc(val(up)) + esc(task.metric.unit) : "not reported"}</div>
       </div>`;
-  const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad";
-  const sampLab = task.id === "sd" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
+  const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad" || task.id === "dh3";
+  const sampLab = task.id === "sd" || task.id === "dh3" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
   const sampleBox = !hasSample ? "" : (cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
