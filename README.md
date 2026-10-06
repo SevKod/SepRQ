@@ -11,6 +11,7 @@
 </p>
 
 <p align="center">
+  📄 <a href="https://arxiv.org/abs/2610.04690"><b>Paper</b></a> &nbsp;·&nbsp;
   🌐 <a href="https://sevkod.github.io/SepRQ/"><b>Website</b></a> &nbsp;·&nbsp;
   🤗 <a href="https://huggingface.co/SevKod/SepRQ"><b>Hugging Face</b></a> &nbsp;·&nbsp;
   💻 <a href="https://github.com/SevKod/SepRQ"><b>GitHub</b></a>
@@ -215,8 +216,17 @@ EEND diarization on DIHARD 3 and ConvTasNet separation on WSJ0-2/3mix.
 
 ## Citation
 
-> 🚧 **TODO** — BibTeX coming soon.
+If SepRQ helps your research, please cite the paper: [arXiv:2610.04690](https://arxiv.org/abs/2610.04690).
 
 ```bibtex
-% TODO: citation to be added
+@misc{baroudi2026seprqselfsupervisedspeech,
+  title         = {SepRQ : Self-Supervised Speech Mixture Representation Learning
+                   via Mask-Free, Multi-Scale Source Separation},
+  author        = {Séverin Baroudi and Hervé Bredin and Ricard Marxer},
+  year          = {2026},
+  eprint        = {2610.04690},
+  archivePrefix = {arXiv},
+  primaryClass  = {eess.AS},
+  url           = {https://arxiv.org/abs/2610.04690}
+}
 ```
