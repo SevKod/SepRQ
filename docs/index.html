@@ -420,6 +420,12 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .w-del{background:#FFD1CC;border-radius:4px;padding:0 2px;text-decoration:line-through}
 .wer-line{font-size:13px;color:var(--ink-2);margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .lmtag{font:600 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
+.lmtbl{border-collapse:collapse;margin-top:6px;font-size:13px}
+.lmtbl th,.lmtbl td{padding:4px 10px;text-align:center;border:1px solid var(--line)}
+.lmtbl thead th{background:var(--bg-2);font-weight:600}
+.lmtbl tbody th{font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);text-align:left}
+.lmtbl .pill{font-size:11px}
+.lmtbl .mv{font-weight:600}
 .ovctl{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .ovlab{font-size:13px;color:var(--ink-2);margin-bottom:8px}
 .ovlab b{color:var(--accent);font-size:14px}
@@ -1092,10 +1098,13 @@ async function loadASR(token) {
   const miss = (el, what) => { el.classList.add("missing"); el.innerHTML = `<b>Placeholder · ${what}</b>${esc(el.dataset.src)}`; };
   const ref = res[0];
   ref.status === "fulfilled" ? (refEl.textContent = ref.value) : miss(refEl, "reference transcript");
-  hyps.forEach((hypEl, k) => {
-    const hyp = res[k + 1], stats = document.getElementById("asr-stats-" + k);
-    if (hyp.status !== "fulfilled") { miss(hypEl, "transcription output"); stats.innerHTML = ""; return; }
-    if (ref.status !== "fulfilled") { hypEl.textContent = hyp.value; stats.innerHTML = ""; return; }
+  hyps.forEach((hypEl, idx) => {
+    const hyp = res[idx + 1];
+    const stats = document.getElementById(hypEl.id.replace("asr-hyp", "asr-stats"));
+    const upId = hypEl.dataset.up, lm = hypEl.dataset.lm;
+    const cell = () => (upId != null ? document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="${lm}"]`) : []);
+    if (hyp.status !== "fulfilled") { miss(hypEl, "transcription output"); if (stats) stats.innerHTML = ""; cell().forEach(s => { s.textContent = "—"; }); return; }
+    if (ref.status !== "fulfilled") { hypEl.textContent = hyp.value; if (stats) stats.innerHTML = ""; return; }
     const a = align(ref.value.split(/\s+/), hyp.value.split(/\s+/));
     hypEl.innerHTML = a.ops.map(o => o.t === "ok" ? esc(o.h)
       : o.t === "sub" ? `<span class="w-sub" title="reference: ${esc(o.r)}">${esc(o.h)}</span>`
@@ -1103,24 +1112,10 @@ async function loadASR(token) {
       : `<span class="w-del" title="deletion">${esc(o.r)}</span>`).join(" ");
     const c = (t) => a.ops.filter(o => o.t === t).length;
     const wer = (100 * a.errors / Math.max(1, a.n)).toFixed(1) + "%";
-    const box = hypEl.closest(".box");
-    const upId = box && box.querySelector(".mb.samp") ? box.querySelector(".mb.samp").dataset.up : null;
-    if (upId) document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="0"]`).forEach(s => { s.textContent = wer; });
-    stats.innerHTML = `<span><i class="legend-sw" style="background:#FFE0B8"></i>${c("sub")} sub.</span>
+    cell().forEach(s => { s.textContent = wer; });
+    if (stats) stats.innerHTML = `<span><i class="legend-sw" style="background:#FFE0B8"></i>${c("sub")} sub.</span>
       <span><i class="legend-sw" style="background:#FFD1CC"></i>${c("ins")} ins.</span>
       <span><i class="legend-sw" style="background:#E7E0D6"></i>${c("del")} del.</span>`;
-    // w/ LM row: align the LM-decoded hypothesis the same way
-    if (upId && ref.status === "fulfilled") {
-      const lmSrc = (hypEl.dataset.src || "").replace("hypothesis.txt", "hypothesis_lm.txt");
-      fetchText(lmSrc).then(txt => {
-        if (token !== renderToken) return;
-        const la = align(ref.value.split(/\s+/), txt.split(/\s+/));
-        const lwer = (100 * la.errors / Math.max(1, la.n)).toFixed(1) + "%";
-        document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="1"]`).forEach(s => { s.textContent = lwer; });
-      }).catch(() => {
-        document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="1"]`).forEach(s => { s.textContent = "—"; });
-      });
-    }
   });
 }
 
@@ -1295,12 +1290,18 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
       </div>`;
   const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad" || task.id === "dh3" || task.id === "tsasr";
   const sampLab = task.id === "sd" || task.id === "dh3" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "tsasr" ? "WER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
-  const lmRows = (u) => `<div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span><span class="lmtag">w/o LM</span><span class="mv samp" data-up="${esc(u.id)}" data-lm="0">…</span></div>
-        <div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span><span class="lmtag">w/ LM</span><span class="mv samp" data-up="${esc(u.id)}" data-lm="1">…</span></div>`;
+  const lmCell = (u, lm) => `<td><span class="mv samp" data-up="${esc(u.id)}" data-lm="${lm}">…</span></td>`;
+  const lmTable = `<table class="lmtbl">
+        <thead><tr><th></th>${models.map(u => `<th><span class="pill ${pillCls(u)}">${esc(u.name)}</span></th>`).join("")}</tr></thead>
+        <tbody>
+          <tr><th>w/o LM</th>${models.map(u => lmCell(u, 0)).join("")}</tr>
+          <tr><th>w/ LM</th>${models.map(u => lmCell(u, 1)).join("")}</tr>
+        </tbody>
+      </table>`;
   const sampleBox = !hasSample ? "" : (task.id === "tsasr"
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
-        <div class="mvs">${models.map(lmRows).join("")}</div>
+        ${lmTable}
       </div>`
     : cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
@@ -1357,10 +1358,14 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
       </div></div>`;
   } else if (task.kind === "text") {
     const F = PATHS.files.text;
-    html += `<div class="tcols" style="--n:${models.length + 1}">
-        ${models.map((u, k) => `<div class="box"><h4>${PILL(pillCls(u), u.name)}Recognized text${mb(u)}</h4>
-          ${textSlot("asr-hyp-" + k, PATHS.out(u.id, task.id, mp, F.out))}
-          <div class="wer-line" id="asr-stats-${k}"></div></div>`).join("")}
+    const hypBox = (u, k, lm) => {
+      const src = PATHS.out(u.id, task.id, mp, lm ? "hypothesis_lm.txt" : F.out);
+      return `<div class="box"><h4>${PILL(pillCls(u), u.name)}Recognized text <span class="lmtag">${lm ? "w/ LM" : "w/o LM"}</span></h4>
+          <div class="txt" id="asr-hyp-${k}-${lm}" data-src="${esc(src)}" data-up="${esc(u.id)}" data-lm="${lm}"><span style="color:var(--ink-3)">Loading…</span></div>
+          <div class="wer-line" id="asr-stats-${k}-${lm}"></div></div>`;
+    };
+    html += `<div class="tcols" style="--n:${models.length * 2 + 1}">
+        ${models.map((u, k) => hypBox(u, k, 0) + hypBox(u, k, 1)).join("")}
         <div class="box"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
           ${textSlot("asr-ref", PATHS.ref(task.id, mp, F.ref))}</div>
       </div>`;
