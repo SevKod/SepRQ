@@ -419,6 +419,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .w-ins{background:#FFD1CC;border-radius:4px;padding:0 2px}
 .w-del{background:#FFD1CC;border-radius:4px;padding:0 2px;text-decoration:line-through}
 .wer-line{font-size:13px;color:var(--ink-2);margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.lmtag{font:600 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
 .ovctl{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .ovlab{font-size:13px;color:var(--ink-2);margin-bottom:8px}
 .ovlab b{color:var(--accent);font-size:14px}
@@ -834,8 +835,8 @@ const INPUT_SETS = {
   l2m_sep:        { label: "Libri2Mix", noun: "mixture", items: [{ id: "1089-134686-0000_121-127105-0031", title: "Mixture 1", meta: "2 speakers · 10.4s" }, { id: "237-126133-0014_3729-6852-0037", title: "Mixture 2", meta: "2 speakers · 5.9s" }, { id: "4507-16021-0050_2961-961-0003", title: "Mixture 3", meta: "2 speakers · 3.9s" }, { id: "672-122797-0073_1580-141084-0004", title: "Mixture 4", meta: "2 speakers · 8.2s" }, { id: "8463-287645-0013_5142-33396-0037", title: "Mixture 5", meta: "2 speakers · 3.6s" }] },
   l2m_diar:       { label: "Libri2Mix", noun: "recording", items: [{ id: "1320-122617-0002_8455-210777-0028", title: "Recording 1", meta: "2 speakers · 13.6s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Recording 2", meta: "2 speakers · 5.2s" }, { id: "4507-16021-0053_2300-131720-0005", title: "Recording 3", meta: "2 speakers · 8.1s" }, { id: "6829-68771-0032_1995-1837-0014", title: "Recording 4", meta: "2 speakers · 12.5s" }, { id: "7127-75947-0019_1089-134691-0018", title: "Recording 5", meta: "2 speakers · 3.9s" }] },
   dihard3:        { label: "DIHARD 3",         noun: "recording",    items: [{ id: "broadcast_interview", title: "Broadcast interview", meta: "2 speakers · DIHARD3 dev" }, { id: "court", title: "Court", meta: "2 speakers · DIHARD3 dev" }, { id: "cts", title: "Telephone (CTS)", meta: "2 speakers · DIHARD3 dev" }, { id: "meeting", title: "Meeting", meta: "3 speakers · DIHARD3 dev" }, { id: "restaurant", title: "Restaurant", meta: "6 speakers · DIHARD3 dev" }] },
-  wsj0_2mix:      { label: "WSJ0-2mix",        noun: "2-spk mixture", items: [{ id: "445o0308_1.3737_420a010y_-1.3737", title: "2-spk mixture 1", meta: "2 speakers · 5.5s" }, { id: "447c0206_2.0186_22go010y_-2.0186", title: "2-spk mixture 2", meta: "2 speakers · 7.6s" }, { id: "447c020n_1.281_22go0107_-1.281", title: "2-spk mixture 3", meta: "2 speakers · 7.2s" }] },
-  wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: [{ id: "050o020a_2.1724_441o030p_-2.1724_442c0213_0", title: "3-spk mixture 1", meta: "3 speakers · 2.4s" }, { id: "22ho0114_0.2961_440c0203_-0.2961_446c0204_0", title: "3-spk mixture 2", meta: "3 speakers · 4.6s" }, { id: "442o030f_1.7037_422c020a_-1.7037_443o0306_0", title: "3-spk mixture 3", meta: "3 speakers · 1.9s" }] },
+  wsj0_2mix:      { label: "WSJ0-2mix",        noun: "2-spk mixture", items: [{ id: "445o0308_1.3737_420a010y_-1.3737", title: "2-spk mixture 1", meta: "2 speakers · 5.5s" }, { id: "447c0206_2.0186_22go010y_-2.0186", title: "2-spk mixture 2", meta: "2 speakers · 7.6s" }, { id: "447c020n_1.281_22go0107_-1.281", title: "2-spk mixture 3", meta: "2 speakers · 7.2s" }, { id: "440c0205_0.7546_050c010e_-0.7546", title: "2-spk mixture 4", meta: "2 speakers · 4.5s" }, { id: "422a010j_1.3587_420a010l_-1.3587", title: "2-spk mixture 5", meta: "2 speakers · 5.2s" }] },
+  wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: [{ id: "050o020a_2.1724_441o030p_-2.1724_442c0213_0", title: "3-spk mixture 1", meta: "3 speakers · 2.4s" }, { id: "22ho0114_0.2961_440c0203_-0.2961_446c0204_0", title: "3-spk mixture 2", meta: "3 speakers · 4.6s" }, { id: "442o030f_1.7037_422c020a_-1.7037_443o0306_0", title: "3-spk mixture 3", meta: "3 speakers · 1.9s" }, { id: "052o020n_0.48935_441o0304_-0.48935_421c020h_0", title: "3-spk mixture 4", meta: "3 speakers · 5.6s" }, { id: "440c0214_0.30311_050o020j_-0.30311_447o0312_0", title: "3-spk mixture 5", meta: "3 speakers · 4.3s" }] },
   voicebank:      { label: "VoiceBank-DEMAND", noun: "noisy speech", items: [{ id: "p232_001", title: "Noisy clip 1", meta: "p232 · 1.7s" }, { id: "p232_211", title: "Noisy clip 2", meta: "p232 · 1.4s" }, { id: "p257_008", title: "Noisy clip 3", meta: "p257 · 5.6s" }, { id: "p257_210", title: "Noisy clip 4", meta: "p257 · 2.5s" }, { id: "p257_410", title: "Noisy clip 5", meta: "p257 · 3.6s" }] },
   sparselibrimix: { label: "SparseLibriMix",   noun: "sparse mixture", items: placeholder("slm", "Sparse mixture") },
   tse_in:         { label: "Libri2Mix", noun: "mixture", items: [{ id: "1188-133604-0025_4992-23283-0016", title: "Mixture 1", meta: "2 speakers · 4.5s" }, { id: "1995-1837-0025_5142-36377-0017", title: "Mixture 2", meta: "2 speakers · 4.7s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Mixture 3", meta: "2 speakers · 3.8s" }, { id: "5683-32866-0012_121-121726-0001", title: "Mixture 4", meta: "2 speakers · 5.9s" }, { id: "6930-76324-0027_5683-32879-0011", title: "Mixture 5", meta: "2 speakers · 8.3s" }] },
@@ -1104,10 +1105,22 @@ async function loadASR(token) {
     const wer = (100 * a.errors / Math.max(1, a.n)).toFixed(1) + "%";
     const box = hypEl.closest(".box");
     const upId = box && box.querySelector(".mb.samp") ? box.querySelector(".mb.samp").dataset.up : null;
-    if (upId) document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"]`).forEach(s => { s.textContent = wer; });
+    if (upId) document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="0"]`).forEach(s => { s.textContent = wer; });
     stats.innerHTML = `<span><i class="legend-sw" style="background:#FFE0B8"></i>${c("sub")} sub.</span>
       <span><i class="legend-sw" style="background:#FFD1CC"></i>${c("ins")} ins.</span>
       <span><i class="legend-sw" style="background:#E7E0D6"></i>${c("del")} del.</span>`;
+    // w/ LM row: align the LM-decoded hypothesis the same way
+    if (upId && ref.status === "fulfilled") {
+      const lmSrc = (hypEl.dataset.src || "").replace("hypothesis.txt", "hypothesis_lm.txt");
+      fetchText(lmSrc).then(txt => {
+        if (token !== renderToken) return;
+        const la = align(ref.value.split(/\s+/), txt.split(/\s+/));
+        const lwer = (100 * la.errors / Math.max(1, la.n)).toFixed(1) + "%";
+        document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="1"]`).forEach(s => { s.textContent = lwer; });
+      }).catch(() => {
+        document.querySelectorAll(`#blk-out .samp[data-up="${CSS.escape(upId)}"][data-lm="1"]`).forEach(s => { s.textContent = "—"; });
+      });
+    }
   });
 }
 
@@ -1240,7 +1253,7 @@ function fmtSample(task, m) {
   if (!m) return "—";
   if (task.id === "sd") return (m.der != null ? m.der + "%" : "—");
   if (task.id === "pvad") return (m.map != null ? (m.map * 100).toFixed(1) + "%" : "—");
-  if (task.id === "dh3") return (m.der != null ? m.der + "%" + (m.sc != null ? ` · SC ${m.sc} / MD ${m.md} / FA ${m.fa}` : "") : "—");
+  if (task.id === "dh3") return (m.der != null ? m.der + "%" : "—");
   if (task.id === "se") return (m.pesq != null ? m.pesq.toFixed(2) + " / " + (m.stoi * 100).toFixed(1) : "—");
   return (m.si_sdri != null ? m.si_sdri.toFixed(2) + " dB" : "—");
 }
@@ -1250,7 +1263,15 @@ function fillSampleMetrics(task, mixId) {
     const up = el.dataset.up;
     try {
       const r = await fetch(`${ROOT}/outputs/${up}/${task.id}/${mixId}/metrics.json`, { cache: "no-store" });
-      el.textContent = r.ok ? fmtSample(task, await r.json()) : "—";
+      const m = r.ok ? await r.json() : null;
+      el.textContent = m ? fmtSample(task, m) : "—";
+      if (task.id === "dh3") {
+        const line = document.querySelector(`#blk-out [data-der-up="${CSS.escape(up)}"]`);
+        if (line) line.innerHTML = (m && m.sc != null)
+          ? `<span><i class="legend-sw" style="background:#FFE0B8"></i>${m.sc}% conf.</span>
+             <span><i class="legend-sw" style="background:#FFD1CC"></i>${m.md}% miss</span>
+             <span><i class="legend-sw" style="background:#E7E0D6"></i>${m.fa}% false al.</span>` : "";
+      }
     } catch { el.textContent = "—"; }
   });
 }
@@ -1274,7 +1295,14 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
       </div>`;
   const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad" || task.id === "dh3" || task.id === "tsasr";
   const sampLab = task.id === "sd" || task.id === "dh3" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "tsasr" ? "WER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
-  const sampleBox = !hasSample ? "" : (cmpUp
+  const lmRows = (u) => `<div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span><span class="lmtag">w/o LM</span><span class="mv samp" data-up="${esc(u.id)}" data-lm="0">…</span></div>
+        <div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span><span class="lmtag">w/ LM</span><span class="mv samp" data-up="${esc(u.id)}" data-lm="1">…</span></div>`;
+  const sampleBox = !hasSample ? "" : (task.id === "tsasr"
+    ? `<div class="metric sample" title="Score on the selected sample">
+        <div class="ml">This sample<br>${esc(sampLab)}</div>
+        <div class="mvs">${models.map(lmRows).join("")}</div>
+      </div>`
+    : cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
         <div class="mvs">${models.map(u => `<div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>
@@ -1321,7 +1349,8 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
         <div class="stream-h"><span class="bar" style="background:var(--spk1)"></span>${task.id === "pvad" ? "Target-speaker activation" : "Speaker activations"}</div>
         <div class="pair${cmpUp ? " three" : ""}">
           ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>Predicted${mb(u)}</div>
-            ${imgSlot(PATHS.out(u.id, task.id, mp, F.out) + "?v=rows2", u.name + " · predicted " + what, "3/1")}</div>`).join("")}
+            ${imgSlot(PATHS.out(u.id, task.id, mp, F.out) + "?v=rows2", u.name + " · predicted " + what, "3/1")}
+            ${task.id === "dh3" ? `<div class="wer-line" data-der-up="${esc(u.id)}"></div>` : ""}</div>`).join("")}
           <div><div class="side-l"><span class="pill ref">Ref</span>Reference annotation</div>
             ${imgSlot(PATHS.ref(task.id, mp, F.ref) + "?v=rows2", "reference annotation", "3/1")}</div>
         </div>
