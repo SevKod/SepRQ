@@ -407,8 +407,8 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .aslot .ph .play{width:24px;height:24px;border-radius:50%;background:var(--line-2);display:grid;place-items:center;flex:none}
 .aslot .ph span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:normal}
 
-.act-stream .slot{min-height:0}
-.act-stream .slot.loaded img{max-height:150px;object-fit:contain;background:#fff}
+.act-stream .slot{min-height:0;overflow:visible}
+.act-stream .slot.loaded img{max-height:none;height:auto;object-fit:contain;background:#fff}
 .act{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
 .axis{display:flex;justify-content:space-between;font:11px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-3);padding:4px 2px 0}
 
@@ -1316,9 +1316,9 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
         <div class="stream-h"><span class="bar" style="background:var(--spk1)"></span>${task.id === "pvad" ? "Target-speaker activation" : "Speaker activations"}</div>
         <div class="pair${cmpUp ? " three" : ""}">
           ${models.map(u => `<div><div class="side-l"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>Predicted${mb(u)}</div>
-            ${imgSlot(PATHS.out(u.id, task.id, mp, F.out), u.name + " · predicted " + what, "3/1")}</div>`).join("")}
+            ${imgSlot(PATHS.out(u.id, task.id, mp, F.out) + "?v=rows2", u.name + " · predicted " + what, "3/1")}</div>`).join("")}
           <div><div class="side-l"><span class="pill ref">Ref</span>Reference annotation</div>
-            ${imgSlot(PATHS.ref(task.id, mp, F.ref), "reference annotation", "3/1")}</div>
+            ${imgSlot(PATHS.ref(task.id, mp, F.ref) + "?v=rows2", "reference annotation", "3/1")}</div>
         </div>
       </div></div>`;
   } else if (task.kind === "text") {
