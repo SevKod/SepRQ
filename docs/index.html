@@ -429,7 +429,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .lmtbl td+td{border-left:1px solid var(--line)}
 .lmtbl .pill{font-size:11px}
 .lmtbl .mv{font-weight:700;font-size:15px;color:var(--ink)}
-.lmbar{display:flex;align-items:center;gap:12px;margin:14px 0 2px}
+.lmbar{width:100%;display:flex;align-items:center;gap:10px;margin:0}
 .lmbar-l{font:600 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .lmseg{display:inline-flex;gap:3px;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:3px}
 .lmseg-b{appearance:none;cursor:pointer;font:600 12.5px Inter,sans-serif;color:var(--ink-2);background:transparent;border:0;padding:5px 14px;border-radius:7px;transition:background .15s,color .15s}
@@ -1245,7 +1245,7 @@ function renderDemo() {
     <button class="ds-change" data-goto="task-pick">Change task ↑</button>`);
 
   // OUTPUT
-  const outKey = `${mix.id}|${up.id}|${task.id}|${state.cmp}|${state.ov}`;
+  const outKey = `${mix.id}|${up.id}|${task.id}|${state.cmp}|${state.ov}|${state.lm}`;
   if (keys["blk-out"] !== outKey) { setHTML("blk-out", outKey, outputHTML(mix, up, task, set, cmpUp, mp)); if (task.kind === "text") loadASR(renderToken); fillSampleMetrics(task, mp); }
 
   // reproduce snippet
@@ -1297,30 +1297,24 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
   const val = (u) => task.metric.values[u.id];
   const mb = (u) => `<span class="mb samp" data-up="${esc(u.id)}" title="This sample">…</span>`;
   const upName = (u) => (u.ours ? `<b>${esc(u.name)}</b>` : esc(u.name));
-  const metricBox = cmpUp
-    ? `<div class="metric" title="${esc(task.metric.note || "Reported in the paper")}">
-        <div class="ml">Paper result<br>${esc(task.metric.label)} · ${esc(task.dataset)}</div>
-        <div class="mvs">${models.map(u => `<div class="mvrow"><span class="pill ${pillCls(u)}">${esc(u.name)}</span>
-          <span class="mv${val(u) ? "" : " na"}">${val(u) ? esc(val(u)) + esc(task.metric.unit) : "not reported"}</span></div>`).join("")}</div>
-      </div>`
-    : `<div class="metric${val(up) ? "" : " na"}" title="${esc(task.metric.note || "Reported in the paper")}">
-        <div class="ml">Paper result<br>${esc(task.metric.label)} · ${esc(task.dataset)}</div>
-        <div class="mv">${val(up) ? esc(val(up)) + esc(task.metric.unit) : "not reported"}</div>
-      </div>`;
   const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad" || task.id === "dh3" || task.id === "tsasr";
   const sampLab = task.id === "sd" || task.id === "dh3" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "tsasr" ? "WER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
-  const lmCell = (u, lm) => `<td><span class="mv samp" data-up="${esc(u.id)}" data-lm="${lm}">…</span></td>`;
-  const lmTable = `<table class="lmtbl">
-        <thead><tr><th></th>${models.map(u => `<th><span class="pill ${pillCls(u)}">${esc(u.name)}</span></th>`).join("")}</tr></thead>
-        <tbody>
-          <tr><th>w/o LM</th>${models.map(u => lmCell(u, 0)).join("")}</tr>
-          <tr><th>w/ LM</th>${models.map(u => lmCell(u, 1)).join("")}</tr>
-        </tbody>
-      </table>`;
+  // --- TS-ASR: twin 2x2 WER tables (paper + this-sample), same clean style ---
+  const paperWer = (u, lm) => { const parts = String(val(u) || "").split("/").map(s => s.trim()); return parts[lm] || "—"; };
+  const werTable = (label, cls, cellFn) => `<div class="metric ${cls}" title="${esc(label)}">
+        <div class="ml">${esc(label)}<br>WER ↓</div>
+        <table class="lmtbl">
+          <thead><tr><th></th>${models.map(u => `<th><span class="pill ${pillCls(u)}">${esc(u.name)}</span></th>`).join("")}</tr></thead>
+          <tbody>
+            <tr><th>w/o LM</th>${models.map(u => `<td>${cellFn(u, 0)}</td>`).join("")}</tr>
+            <tr><th>w/ LM</th>${models.map(u => `<td>${cellFn(u, 1)}</td>`).join("")}</tr>
+          </tbody>
+        </table>
+      </div>`;
   const sampleBox = !hasSample ? "" : (task.id === "tsasr"
-    ? `<div class="metric sample" title="Score on the selected sample">
-        <div class="ml">This sample<br>${esc(sampLab)}</div>
-        ${lmTable}
+    ? `<div class="metrics-wrap">
+        ${werTable("Paper result", "", (u, lm) => `<span class="mv">${esc(paperWer(u, lm))}</span>`)}
+        ${werTable("This sample", "sample", (u, lm) => `<span class="mv samp" data-up="${esc(u.id)}" data-lm="${lm}">…</span>`)}
       </div>`
     : cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
@@ -1332,10 +1326,16 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
         <div class="ml">This sample<br>${esc(sampLab)}</div>
         <div class="mv samp" data-up="${esc(up.id)}">…</div>
       </div>`);
+  const lmToggle = task.id === "tsasr" ? `<div class="lmbar"><span class="lmbar-l">Decoder</span>
+      <div class="lmseg" role="group" aria-label="Decoding mode">
+        <button class="lmseg-b" data-lm-toggle="0" aria-pressed="${state.lm === 0}">w/o LM</button>
+        <button class="lmseg-b" data-lm-toggle="1" aria-pressed="${state.lm === 1}">w/ LM</button>
+      </div></div>` : "";
 
   let html = `<div class="out-h">
       <span class="dot" style="width:10px;height:10px;border-radius:3px;background:var(--ink)"></span><span class="bt">Output</span>
       <span class="path">${esc(mix.title)} <small style="color:var(--ink-3)">(${esc(set.label)})</small><span class="arrow">→</span>${upName(up)}${cmpUp ? ` <small style="color:var(--ink-3)">vs</small> <span style="color:var(--cmp);font-weight:600">${esc(cmpUp.name)}</span>` : ""}<span class="arrow">→</span>${esc(task.name)}${task.tag ? ` (${esc(task.tag)})` : ""}</span>
+      ${lmToggle}
       ${sampleBox}
       ${task.metric.note ? `<div class="res-sub">${esc(task.metric.note)}.</div>` : ""}
     </div>`;
@@ -1384,12 +1384,7 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
           <div class="wer-line" id="asr-stats-${k}-${lm}"></div></div>`;
     };
     const lm = state.lm;
-    const toggle = `<div class="lmseg" role="group" aria-label="Decoding mode">
-        <button class="lmseg-b" data-lm-toggle="0" aria-pressed="${lm === 0}">w/o LM</button>
-        <button class="lmseg-b" data-lm-toggle="1" aria-pressed="${lm === 1}">w/ LM</button>
-      </div>`;
-    html += `<div class="lmbar"><span class="lmbar-l">Decoder</span>${toggle}</div>
-      <div class="tcols" style="--n:${models.length + 1}">
+    html += `<div class="tcols" style="--n:${models.length + 1}">
         ${models.map((u, k) => hypBox(u, k, lm)).join("")}
         <div class="box"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
           ${textSlot("asr-ref", PATHS.ref(task.id, mp, F.ref))}</div>
