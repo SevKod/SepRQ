@@ -421,11 +421,13 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .wer-line{font-size:13px;color:var(--ink-2);margin-top:10px;display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 .lmtag{font:600 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
 .lmtbl{border-collapse:collapse;margin-top:6px;font-size:13px}
-.lmtbl th,.lmtbl td{padding:4px 10px;text-align:center;border:1px solid var(--line)}
-.lmtbl thead th{background:var(--bg-2);font-weight:600}
-.lmtbl tbody th{font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);background:var(--bg-2);text-align:left}
+.lmtbl th,.lmtbl td{padding:5px 12px;text-align:center;border:2.5px solid var(--accent-soft)}
+.lmtbl thead th{font-weight:600}
+.lmtbl tbody th{font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);text-align:left}
 .lmtbl .pill{font-size:11px}
 .lmtbl .mv{font-weight:600}
+.refspan{grid-row:1 / span 2;align-self:start}
+@media (max-width:860px){.refspan{grid-column:auto !important;grid-row:auto !important}}
 .ovctl{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
 .ovlab{font-size:13px;color:var(--ink-2);margin-bottom:8px}
 .ovlab b{color:var(--accent);font-size:14px}
@@ -1364,10 +1366,14 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
           <div class="txt" id="asr-hyp-${k}-${lm}" data-src="${esc(src)}" data-up="${esc(u.id)}" data-lm="${lm}"><span style="color:var(--ink-3)">Loading…</span></div>
           <div class="wer-line" id="asr-stats-${k}-${lm}"></div></div>`;
     };
-    html += `<div class="tcols" style="--n:${models.length * 2 + 1}">
-        ${models.map((u, k) => hypBox(u, k, 0) + hypBox(u, k, 1)).join("")}
-        <div class="box"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
+    const cols = models.length + 1;
+    const woRow = models.map((u, k) => hypBox(u, k, 0)).join("");   // row 1: w/o LM
+    const lmRow = models.map((u, k) => hypBox(u, k, 1)).join("");   // row 2: w/ LM
+    html += `<div class="tcols" style="--n:${cols}">
+        ${woRow}
+        <div class="box refspan" style="grid-column:${cols}"><h4>${PILL("ref", "Ref")}Reference transcript</h4>
           ${textSlot("asr-ref", PATHS.ref(task.id, mp, F.ref))}</div>
+        ${lmRow}
       </div>`;
   }
   return html;
