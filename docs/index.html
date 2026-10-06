@@ -306,6 +306,10 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .ds-facts dd{margin:3px 0 0;font-size:14px;font-weight:500}
 .ds-facts dd b{font-family:"Bricolage Grotesque",Inter,sans-serif;font-size:19px;font-weight:800}
 .ds-facts .pfact dd{display:grid;gap:7px;margin-top:7px}
+.ds-facts .pfact-tbl dd{display:block;margin-top:8px;overflow-x:auto}
+.ds-facts .pfact-tbl .lmtbl{width:100%}
+.ds-facts .pfact-tbl .lmtbl th,.ds-facts .pfact-tbl .lmtbl td{padding:6px 10px}
+.ds-facts .pfact-tbl .lmtbl .mv{font-size:14px}
 .pv{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:nowrap;border-radius:10px;padding:8px 11px;border:1.5px solid}
 .pv.est{background:var(--accent-softer);border-color:var(--accent);color:var(--accent-ink)}
 .pv.cmp{background:var(--cmp-soft);border-color:var(--cmp);color:var(--cmp)}
@@ -1230,6 +1234,21 @@ function renderDemo() {
       : "Transcript of the target speaker";
   const mvD = task.metric.values[up.id];
   const mvC = cmpUp ? task.metric.values[cmpUp.id] : null;
+  const dsModels = cmpUp ? [up, cmpUp] : [up];
+  const dsPaperWer = (u, lm) => { const p = String(task.metric.values[u.id] || "").split("/").map(s => s.trim()); return p[lm] || "—"; };
+  const paperFact = task.id === "tsasr"
+    ? `<div class="pfact pfact-tbl"><dt>Paper · WER ↓</dt><dd>
+        <table class="lmtbl">
+          <thead><tr><th></th>${dsModels.map(u => `<th><span class="pill ${u === up ? "est" : "cmp"}">${esc(u.name)}</span></th>`).join("")}</tr></thead>
+          <tbody>
+            <tr><th>w/o LM</th>${dsModels.map(u => `<td><span class="mv">${esc(dsPaperWer(u, 0))}</span></td>`).join("")}</tr>
+            <tr><th>w/ LM</th>${dsModels.map(u => `<td><span class="mv">${esc(dsPaperWer(u, 1))}</span></td>`).join("")}</tr>
+          </tbody>
+        </table></dd></div>`
+    : `<div class="pfact"><dt>Paper · ${esc(task.metric.label)}</dt><dd>
+        ${[[up, mvD, "est"], ...(cmpUp ? [[cmpUp, mvC, "cmp"]] : [])].map(([u, v, c]) => `<div class="pv ${c}">
+          <span class="pv-n">${esc(u.name)}</span><span class="pv-v${v ? "" : " na"}">${v ? esc(v) + esc(task.metric.unit) : "not reported"}</span></div>`).join("")}
+      </dd></div>`;
   setHTML("blk-down", `${task.id}|${up.id}|${state.cmp}`, `
     <div class="blk-h"><span class="bt">Downstream</span><span class="bs">🔥 trained</span></div>
     <div class="ds-name">${esc(task.name)}${task.tag || task.short ? `<span class="tag">${esc(task.tag || task.short)}</span>` : ""}</div>
@@ -1237,10 +1256,7 @@ function renderDemo() {
     <dl class="ds-facts">
       <div><dt>Inputs</dt><dd>${esc(set.label)}${task.enroll ? " + enrollment" : ""}</dd></div>
       <div><dt>Output</dt><dd>${esc(outDesc)}</dd></div>
-      <div class="pfact"><dt>Paper · ${esc(task.metric.label)}</dt><dd>
-        ${[[up, mvD, "est"], ...(cmpUp ? [[cmpUp, mvC, "cmp"]] : [])].map(([u, v, c]) => `<div class="pv ${c}">
-          <span class="pv-n">${esc(u.name)}</span><span class="pv-v${v ? "" : " na"}">${v ? esc(v) + esc(task.metric.unit) : "not reported"}</span></div>`).join("")}
-      </dd></div>
+      ${paperFact}
     </dl>
     <button class="ds-change" data-goto="task-pick">Change task ↑</button>`);
 
@@ -1299,8 +1315,7 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
   const upName = (u) => (u.ours ? `<b>${esc(u.name)}</b>` : esc(u.name));
   const hasSample = (task.kind === "audio") || task.id === "sd" || task.id === "pvad" || task.id === "dh3" || task.id === "tsasr";
   const sampLab = task.id === "sd" || task.id === "dh3" ? "DER ↓" : task.id === "pvad" ? "mAP ↑" : task.id === "tsasr" ? "WER ↓" : task.id === "se" ? "PESQ ↑ / STOI ↑" : "SI-SDRi ↑";
-  // --- TS-ASR: twin 2x2 WER tables (paper + this-sample), same clean style ---
-  const paperWer = (u, lm) => { const parts = String(val(u) || "").split("/").map(s => s.trim()); return parts[lm] || "—"; };
+  // --- TS-ASR: 2x2 WER table (this-sample), clean style ---
   const werTable = (label, cls, cellFn) => `<div class="metric ${cls}" title="${esc(label)}">
         <div class="ml">${esc(label)}<br>WER ↓</div>
         <table class="lmtbl">
@@ -1312,10 +1327,7 @@ function outputHTML(mix, up, task, set, cmpUp, mp) {
         </table>
       </div>`;
   const sampleBox = !hasSample ? "" : (task.id === "tsasr"
-    ? `<div class="metrics-wrap">
-        ${werTable("Paper result", "", (u, lm) => `<span class="mv">${esc(paperWer(u, lm))}</span>`)}
-        ${werTable("This sample", "sample", (u, lm) => `<span class="mv samp" data-up="${esc(u.id)}" data-lm="${lm}">…</span>`)}
-      </div>`
+    ? werTable("This sample", "sample", (u, lm) => `<span class="mv samp" data-up="${esc(u.id)}" data-lm="${lm}">…</span>`)
     : cmpUp
     ? `<div class="metric sample" title="Score on the selected sample">
         <div class="ml">This sample<br>${esc(sampLab)}</div>
