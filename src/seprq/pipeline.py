@@ -137,7 +137,7 @@ class SepRQPipeline(nn.Module):
 
     .. code-block:: python
 
-        save_to = "output"
+        save_to = "./output"
         pipe = SepRQPipeline("separation",
                              upstream="SepRQ",
                              streams=2)
