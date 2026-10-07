@@ -174,23 +174,18 @@ class SepRQPipeline(nn.Module):
         clean = pipe(mixture, save_to=save_to)
         # [num_samples]
 
-        # ./output/0.wav
-
         pipe = SepRQPipeline("target-speaker-extraction",
                              upstream="SepRQ",
                              streams=2)
 
         # Input mixture - [num_samples]
         mixture = "mixture.wav"
-
         enrollment = "enrollment.wav"
 
         save_to = "./output"
 
         target = pipe(mixture, enrollment=enrollment, save_to=save_to)
         # [num_samples]
-
-        # ./output/0.wav
     """
 
     def __init__(self, task, upstream="SepRQ", streams=2, repo_id=None, device=None):

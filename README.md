@@ -132,8 +132,6 @@ save_to = "./output"
 clean = pipe(mixture, save_to=save_to)
 # [num_samples]
 
-# ./output/0.wav
-
 # Target speaker extraction
 pipe = SepRQPipeline("target-speaker-extraction",
                      upstream="SepRQ",
@@ -141,7 +139,6 @@ pipe = SepRQPipeline("target-speaker-extraction",
 
 # Input mixture - [num_samples]
 mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/TSE/mix1.wav"
-
 enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/TSE/enroll1.wav"
 
 save_to = "./output"
@@ -149,14 +146,13 @@ save_to = "./output"
 target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
-# ./output/0.wav
-
 # Personalized speech extraction
-pipe = SepRQPipeline("personalized-extraction", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("personalized-extraction",
+                     upstream="SepRQ",
+                     streams=2)
 
 # Input mixture - [num_samples]
 mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/PSE/mix1.wav"
-
 enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/PSE/enroll1.wav"
 
 save_to = "./output"
@@ -164,14 +160,11 @@ save_to = "./output"
 target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
-# ./output/0.wav
-
 # Personalized VAD
 pipe = SepRQPipeline("personalized-vad", upstream="SepRQ", streams=2)
 
 # Input mixture - [num_samples]
 mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/PVAD/mix1.wav"
-
 enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/PVAD/enroll1.wav"
 
 save_to = "./output"
@@ -188,7 +181,6 @@ pipe = SepRQPipeline("target-speaker-asr",
 
 # Input mixture - [num_samples]
 mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/TS-ASR/mix1.wav"
-
 enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/TS-ASR/enroll1.wav"
 
 save_to = "./output"
