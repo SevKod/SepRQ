@@ -974,7 +974,6 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
 const DIHARD_LINES = [
   "Local segmentation only (EEND).",
-  "Local segmentation.",
   "Not intended for long file recordings without clustering.",
 ];
 const DIHARD_NOTE = DIHARD_LINES.map(line => `# ${line}`).join("\n");
@@ -1071,7 +1070,7 @@ const snipTask = (u, d) => {
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
   const folder = EX_FOLDER[d.id];
   const wav = folder ? `${ex}/${folder}/mix1.wav` : `${ex}/mix.wav`;
-  const setup = [`mixture = "${wav}"`];
+  const setup = [`# Input mixture - [num_samples]\nmixture = "${wav}"`];
   const callArgs = ["mixture"];
   if (d.enroll) {
     setup.push(`enrollment = "${ex}/${folder}/enroll1.wav"`);
@@ -1086,7 +1085,9 @@ const snipTask = (u, d) => {
 
 # ${u.name} · ${d.label}
 pipe = SepRQPipeline(${ctor.join(", ")})
+
 ${setup.join("\n\n")}
+
 ${d.var} = pipe(${callArgs.join(", ")})${shape}
 
 # ${savedFiles(d.save, d.save === "wav" ? speakers : 1)}${dihard}`;
@@ -1386,8 +1387,8 @@ function renderDemo() {
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
   const setup = [];
   const callArgs = ["mixture"];
-  if (hubFolder && mix.n) setup.push(`mixture = "${ex}/${hubFolder}/mix${mix.n}.wav"`);
-  else setup.push(`mixture = ${mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`}`);
+  const mixturePath = hubFolder && mix.n ? `"${ex}/${hubFolder}/mix${mix.n}.wav"` : (mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`);
+  setup.push(`# Input mixture - [num_samples]\nmixture = ${mixturePath}`);
   if (task.enroll) {
     const enroll = hubFolder && mix.n ? `"${ex}/${hubFolder}/enroll${mix.n}.wav"` : (mix.n ? `"enroll${mix.n}.wav"` : `"enrollment.wav"`);
     setup.push(`enrollment = ${enroll}`);
@@ -1400,7 +1401,7 @@ function renderDemo() {
     : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
   const save = task.kind === "text" ? "txt" : task.kind === "activation" ? "rttm" : "wav";
   const dihard = task.id === "dh3" ? `\n${DIHARD_NOTE}` : "";
-  const code = `from seprq import SepRQPipeline\n\npipe = SepRQPipeline(${ctor.join(", ")})\n${setup.join("\n\n")}\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}\n\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}${dihard}`;
+  const code = `from seprq import SepRQPipeline\n\npipe = SepRQPipeline(${ctor.join(", ")})\n\n${setup.join("\n\n")}\n\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}\n\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}${dihard}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
