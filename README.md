@@ -45,15 +45,15 @@ pip install seprq
 ```python
 from seprq import SepRQEncoder
 
-encoder = SepRQEncoder("SepRQ")            # or "BestRQ_50Hz", "WavLM_BASE", ... (see "Available models" below)
+wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
+# wav = torchaudio.load("path/to/audio.wav")
+
+# "SepRQ" — see "Available models" for every name
+encoder = SepRQEncoder("SepRQ", streams=2)
 
 # ❄️ frozen feature extraction
-encoder.requires_grad_(False).eval()
-features = encoder(wavs)                    # wavs: [B, num_samples] or [B, channel, num_samples]
-
-# 🔥 fine-tuning (plug into your model)
-encoder.requires_grad_(True).train()
-features = encoder(wavs)
+encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
+features = encoder(wav)
 ```
 
 It accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz)
