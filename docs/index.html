@@ -1035,6 +1035,12 @@ encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
 features = encoder(wav)`;
 };
 
+function savedFiles(save, speakers) {
+  if (save === "rttm") return "./output/0.rttm";
+  if (save === "txt") return "./output/0.txt";
+  const n = speakers || 1;
+  return Array.from({ length: n }, (_, i) => `./output/${i}.wav`).join(", ");
+}
 const snipTask = (u, d) => {
   const taskId = d.wsj ? `separation-wsj0-${state.qsWsj}mix` : d.id;
   const ctor = [`"${taskId}"`, `upstream="${u.code}"`];
@@ -1049,15 +1055,22 @@ const snipTask = (u, d) => {
     "target-speaker-asr": "target-speaker-asr",
   };
   const wav = prepared[d.id] ? `${ex}/${prepared[d.id]}/mix1.wav` : `${ex}/mix.wav`;
-  const callArgs = [`"${wav}"`];
-  if (d.enroll) callArgs.push(`enrollment="${ex}/${prepared[d.id]}/enroll1.wav"`);
+  const setup = [`mix = "${wav}"`];
+  const callArgs = ["mix"];
+  if (d.enroll) {
+    setup.push(`enrollment = "${ex}/${prepared[d.id]}/enroll1.wav"`);
+    callArgs.push("enrollment=enrollment");
+  }
+  setup.push('save_to = "./output"');
   callArgs.push("save_to=save_to");
+  const speakers = d.wsj ? state.qsWsj : (d.save === "wav" && d.id === "separation" ? 2 : 1);
   const shape = d.shape ? `\n# ${d.shape}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
 ${callRows("pipe = SepRQPipeline(", ctor)}
-save_to = "./output"
+${setup.join("\n")}
+# ${savedFiles(d.save, d.save === "wav" ? speakers : 1)}
 ${callRows(`${d.var} = pipe(`, callArgs)}${shape}`;
 };
 
@@ -1102,7 +1115,6 @@ function sideTask() {
     <div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(QS_TASK_UPS)}</div></div>
     <div class="qs-pick"><div class="qs-pick-lab">Select the downstream</div><div class="qs-downs">${qsDownsHTML()}</div></div>
     <ul>
-      <li>One file, or a batch: a tensor <code>[batch, num_samples]</code> or a list of paths. <code>save_to</code> is a relative directory (<code>.wav</code>, <code>.rttm</code> or <code>.txt</code>).</li>
       <li>Target-speaker tasks take an <code>enrollment</code> utterance.</li>
     </ul>`;
 }
@@ -1351,13 +1363,35 @@ function renderDemo() {
   const demoUp = { seprq: ["SepRQ"], seprq_k2: ["SepRQ", 2], seprq_k3: ["SepRQ", 3], hubert: ["HuBERT_BASE"], wavlm: ["WavLM_BASE"], wavlmplus: ["WavLM_BASE_PLUS"] }[up.id];
   const ctor = [`"${task.api}"`, `upstream="${demoUp[0]}"`];
   if (demoUp[1]) ctor.push(`streams=${demoUp[1]}`);
-  const callArgs = [mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`];
-  if (task.enroll) callArgs.push(mix.n ? `enrollment="enroll${mix.n}.wav"` : `enrollment="enrollment.wav"`);
+  const hubFolder = {
+    separation: "separation",
+    diarization: "diarization",
+    enhancement: "enhancement",
+    "target-speaker-extraction": "target-speaker-extraction",
+    "personalized-vad": "personalized-vad",
+    "target-speaker-asr": "target-speaker-asr",
+  }[task.api];
+  const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
+  const setup = [];
+  const callArgs = [];
+  if (hubFolder && mix.n) {
+    setup.push(`mix = "${ex}/${hubFolder}/mix${mix.n}.wav"`);
+    callArgs.push("mix");
+    if (task.enroll) {
+      setup.push(`enrollment = "${ex}/${hubFolder}/enroll${mix.n}.wav"`);
+      callArgs.push("enrollment=enrollment");
+    }
+  } else {
+    callArgs.push(mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`);
+    if (task.enroll) callArgs.push(mix.n ? `enrollment="enroll${mix.n}.wav"` : `enrollment="enrollment.wav"`);
+  }
+  setup.push('save_to = "./output"');
   callArgs.push("save_to=save_to");
   const shape = task.kind === "text" ? ""
     : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
     : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
-  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\nsave_to = "./output"\n${callRows("out = pipe(", callArgs)}${shape ? `\n# ${shape}` : ""}`;
+  const save = task.kind === "text" ? "txt" : task.kind === "activation" ? "rttm" : "wav";
+  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\n${setup.join("\n")}\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}\n${callRows("out = pipe(", callArgs)}${shape ? `\n# ${shape}` : ""}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
