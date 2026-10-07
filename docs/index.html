@@ -995,7 +995,7 @@ const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
 const snipFeatures = (u) =>
 `from seprq import SepRQEncoder
 
-path = "https://huggingface.co/SepRQ/SepRQ/blob/main/examples/sample_mixture.wav"
+path = "https://hf.co/SepRQ/SepRQ/blob/main/examples/sample_mixture.wav"
 
 # "${u.code}" — see "Available models" for every name
 encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u.code}"`})
