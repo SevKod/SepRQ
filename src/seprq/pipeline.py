@@ -140,33 +140,43 @@ class SepRQPipeline(nn.Module):
 
     .. code-block:: python
 
+        mixture = "mixture.wav"
+
         save_to = "./output"
-        pipe = SepRQPipeline("separation",
-                             upstream="SepRQ",
-                             streams=2)
-        sources = pipe("mixture.wav",
-                       save_to=save_to)
+        pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
+        sources = pipe(mixture, save_to=save_to)
         # [num_speakers, num_samples]
 
-        pipe = SepRQPipeline("diarization",
-                             upstream="HuBERT_BASE")
-        activations = pipe("mixture.wav",
-                           save_to=save_to)
+        # ./output/0.wav, ./output/1.wav
+
+        mixture = "mixture.wav"
+
+        save_to = "./output"
+        pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
+        activations = pipe(mixture, save_to=save_to)
         # [time, num_speakers]
 
-        pipe = SepRQPipeline("enhancement",
-                             upstream="WavLM_BASE")
-        clean = pipe("noisy.wav",
-                     save_to=save_to)
+        # ./output/0.rttm
+
+        mixture = "noisy.wav"
+
+        save_to = "./output"
+        pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
+        clean = pipe(mixture, save_to=save_to)
         # [num_samples]
 
-        pipe = SepRQPipeline("target-speaker-extraction",
-                             upstream="SepRQ",
-                             streams=2)
-        target = pipe("mixture.wav",
-                      enrollment="enrollment.wav",
-                      save_to=save_to)
+        # ./output/0.wav
+
+        mixture = "mixture.wav"
+
+        enrollment = "enrollment.wav"
+
+        save_to = "./output"
+        pipe = SepRQPipeline("target-speaker-extraction", upstream="SepRQ", streams=2)
+        target = pipe(mixture, enrollment=enrollment, save_to=save_to)
         # [num_samples]
+
+        # ./output/0.wav
     """
 
     def __init__(self, task, upstream="SepRQ", streams=2, repo_id=None, device=None):
