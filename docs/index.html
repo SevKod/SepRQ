@@ -996,14 +996,14 @@ const QS_UPS = [
   { id: "wavlmlarge", code: "WavLM_LARGE",    name: "WavLM Large" },
 ];
 const QS_DOWNS = [
-  { id: "separation",                 label: "Separation",                 short: "SS",     group: "SUPERB",         enroll: false, var: "sources",     ret: "# one waveform per speaker" },
-  { id: "diarization",                label: "Diarization",                short: "SD",     group: "SUPERB",         enroll: false, var: "activations", ret: "# [T, num_speakers]" },
-  { id: "enhancement",                label: "Enhancement",                short: "SE",     group: "SUPERB",         enroll: false, var: "clean",       ret: "" },
-  { id: "target-speaker-extraction",  label: "Target Speaker Extraction",  short: "TSE",    group: "Target Speaker", enroll: true,  var: "target",      ret: "# target-speaker waveform" },
-  { id: "personalized-vad",           label: "Personalized VAD",           short: "PVAD",   group: "Target Speaker", enroll: true,  var: "activations", ret: "# [T] target-speaker activity" },
-  { id: "target-speaker-asr",         label: "Target-Speaker ASR",         short: "TS-ASR", group: "Target Speaker", enroll: true,  var: "text",        ret: "# transcript string" },
-  { id: "diarization-dihard3",        label: "Diarization",                short: "SD",     group: "Out-of-domain",  enroll: false, var: "activations", ret: "# [T, num_speakers]", ood: true },
-  { id: "separation-wsj",             label: "Separation",                 short: "SS",     group: "Out-of-domain",  enroll: false, var: "sources",     ret: "# one waveform per speaker", ood: true, wsj: true },
+  { id: "separation",                 label: "Separation",                 short: "SS",     group: "SUPERB",         enroll: false, var: "sources",     shape: "[num_speakers, num_samples]", save: "wav" },
+  { id: "diarization",                label: "Diarization",                short: "SD",     group: "SUPERB",         enroll: false, var: "activations", shape: "[time, num_speakers]", save: "rttm" },
+  { id: "enhancement",                label: "Enhancement",                short: "SE",     group: "SUPERB",         enroll: false, var: "clean",       shape: "[num_samples]", save: "wav" },
+  { id: "target-speaker-extraction",  label: "Target Speaker Extraction",  short: "TSE",    group: "Target Speaker", enroll: true,  var: "target",      shape: "[num_samples]", save: "wav" },
+  { id: "personalized-vad",           label: "Personalized VAD",           short: "PVAD",   group: "Target Speaker", enroll: true,  var: "activations", shape: "[time]", save: "rttm" },
+  { id: "target-speaker-asr",         label: "Target-Speaker ASR",         short: "TS-ASR", group: "Target Speaker", enroll: true,  var: "text",        shape: "", save: "txt" },
+  { id: "diarization-dihard3",        label: "Diarization",                short: "SD",     group: "Out-of-domain",  enroll: false, var: "activations", shape: "[time, num_speakers]", save: "rttm", ood: true },
+  { id: "separation-wsj",             label: "Separation",                 short: "SS",     group: "Out-of-domain",  enroll: false, var: "sources",     shape: "[num_speakers, num_samples]", save: "wav", ood: true, wsj: true },
 ];
 const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
 const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
@@ -1038,12 +1038,14 @@ const snipTask = (u, d) => {
     : "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav";
   const callArgs = [`"${wav}"`];
   if (d.enroll) callArgs.push(`enrollment="speaker.wav"`);
-  const note = d.ret ? `\n${d.ret}` : "";
+  callArgs.push("save_to=save_to");
+  const shape = d.shape ? `\n# ${d.shape}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
 ${callRows("pipe = SepRQPipeline(", ctor)}
-${callRows(`${d.var} = pipe(`, callArgs)}${note}`;
+save_to = "output"
+${callRows(`${d.var} = pipe(`, callArgs)}${shape}`;
 };
 
 const QS_TASK_UPS = QS_UPS.filter(u => u.id !== "bestrq" && u.id !== "wavlmlarge");
@@ -1087,6 +1089,7 @@ function sideTask() {
     <div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(QS_TASK_UPS)}</div></div>
     <div class="qs-pick"><div class="qs-pick-lab">Select the downstream</div><div class="qs-downs">${qsDownsHTML()}</div></div>
     <ul>
+      <li>One file, or a batch: a tensor <code>[batch, num_samples]</code> or a list of paths. <code>save_to</code> is a relative directory (<code>.wav</code>, <code>.rttm</code> or <code>.txt</code>).</li>
       <li>Target-speaker tasks take an <code>enrollment</code> utterance.</li>
     </ul>`;
 }
@@ -1337,9 +1340,11 @@ function renderDemo() {
   if (demoUp[1]) ctor.push(`streams=${demoUp[1]}`);
   const callArgs = [`"${mix.id}.wav"`];
   if (task.enroll) callArgs.push(`enrollment="enrollment.wav"`);
-  const ret = task.kind === "audio" ? (task.streams > 1 ? `# list of ${task.streams} waveforms` : "# enhanced / extracted waveform")
-            : task.kind === "activation" ? "# frame-level activations" : "# transcription (str)";
-  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\n${callRows("out = pipe(", callArgs)}\n${ret}`;
+  callArgs.push("save_to=save_to");
+  const shape = task.kind === "text" ? ""
+    : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
+    : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
+  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\nsave_to = "output"\n${callRows("out = pipe(", callArgs)}${shape ? `\n# ${shape}` : ""}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>

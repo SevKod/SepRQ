@@ -97,23 +97,31 @@ from seprq import SepRQPipeline
 wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 noisy = "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
 
-# Separation — one waveform per speaker
+save_to = "output"
+
+# Separation — writes output/0.wav, output/1.wav
 pipe = SepRQPipeline("separation",
                      upstream="SepRQ",
                      streams=2)
-sources = pipe(wav)
+sources = pipe(wav,
+               save_to=save_to)
+# [num_speakers, num_samples]
 
-# Diarization — [T, num_speakers]
+# Diarization — writes output/0.rttm
 pipe = SepRQPipeline("diarization",
                      upstream="SepRQ",
                      streams=2)
-activations = pipe(wav)
+activations = pipe(wav,
+                   save_to=save_to)
+# [time, num_speakers]
 
-# Enhancement — VoiceBank-DEMAND noisy speech
+# Enhancement — writes output/0.wav
 pipe = SepRQPipeline("enhancement",
                      upstream="SepRQ",
                      streams=2)
-clean = pipe(noisy)
+clean = pipe(noisy,
+             save_to=save_to)
+# [num_samples]
 ```
 
 ## 🔀 SepRQ — separation as the pretext task

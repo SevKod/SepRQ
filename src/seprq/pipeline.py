@@ -5,6 +5,9 @@ The Hub file stores the learned 13-way layer weights and the downstream
 module, without the optimizer state.
 """
 
+import math
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -73,6 +76,40 @@ def _match_length(feat, n_frames):
     return out
 
 
+def _is_path(value):
+    return isinstance(value, (str, bytes)) or hasattr(value, "__fspath__")
+
+
+def _write_wav(path, wave):
+    import soundfile as sf
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    sf.write(str(path), wave.detach().cpu().numpy(), 16000, subtype="PCM_16")
+
+
+def _rttm(prob, frame_shift, uri):
+    """Collapse frame posteriors into an RTTM. ``prob`` is ``[time, speakers]``."""
+    hop = frame_shift / 16000
+    active = prob.detach().cpu() >= 0.5
+    lines = []
+    if active.numel() == 0:
+        return ""
+    for speaker in range(active.shape[1]):
+        column = active[:, speaker].tolist()
+        start = None
+        for frame, on in enumerate(column + [False]):
+            if on and start is None:
+                start = frame
+            elif not on and start is not None:
+                onset = start * hop
+                duration = (frame - start) * hop
+                lines.append(
+                    f"SPEAKER {uri} 1 {onset:.3f} {duration:.3f} <NA> <NA> spk{speaker} <NA> <NA>"
+                )
+                start = None
+    return ("\n".join(lines) + "\n") if lines else ""
+
+
 def _suppress_impulse(x):
     """Zero the tail impulse the STFT mask sometimes leaves at the end of a wav."""
     y = np.copy(x)
@@ -100,21 +137,25 @@ class SepRQPipeline(nn.Module):
 
     .. code-block:: python
 
+        save_to = "output"
         pipe = SepRQPipeline("separation",
                              upstream="SepRQ",
                              streams=2)
-        sources = pipe("mixture.wav")
-        # one waveform per speaker
+        sources = pipe("mixture.wav",
+                       save_to=save_to)
+        # [num_speakers, num_samples]
 
         pipe = SepRQPipeline("diarization",
                              upstream="HuBERT_BASE")
-        activations = pipe("mixture.wav")
-        # [T, num_speakers]
+        activations = pipe("mixture.wav",
+                           save_to=save_to)
+        # [time, num_speakers]
 
         pipe = SepRQPipeline("enhancement",
                              upstream="WavLM_BASE")
-        clean = pipe("noisy.wav")
-        # enhanced waveform
+        clean = pipe("noisy.wav",
+                     save_to=save_to)
+        # [num_samples]
     """
 
     def __init__(self, task, upstream="SepRQ", streams=2, repo_id=None, device=None):
@@ -159,8 +200,10 @@ class SepRQPipeline(nn.Module):
     def _build_head(self, blob):
         weights = blob["model"]
         if self.task == "diarization":
+            self.frame_shift = int(blob["frame_shift"])
+            self.num_speakers = int(blob["num_speakers"])
             self.head = _DiarizationHead(
-                blob["input_dim"], blob["hidden_size"], blob["num_speakers"], blob["rnn_layers"]
+                blob["input_dim"], blob["hidden_size"], self.num_speakers, blob["rnn_layers"]
             )
         else:
             self.hop_length = int(blob["hop_length"])
@@ -226,25 +269,105 @@ class SepRQPipeline(nn.Module):
             )
         return waves
 
-    def forward(self, audio, wav_lens=None):
+    def _collate(self, audio, wav_lens):
+        """Return ``[batch, num_samples]``, per-item lengths, and relative lengths."""
+        batched = isinstance(audio, (list, tuple)) and audio and (
+            _is_path(audio[0]) or torch.is_tensor(audio[0]) or isinstance(audio[0], np.ndarray)
+        )
+        if batched:
+            if _is_path(audio[0]):
+                waves = [self.encoder._load(item) for item in audio]
+            else:
+                waves = []
+                for item in audio:
+                    wave = torch.as_tensor(item, dtype=torch.float32).reshape(-1)
+                    waves.append(wave)
+            width = max(int(wave.numel()) for wave in waves)
+            batch = waves[0].new_zeros(len(waves), width)
+            for index, wave in enumerate(waves):
+                batch[index, : wave.numel()] = wave
+            batch = batch.to(self.encoder._device())
+            lengths = [int(wave.numel()) for wave in waves]
+        else:
+            batch = self.encoder._as_batch(audio)
+            lengths = [batch.shape[1]] * batch.shape[0]
+        if wav_lens is not None:
+            relative = torch.as_tensor(wav_lens, dtype=torch.float32).flatten()
+            lengths = [max(1, int((relative[i] * batch.shape[1]).round())) for i in range(batch.shape[0])]
+        else:
+            relative = torch.tensor([length / batch.shape[1] for length in lengths], dtype=torch.float32)
+        return batch, lengths, relative
+
+    def _write(self, result, save_to):
+        root = Path(save_to)
+        root.mkdir(parents=True, exist_ok=True)
+        if self.task == "diarization":
+            if torch.is_tensor(result) and result.dim() == 2:
+                items = [result]
+            elif torch.is_tensor(result):
+                items = [result[index] for index in range(result.shape[0])]
+            else:
+                items = result
+            for index, prob in enumerate(items):
+                (root / f"{index}.rttm").write_text(_rttm(prob, self.frame_shift, str(index)))
+            return
+        if self.task == "enhancement":
+            if torch.is_tensor(result) and result.dim() == 1:
+                waves = [result]
+            elif torch.is_tensor(result):
+                waves = [result[index] for index in range(result.shape[0])]
+            else:
+                waves = result
+            for index, wave in enumerate(waves):
+                _write_wav(root / f"{index}.wav", wave)
+            return
+        # separation: [speakers, samples], [batch, speakers, samples], or a list of the first
+        if torch.is_tensor(result) and result.dim() == 2:
+            items = [result]
+        elif torch.is_tensor(result):
+            items = [result[index] for index in range(result.shape[0])]
+        else:
+            items = result
+        for index, item in enumerate(items):
+            folder = root if len(items) == 1 else root / str(index)
+            for speaker in range(item.shape[0]):
+                _write_wav(folder / f"{speaker}.wav", item[speaker])
+
+    def forward(self, audio, save_to=None, wav_lens=None):
         """Run the selected SUPERB task.
 
-        audio is a path (local or ``hf.co/...``) or a 16 kHz waveform, same as
-        ``SepRQEncoder``. One utterance returns the shapes used on the website:
-        a list of waveforms, one enhanced waveform, or ``[T, num_speakers]``
-        probabilities. A batch keeps a leading batch dimension.
+        audio is one path, a list of paths, or a 16 kHz waveform shaped
+        ``[num_samples]``, ``[batch, num_samples]`` or
+        ``[batch, channel, num_samples]``. One utterance returns
+        ``[num_speakers, num_samples]``, ``[num_samples]``, or
+        ``[time, num_speakers]``. A batch keeps a leading batch dimension.
+        ``save_to`` is a relative directory: separation and enhancement write
+        wav files, diarization writes an RTTM per utterance.
         """
-        batch = self.encoder._as_batch(audio)
+        batch, lengths, relative = self._collate(audio, wav_lens)
         if self.task == "diarization":
-            states = self.encoder.hidden_states(batch, wav_lens)
+            states = self.encoder.hidden_states(batch, relative)
             logits = self.head(self._weighted(states))
             prob = torch.sigmoid(logits)
-            return prob[0] if prob.shape[0] == 1 else prob
-
-        outs = [self._separate(batch[i]) for i in range(batch.shape[0])]
-        if self.task == "enhancement":
-            waves = [item[0] for item in outs]
-            return waves[0] if len(waves) == 1 else torch.stack(waves)
-        if len(outs) == 1:
-            return outs[0]
-        return [torch.stack([item[s] for item in outs]) for s in range(self.num_speakers)]
+            trimmed = []
+            for index, length in enumerate(lengths):
+                frames = min(prob.shape[1], max(1, math.ceil(length / self.frame_shift)))
+                trimmed.append(prob[index, :frames])
+            result = trimmed[0] if len(trimmed) == 1 else (
+                torch.stack(trimmed) if len({item.shape[0] for item in trimmed}) == 1 else trimmed
+            )
+        else:
+            outs = [self._separate(batch[index, :lengths[index]]) for index in range(batch.shape[0])]
+            if self.task == "enhancement":
+                waves = [item[0] for item in outs]
+                result = waves[0] if len(waves) == 1 else (
+                    torch.stack(waves) if len({wave.shape[0] for wave in waves}) == 1 else waves
+                )
+            else:
+                stacked = [torch.stack(item) for item in outs]
+                result = stacked[0] if len(stacked) == 1 else (
+                    torch.stack(stacked) if len({item.shape[1] for item in stacked}) == 1 else stacked
+                )
+        if save_to is not None:
+            self._write(result, save_to)
+        return result
