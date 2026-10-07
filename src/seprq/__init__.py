@@ -16,8 +16,8 @@ from huggingface_hub import hf_hub_download
 
 SAMPLE_RATE = 16000
 
-__all__ = ["SepRQEncoder", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
-__version__ = "0.3.1"
+__all__ = ["SepRQEncoder", "SepRQPipeline", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
+__version__ = "0.4.0"
 
 REPO_ID = "SevKod/SepRQ"
 
@@ -226,3 +226,71 @@ class SepRQEncoder(torch.nn.Module):
                 h.remove()
 
         return outs                                        # [B, T, 576] x 12
+
+    def hidden_states(self, audio, wav_lens=None):
+        """Return the 13 states the SUPERB featurizer was trained on.
+
+        SepRQ / BEST-RQ: the projected CNN output, then the 12 Conformer
+        outputs. HuBERT / WavLM: each transformer-layer input, then the
+        encoder output (final layer-norm when the model is post-norm).
+        ``forward`` still returns the 12 layer outputs.
+        """
+        x = self._as_batch(audio)
+        device = x.device
+        if self.kind == "torchaudio":
+            lengths = None
+            if wav_lens is not None:
+                wav_lens = torch.as_tensor(wav_lens, dtype=torch.float32, device=device)
+                lengths = (wav_lens * x.shape[1]).round().long()
+            return self._torchaudio_states(x, lengths)
+
+        if wav_lens is None:
+            wav_lens = torch.ones(x.shape[0], device=device)
+        else:
+            wav_lens = torch.as_tensor(wav_lens, dtype=torch.float32, device=device)
+        feats = self.melspec(x)
+        if self.norm_mode == "sentence":
+            feats = self.normalizer(feats, wav_lens)
+        else:
+            feats = (feats - self.running_mean) / self.running_std
+        return self._seprq_states(feats, wav_lens)
+
+    def _seprq_states(self, feats, wav_lens):
+        first = []
+        outs = []
+        layers = self.wrapper.transformer.encoder.layers
+
+        def pre(_module, inputs):
+            if not first:
+                first.append(inputs[0].clone())
+
+        def post(_module, _inputs, output):
+            outs.append(output[0] if isinstance(output, tuple) else output)
+
+        handles = [layers[0].register_forward_pre_hook(pre)]
+        handles += [layer.register_forward_hook(post) for layer in layers]
+        try:
+            self.wrapper(self.cnn(feats), wav_lens)
+        finally:
+            for handle in handles:
+                handle.remove()
+        return [first[0]] + outs
+
+    def _torchaudio_states(self, waveforms, lengths):
+        model = self.ssl
+        features, feat_lengths = model.feature_extractor(waveforms, lengths)
+        hidden, mask = model.encoder._preprocess(features, feat_lengths)
+        transformer = model.encoder.transformer
+        hidden = transformer._preprocess(hidden)
+        states = []
+        position_bias = None
+        for layer in transformer.layers:
+            states.append(hidden)
+            hidden, position_bias = layer(hidden, mask, position_bias=position_bias)
+        if not transformer.layer_norm_first:
+            hidden = transformer.layer_norm(hidden)
+        states.append(hidden)
+        return states
+
+
+from .pipeline import SepRQPipeline  # noqa: E402

@@ -82,6 +82,30 @@ The SepRQ / BEST-RQ weights come from the Hub (private — authenticate once wit
 `huggingface-cli login` or `HF_TOKEN`); the HuBERT / WavLM baselines are fetched
 from the torchaudio pipelines, nothing extra to host.
 
+## Run a task
+
+SUPERB separation, diarization, and enhancement. The head is chosen from the
+upstream. Published for `SepRQ` (`streams=2`), `HuBERT_BASE`, `WavLM_BASE`,
+and `WavLM_BASE_PLUS`.
+
+```python
+from seprq import SepRQPipeline
+
+wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
+
+# Separation — one waveform per speaker
+pipe = SepRQPipeline("separation-2spk", upstream="SepRQ", streams=2)
+sources = pipe(wav)
+
+# Diarization — [T, num_speakers]
+pipe = SepRQPipeline("diarization", upstream="SepRQ", streams=2)
+activations = pipe(wav)
+
+# Enhancement — enhanced waveform
+pipe = SepRQPipeline("enhancement", upstream="SepRQ", streams=2)
+clean = pipe(wav)
+```
+
 ## 🔀 SepRQ — separation as the pretext task
 
 SepRQ swaps masked prediction for pseudo source separation. It predicts one
