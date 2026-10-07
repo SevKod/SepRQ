@@ -158,7 +158,9 @@ section.block{padding:72px 0 8px}
 .code-top .copy:hover{background:rgba(255,255,255,.16)}
 .code-top .copy.done{background:#3E9A6A;color:#fff}
 pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);font-size:14px;line-height:1.7;tab-size:4}
-.t-c{color:#9C8470;font-style:italic}.t-s{color:#FFC48A}.t-k{color:#FF8E4D;font-weight:500}.t-n{color:#F7D774}.t-f{color:#9BD3FF}
+.t-c{color:#9C8470;font-style:italic}.t-s{color:#FFC48A}.t-k{color:#FF8E4D;font-weight:500}.t-n{color:#F7D774}.t-f{color:#9BD3FF}.t-w{color:#FF5C5C;font-style:italic;font-weight:650}
+.dh3-note{margin:12px 0 0;color:#D1242F;font-size:13.5px;font-weight:650;line-height:1.45}
+.code-card .dh3-note{margin:0;padding:0 20px 16px;color:#FF5C5C;font-size:13px}
 .qs-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:stretch}
 @media (max-width:900px){.qs-grid{grid-template-columns:minmax(0,1fr)}}
 .qs-side{padding:22px}
@@ -959,6 +961,15 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
+const DIHARD_NOTE = "Local segmentation. Not intended for long file recordings without clustering.";
+const EX_FOLDER = {
+  separation: "SS",
+  diarization: "SD",
+  enhancement: "SE",
+  "target-speaker-extraction": "TSE",
+  "personalized-vad": "PVAD",
+  "target-speaker-asr": "TS-ASR",
+};
 const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlm", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation", qsWsj: 2, ov: 0, lm: 0 };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlm" : "seprq");
 /* Sparse tasks (SparseLibriMix) carry an overlap dimension; assets live in an ov<NN> subfolder. */
@@ -970,7 +981,7 @@ function hl(code) {
   let out = "", last = 0, m;
   while ((m = re.exec(code))) {
     out += esc(code.slice(last, m.index));
-    const c = m[1] ? "c" : m[2] ? "s" : m[3] ? "k" : m[4] ? "n" : "f";
+    const c = m[1] ? (m[1].includes("Local segmentation") ? "w" : "c") : m[2] ? "s" : m[3] ? "k" : m[4] ? "n" : "f";
     out += `<span class="t-${c}">${esc(m[0])}</span>`;
     last = re.lastIndex;
   }
@@ -1046,32 +1057,26 @@ const snipTask = (u, d) => {
   const ctor = [`"${taskId}"`, `upstream="${u.code}"`];
   if (u.streams) ctor.push(`streams=${u.streams}`);
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
-  const prepared = {
-    separation: "separation",
-    diarization: "diarization",
-    enhancement: "enhancement",
-    "target-speaker-extraction": "target-speaker-extraction",
-    "personalized-vad": "personalized-vad",
-    "target-speaker-asr": "target-speaker-asr",
-  };
-  const wav = prepared[d.id] ? `${ex}/${prepared[d.id]}/mix1.wav` : `${ex}/mix.wav`;
+  const folder = EX_FOLDER[d.id];
+  const wav = folder ? `${ex}/${folder}/mix1.wav` : `${ex}/mix.wav`;
   const setup = [`mix = "${wav}"`];
   const callArgs = ["mix"];
   if (d.enroll) {
-    setup.push(`enrollment = "${ex}/${prepared[d.id]}/enroll1.wav"`);
+    setup.push(`enrollment = "${ex}/${folder}/enroll1.wav"`);
     callArgs.push("enrollment=enrollment");
   }
   setup.push('save_to = "./output"');
   callArgs.push("save_to=save_to");
   const speakers = d.wsj ? state.qsWsj : (d.save === "wav" && d.id === "separation" ? 2 : 1);
   const shape = d.shape ? `\n# ${d.shape}` : "";
+  const dihard = d.id === "diarization-dihard3" ? `\n# ${DIHARD_NOTE}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
 ${callRows("pipe = SepRQPipeline(", ctor)}
 ${setup.join("\n")}
 # ${savedFiles(d.save, d.save === "wav" ? speakers : 1)}
-${callRows(`${d.var} = pipe(`, callArgs)}${shape}`;
+${d.var} = pipe(${callArgs.join(", ")})${shape}${dihard}`;
 };
 
 const QS_TASK_UPS = QS_UPS.filter(u => u.id !== "bestrq" && u.id !== "wavlmlarge");
@@ -1348,6 +1353,7 @@ function renderDemo() {
     <div class="blk-h"><span class="bt">Downstream</span><span class="bs">🔥 trained</span></div>
     <div class="ds-name">${esc(task.name)}${task.tag || task.short ? `<span class="tag">${esc(task.tag || task.short)}</span>` : ""}</div>
     <div class="ds-meta">${esc(task.group)} · ${esc(set.label)}</div>
+    ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_NOTE}</p>` : ""}
     <dl class="ds-facts">
       <div><dt>Inputs</dt><dd>${esc(set.label)}${task.enroll ? " + enrollment" : ""}</dd></div>
       <div><dt>Output</dt><dd>${esc(outDesc)}</dd></div>
@@ -1363,14 +1369,7 @@ function renderDemo() {
   const demoUp = { seprq: ["SepRQ"], seprq_k2: ["SepRQ", 2], seprq_k3: ["SepRQ", 3], hubert: ["HuBERT_BASE"], wavlm: ["WavLM_BASE"], wavlmplus: ["WavLM_BASE_PLUS"] }[up.id];
   const ctor = [`"${task.api}"`, `upstream="${demoUp[0]}"`];
   if (demoUp[1]) ctor.push(`streams=${demoUp[1]}`);
-  const hubFolder = {
-    separation: "separation",
-    diarization: "diarization",
-    enhancement: "enhancement",
-    "target-speaker-extraction": "target-speaker-extraction",
-    "personalized-vad": "personalized-vad",
-    "target-speaker-asr": "target-speaker-asr",
-  }[task.api];
+  const hubFolder = EX_FOLDER[task.api];
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
   const setup = [];
   const callArgs = [];
@@ -1391,11 +1390,13 @@ function renderDemo() {
     : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
     : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
   const save = task.kind === "text" ? "txt" : task.kind === "activation" ? "rttm" : "wav";
-  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\n${setup.join("\n")}\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}\n${callRows("out = pipe(", callArgs)}${shape ? `\n# ${shape}` : ""}`;
+  const dihard = task.id === "dh3" ? `\n# ${DIHARD_NOTE}` : "";
+  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\n${setup.join("\n")}\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}${dihard}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
-      <pre class="code" id="repro-code">${hl(code)}</pre></div>`;
+      <pre class="code" id="repro-code">${hl(code)}</pre>
+      ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_NOTE}</p>` : ""}</div>`;
 
   if (fsel) $(fsel)?.focus({ preventScroll: true });
 }

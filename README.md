@@ -98,63 +98,54 @@ from seprq import SepRQPipeline
 save_to = "./output"
 
 # Separation — writes ./output/0.wav, ./output/1.wav
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/separation/mix1.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/SS/mix1.wav"
 pipe = SepRQPipeline("separation",
                      upstream="SepRQ",
                      streams=2)
-sources = pipe(mix,
-               save_to=save_to)
+sources = pipe(mix, save_to=save_to)
 # [num_speakers, num_samples]
 
 # Diarization — writes ./output/0.rttm
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/diarization/mix1.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/SD/mix1.wav"
 pipe = SepRQPipeline("diarization",
                      upstream="SepRQ",
                      streams=2)
-activations = pipe(mix,
-                   save_to=save_to)
+activations = pipe(mix, save_to=save_to)
 # [time, num_speakers]
 
 # Enhancement — writes ./output/0.wav
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/enhancement/mix1.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/SE/mix1.wav"
 pipe = SepRQPipeline("enhancement",
                      upstream="SepRQ",
                      streams=2)
-clean = pipe(mix,
-             save_to=save_to)
+clean = pipe(mix, save_to=save_to)
 # [num_samples]
 
 # Target speaker extraction — writes ./output/0.wav
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/mix1.wav"
-enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/enroll1.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/TSE/mix1.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/TSE/enroll1.wav"
 pipe = SepRQPipeline("target-speaker-extraction",
                      upstream="SepRQ",
                      streams=2)
-target = pipe(mix,
-              enrollment=enrollment,
-              save_to=save_to)
+target = pipe(mix, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
 # Personalized VAD — writes ./output/0.rttm
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/mix1.wav"
-enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/enroll1.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/PVAD/mix1.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/PVAD/enroll1.wav"
 pipe = SepRQPipeline("personalized-vad",
                      upstream="SepRQ",
                      streams=2)
-activations = pipe(mix,
-                   enrollment=enrollment,
-                   save_to=save_to)
+activations = pipe(mix, enrollment=enrollment, save_to=save_to)
 # [time]
 
 # Target-speaker ASR — writes ./output/0.txt
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/mix1.wav"
-enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/enroll1.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/TS-ASR/mix1.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/TS-ASR/enroll1.wav"
 pipe = SepRQPipeline("target-speaker-asr",
                      upstream="SepRQ",
                      streams=2)
-text = pipe(mix,
-            enrollment=enrollment,
-            save_to=save_to)
+text = pipe(mix, enrollment=enrollment, save_to=save_to)
 ```
 
 ## 🔀 SepRQ — separation as the pretext task
