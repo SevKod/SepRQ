@@ -17,7 +17,7 @@ from huggingface_hub import hf_hub_download
 SAMPLE_RATE = 16000
 
 __all__ = ["SepRQEncoder", "SepRQPipeline", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
-__version__ = "0.4.7"
+__version__ = "0.4.8"
 
 REPO_ID = "SevKod/SepRQ"
 
@@ -30,8 +30,8 @@ MODELS = {
     "BestRQ_50Hz": ("BestRQ_50Hz", "sentence"),
 }
 
-# SepRQ comes in variants trained to separate N speakers -> repo subfolder.
-SEPRQ_STREAMS = {2: "SepRQ/2_streams", 3: "SepRQ/3_streams"}
+# The released encoder is the 2-speaker reduced-scale checkpoint.
+SEPRQ_STREAMS = {2: "SepRQ/2_streams"}
 
 # Generic SSL baselines fetched from torchaudio.pipelines (torch hub). 768-dim @ 50 Hz.
 #   name -> torchaudio.pipelines bundle attribute.

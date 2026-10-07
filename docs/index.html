@@ -685,7 +685,7 @@ footer .sp{margin-left:auto}
         <table class="models">
           <thead><tr><th>Name</th><th class="num">Layers</th><th class="num">Dim</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr class="ours"><td><code>SepRQ</code> ⭐</td><td class="num">12</td><td class="num">576</td><td>Ours. <code>streams=2</code> (default) or <code>streams=3</code></td></tr>
+            <tr class="ours"><td><code>SepRQ</code> ⭐</td><td class="num">12</td><td class="num">576</td><td>Ours. <code>streams=2</code></td></tr>
             <tr><td><code>BestRQ_50Hz</code></td><td class="num">12</td><td class="num">576</td><td>BEST-RQ trained at 50 Hz, released with SepRQ</td></tr>
             <tr><td><code>HuBERT_BASE</code></td><td class="num">12</td><td class="num">768</td><td>Baseline</td></tr>
             <tr><td><code>WavLM_BASE</code></td><td class="num">12</td><td class="num">768</td><td>Baseline</td></tr>
@@ -1133,15 +1133,15 @@ function qsDownBtn(d) {
 const qsDownsHTML = () => [...new Set(QS_DOWNS.map(d => d.group))].map(g =>
   `<div class="qs-down-cat">${g === "SUPERB" ? "" : `<div class="qs-cat">${esc(g)}</div>`}${QS_DOWNS.filter(d => d.group === g).map(qsDownBtn).join("")}</div>`
 ).join("");
-const pickUp = () => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>`;
+const pickUp = (ups) => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(ups)}</div></div>`;
 
 function sideFeatures() {
   return `<h3>How to use</h3>
-    ${pickUp()}
+    ${pickUp(QS_UPS.filter(u => u.id !== "seprq_k3"))}
     <ul>
       <li>Accepts a <b>waveform tensor</b>: <code>[num_samples]</code>, <code>[batch, num_samples]</code> or <code>[batch, channel, num_samples]</code> — or a <code>file_path</code> — downmixed to mono and resampled to 16 kHz.</li>
       <li>Returns the <b>per-layer features</b> (12 Conformer layers for SepRQ), usable frozen ❄️ or fine-tuned 🔥.</li>
-      <li>SepRQ comes in 2- and 3-speaker variants: pick one with <code>streams</code> (default <code>2</code>).</li>
+      <li>The released SepRQ encoder is the 2-speaker model (<code>streams=2</code>).</li>
     </ul>`;
 }
 function sideTask() {
@@ -1153,6 +1153,7 @@ function sideTask() {
     </ul>`;
 }
 function renderQS() {
+  if (state.qsTab === "features" && state.qsUp === "seprq_k3") state.qsUp = "seprq_k2";
   if (state.qsTab === "task") syncQsDown();
   document.querySelectorAll('.qs-grid .tab').forEach(t => t.setAttribute("aria-selected", t.dataset.tab === state.qsTab));
   $("#qs-code").innerHTML = hl(state.qsTab === "features" ? snipFeatures(qsUp()) : snipTask(qsUp(), qsDown()));
