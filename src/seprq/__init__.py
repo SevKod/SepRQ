@@ -17,7 +17,7 @@ from huggingface_hub import hf_hub_download
 SAMPLE_RATE = 16000
 
 __all__ = ["SepRQEncoder", "SepRQPipeline", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 
 REPO_ID = "SevKod/SepRQ"
 
@@ -106,6 +106,15 @@ class SepRQEncoder(torch.nn.Module):
             self.register_buffer(
                 "running_std", torch.sqrt(norm["running_var"].float() + 1e-5)
             )
+
+    def _load_seprq_checkpoint(self, model_path, norm_path):
+        """Replace the SepRQ weights. The architecture stays the one from the Hub yaml."""
+        torch.nn.ModuleList([self.cnn, self.wrapper]).load_state_dict(
+            torch.load(model_path, map_location="cpu")
+        )
+        norm = torch.load(norm_path, map_location="cpu")
+        self.running_mean.copy_(norm["running_mean"].float())
+        self.running_std.copy_(torch.sqrt(norm["running_var"].float() + 1e-5))
 
     def _init_torchaudio(self, model):
         import torchaudio

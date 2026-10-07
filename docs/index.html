@@ -878,7 +878,7 @@ const INPUT_SETS = {
   libri2mix:      { label: "Libri2Mix",        noun: "mixture",      items: placeholder("l2m", "Mixture") },
   l2m_sep:        { label: "Libri2Mix", noun: "mixture", items: [{ id: "1089-134686-0000_121-127105-0031", n: 1, title: "Mixture 1", meta: "2 speakers · 10.4s" }, { id: "237-126133-0014_3729-6852-0037", n: 2, title: "Mixture 2", meta: "2 speakers · 5.9s" }, { id: "4507-16021-0050_2961-961-0003", n: 3, title: "Mixture 3", meta: "2 speakers · 3.9s" }, { id: "672-122797-0073_1580-141084-0004", n: 4, title: "Mixture 4", meta: "2 speakers · 8.2s" }, { id: "8463-287645-0013_5142-33396-0037", n: 5, title: "Mixture 5", meta: "2 speakers · 3.6s" }] },
   l2m_diar:       { label: "Libri2Mix", noun: "recording", items: [{ id: "1320-122617-0002_8455-210777-0028", n: 1, title: "Recording 1", meta: "2 speakers · 13.6s" }, { id: "4077-13754-0001_5142-33396-0065", n: 2, title: "Recording 2", meta: "2 speakers · 5.2s" }, { id: "4507-16021-0053_2300-131720-0005", n: 3, title: "Recording 3", meta: "2 speakers · 8.1s" }, { id: "6829-68771-0032_1995-1837-0014", n: 4, title: "Recording 4", meta: "2 speakers · 12.5s" }, { id: "7127-75947-0019_1089-134691-0018", n: 5, title: "Recording 5", meta: "2 speakers · 3.9s" }] },
-  dihard3:        { label: "DIHARD 3",         noun: "recording",    items: [{ id: "cts", title: "Telephone (CTS)", meta: "2 speakers · DIHARD3 dev" }, { id: "court", title: "Court", meta: "2 speakers · DIHARD3 dev" }, { id: "broadcast_interview", title: "Broadcast interview", meta: "2 speakers · DIHARD3 dev" }, { id: "meeting", title: "Meeting", meta: "3 speakers · DIHARD3 dev" }, { id: "restaurant", title: "Restaurant", meta: "6 speakers · DIHARD3 dev" }] },
+  dihard3:        { label: "DIHARD 3",         noun: "recording",    items: [{ id: "cts", n: 1, title: "Telephone (CTS)", meta: "2 speakers · DIHARD3 dev" }, { id: "court", n: 2, title: "Court", meta: "2 speakers · DIHARD3 dev" }, { id: "broadcast_interview", n: 3, title: "Broadcast interview", meta: "2 speakers · DIHARD3 dev" }, { id: "meeting", n: 4, title: "Meeting", meta: "3 speakers · DIHARD3 dev" }, { id: "restaurant", n: 5, title: "Restaurant", meta: "6 speakers · DIHARD3 dev" }] },
   wsj0_2mix:      { label: "WSJ0-2mix",        noun: "2-spk mixture", items: [{ id: "445o0308_1.3737_420a010y_-1.3737", title: "2-spk mixture 1", meta: "2 speakers · 5.5s" }, { id: "447c0206_2.0186_22go010y_-2.0186", title: "2-spk mixture 2", meta: "2 speakers · 7.6s" }, { id: "447c020n_1.281_22go0107_-1.281", title: "2-spk mixture 3", meta: "2 speakers · 7.2s" }, { id: "440c0205_0.7546_050c010e_-0.7546", title: "2-spk mixture 4", meta: "2 speakers · 4.5s" }, { id: "422a010j_1.3587_420a010l_-1.3587", title: "2-spk mixture 5", meta: "2 speakers · 5.2s" }] },
   wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: [{ id: "442o030f_1.7037_422c020a_-1.7037_443o0306_0", title: "3-spk mixture 1", meta: "3 speakers · 1.9s" }, { id: "050o020a_2.1724_441o030p_-2.1724_442c0213_0", title: "3-spk mixture 2", meta: "3 speakers · 2.4s" }, { id: "22ho0114_0.2961_440c0203_-0.2961_446c0204_0", title: "3-spk mixture 3", meta: "3 speakers · 4.6s" }, { id: "052o020n_0.48935_441o0304_-0.48935_421c020h_0", title: "3-spk mixture 4", meta: "3 speakers · 5.6s" }, { id: "440c0214_0.30311_050o020j_-0.30311_447o0312_0", title: "3-spk mixture 5", meta: "3 speakers · 4.3s" }] },
   voicebank:      { label: "VoiceBank-DEMAND", noun: "noisy speech", items: [{ id: "p232_001", n: 1, title: "Noisy clip 1", meta: "p232 · 1.7s" }, { id: "p232_211", n: 2, title: "Noisy clip 2", meta: "p232 · 1.4s" }, { id: "p257_008", n: 3, title: "Noisy clip 3", meta: "p257 · 5.6s" }, { id: "p257_210", n: 4, title: "Noisy clip 4", meta: "p257 · 2.5s" }, { id: "p257_410", n: 5, title: "Noisy clip 5", meta: "p257 · 3.6s" }] },
@@ -943,7 +943,7 @@ function clipWav(set, m, kind) {
   if (item && item.n) return kind === "mix" ? `mix${item.n}.wav` : `enroll${item.n}.wav`;
   return kind === "mix" ? "mixture.wav" : "enrollment.wav";
 }
-const SET_EX = { l2m_sep: "SS", l2m_diar: "SD", voicebank: "SE", tse_in: "TSE", slm_in: "PVAD", tsasr_in: "TS-ASR" };
+const SET_EX = { l2m_sep: "SS", l2m_diar: "SD", voicebank: "SE", tse_in: "TSE", slm_in: "PVAD", tsasr_in: "TS-ASR", dihard3: "DH3" };
 function demoWav(set, m, kind, folder) {
   const parts = String(m).split("/");
   const item = ((INPUT_SETS[set] || {}).items || []).find(x => x.id === parts[0]);
@@ -985,6 +985,7 @@ const EX_FOLDER = {
   "personalized-extraction": "PSE",
   "personalized-vad": "PVAD",
   "target-speaker-asr": "TS-ASR",
+  "diarization-dihard3": "DH3",
 };
 const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlm", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation", qsWsj: 2, ov: 0, lm: 0 };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlm" : "seprq");

@@ -16,6 +16,8 @@ from torch.nn.utils.rnn import pack_sequence, pad_packed_sequence
 from .targets import TARGET_TASKS, build_target_head
 
 SUPERB_TASKS = ("separation", "diarization", "enhancement")
+# DIHARD 3 is local segmentation (powerset over 3 speakers), not the SUPERB LSTM.
+OOD_TASKS = ("diarization-dihard3",)
 TASKS = SUPERB_TASKS + TARGET_TASKS
 # The SUPERB separation head is the 2-speaker setup. Checkpoints stay in the
 # folder they were uploaded under.
@@ -64,6 +66,51 @@ class _DiarizationHead(nn.Module):
         return self.linear(hidden)
 
 
+def _powerset_mapping(num_speakers, max_speakers_per_frame):
+    """Rows are powerset classes, columns are speakers. Matches pyannote's order."""
+    from itertools import combinations
+
+    rows = []
+    for size in range(max_speakers_per_frame + 1):
+        for combo in combinations(range(num_speakers), size):
+            row = [0.0] * num_speakers
+            for speaker in combo:
+                row[speaker] = 1.0
+            rows.append(row)
+    return torch.tensor(rows)
+
+
+class _LocalDiarization(nn.Module):
+    """DIHARD 3 local segmentation: LSTM, two leaky-ReLU layers, powerset classes."""
+
+    def __init__(self, input_dim, hidden_size, rnn_layers, dropout, num_speakers, max_speakers_per_frame):
+        super().__init__()
+        self.lstm = nn.LSTM(
+            input_dim,
+            hidden_size,
+            num_layers=rnn_layers,
+            batch_first=True,
+            bidirectional=True,
+            dropout=dropout,
+        )
+        width = hidden_size * 2
+        self.linear = nn.ModuleList(
+            [nn.Linear(width if index == 0 else hidden_size, hidden_size) for index in range(2)]
+        )
+        mapping = _powerset_mapping(num_speakers, max_speakers_per_frame)
+        self.classifier = nn.Linear(hidden_size, mapping.shape[0])
+        self.register_buffer("mapping", mapping)
+
+    def forward(self, features):
+        hidden, _ = self.lstm(features.float())
+        for linear in self.linear:
+            hidden = torch.nn.functional.leaky_relu(linear(hidden))
+        classes = hidden.new_zeros(hidden.shape[0], hidden.shape[1], self.classifier.out_features)
+        picked = self.classifier(hidden).argmax(dim=-1)
+        classes.scatter_(-1, picked.unsqueeze(-1), 1.0)
+        return classes @ self.mapping
+
+
 def _match_length(feat, n_frames):
     """Trim or pad a [T, D] feature so it lines up with an STFT of n_frames."""
     if abs(feat.size(0) - n_frames) >= 5:
@@ -81,6 +128,13 @@ def _match_length(feat, n_frames):
 
 def _is_path(value):
     return isinstance(value, (str, bytes)) or hasattr(value, "__fspath__")
+
+
+def _head_path(task, upstream, streams):
+    folder = _HUB_TASK.get(task, task)
+    if task == "diarization-dihard3" and upstream == "SepRQ" and streams == 3:
+        return f"superb/{folder}/{upstream}/3_streams/head.ckpt"
+    return f"superb/{folder}/{upstream}/head.ckpt"
 
 
 def _item_dir(root, index, count):
@@ -171,6 +225,22 @@ class SepRQPipeline(nn.Module):
 
         # ./output/activations.rttm
 
+        pipe = SepRQPipeline("diarization-dihard3",
+                             upstream="SepRQ",
+                             streams=2)
+
+        # Input mixture - [num_samples]
+        mixture = "mixture.wav"
+
+        save_to = "./output"
+
+        activations = pipe(mixture, save_to=save_to)
+        # [time, num_speakers]
+
+        # ./output/activations.rttm
+        # Local segmentation only (EEND).
+        # Not intended for long file recordings without clustering.
+
         pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
 
         # Input mixture - [num_samples]
@@ -205,15 +275,16 @@ class SepRQPipeline(nn.Module):
 
         if task == "separation-2spk":
             task = "separation"
-        if task not in TASKS:
+        if task not in TASKS and task not in OOD_TASKS:
             raise ValueError(
-                f"task must be one of {list(TASKS)}, got {task!r}"
+                f"task must be one of {list(TASKS + OOD_TASKS)}, got {task!r}"
             )
         if upstream == "SepRQ" and streams != 2:
-            raise ValueError(
-                "Published heads are for SepRQ with streams=2. "
-                f"Got streams={streams!r}."
-            )
+            if not (task == "diarization-dihard3" and streams == 3):
+                raise ValueError(
+                    "Published heads are for SepRQ with streams=2. "
+                    f"Got streams={streams!r}."
+                )
         if upstream not in SUPERB_UPSTREAMS:
             raise ValueError(
                 f"No head is published for {upstream!r} on {task!r}. "
@@ -224,13 +295,20 @@ class SepRQPipeline(nn.Module):
         self.upstream_name = upstream
         self.repo_id = repo_id or REPO_ID
         self.encoder = SepRQEncoder(upstream, streams=streams, repo_id=self.repo_id, device=device)
+        # The published SepRQ/2_streams encoder is the SUPERB one. The DIHARD 3
+        # head was trained on a different 2-stream checkpoint of the same architecture.
+        if task == "diarization-dihard3" and upstream == "SepRQ" and streams == 2:
+            from huggingface_hub import hf_hub_download
+
+            self.encoder._load_seprq_checkpoint(
+                hf_hub_download(self.repo_id, "superb/diarization-dihard3/SepRQ/encoder.ckpt"),
+                hf_hub_download(self.repo_id, "superb/diarization-dihard3/SepRQ/normalize.ckpt"),
+            )
         self.encoder.requires_grad_(False).eval()
 
         from huggingface_hub import hf_hub_download
 
-        path = hf_hub_download(
-            self.repo_id, f"superb/{_HUB_TASK.get(task, task)}/{upstream}/head.ckpt"
-        )
+        path = hf_hub_download(self.repo_id, _head_path(task, upstream, streams))
         blob = torch.load(path, map_location="cpu", weights_only=False)
         self.n_states = int(blob["featurizer"].numel())
         self.register_buffer("layer_weights", blob["featurizer"].float())
@@ -252,6 +330,25 @@ class SepRQPipeline(nn.Module):
             self.head = _DiarizationHead(
                 blob["input_dim"], blob["hidden_size"], self.num_speakers, blob["rnn_layers"]
             )
+        elif self.task == "diarization-dihard3":
+            self.frame_shift = int(blob["frame_shift"])
+            self.num_speakers = int(blob["num_speakers"])
+            self.layer_outputs = bool(blob["layer_outputs"])
+            self.head = _LocalDiarization(
+                blob["input_dim"],
+                blob["hidden_size"],
+                blob["rnn_layers"],
+                blob["dropout"],
+                self.num_speakers,
+                blob["max_speakers_per_frame"],
+            )
+            incompatible = self.head.load_state_dict(weights, strict=False)
+            if incompatible.unexpected_keys or any(key != "mapping" for key in incompatible.missing_keys):
+                raise RuntimeError(
+                    "DIHARD 3 head did not match the published checkpoint: "
+                    f"missing {incompatible.missing_keys}, unexpected {incompatible.unexpected_keys}."
+                )
+            return
         else:
             self.hop_length = int(blob["hop_length"])
             self.n_fft = int(blob["n_fft"])
@@ -349,7 +446,7 @@ class SepRQPipeline(nn.Module):
     def _write(self, result, save_to):
         root = Path(save_to)
         root.mkdir(parents=True, exist_ok=True)
-        if self.task == "diarization":
+        if self.task in ("diarization", "diarization-dihard3"):
             if torch.is_tensor(result) and result.dim() == 2:
                 items = [result]
             elif torch.is_tensor(result):
@@ -464,7 +561,21 @@ class SepRQPipeline(nn.Module):
         if self.task in TARGET_TASKS:
             return self._forward_target(audio, enrollment, save_to, wav_lens)
         batch, lengths, relative = self._collate(audio, wav_lens)
-        if self.task == "diarization":
+        if self.task == "diarization-dihard3":
+            trimmed = []
+            for index, length in enumerate(lengths):
+                wave = batch[index, :length]
+                if self.layer_outputs:
+                    states = self.encoder(wave)
+                else:
+                    states = self.encoder.hidden_states(wave)
+                prob = self.head(self._weighted(states))[0]
+                frames = min(prob.shape[0], max(1, math.ceil(length / self.frame_shift)))
+                trimmed.append(prob[:frames])
+            result = trimmed[0] if len(trimmed) == 1 else (
+                torch.stack(trimmed) if len({item.shape[0] for item in trimmed}) == 1 else trimmed
+            )
+        elif self.task == "diarization":
             states = self.encoder.hidden_states(batch, relative)
             logits = self.head(self._weighted(states))
             prob = torch.sigmoid(logits)

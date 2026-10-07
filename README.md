@@ -87,9 +87,11 @@ from the torchaudio pipelines, nothing extra to host.
 ## Run a task
 
 SUPERB separation, diarization, and enhancement, plus target-speaker
-extraction, personalized speech extraction, personalized VAD, and
-target-speaker ASR. The head is chosen from the upstream. Published for
-`SepRQ` (`streams=2`), `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
+extraction, personalized speech extraction, personalized VAD,
+target-speaker ASR, and DIHARD 3 diarization (local segmentation).
+The head is chosen from the upstream. Published for
+`SepRQ` (`streams=2`, and `streams=3` on DIHARD 3), `HuBERT_BASE`,
+`WavLM_BASE`, and `WavLM_BASE_PLUS`.
 Target-speaker tasks take an enrollment utterance.
 
 ```python
@@ -195,6 +197,23 @@ save_to = "./output"
 text = pipe(mixture, enrollment=enrollment, save_to=save_to)
 
 # ./output/extracted_transcript.txt
+
+# DIHARD 3 diarization
+pipe = SepRQPipeline("diarization-dihard3",
+                     upstream="SepRQ",
+                     streams=2)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/DH3/mix1.wav"
+
+save_to = "./output"
+
+activations = pipe(mixture, save_to=save_to)
+# [time, num_speakers]
+
+# ./output/activations.rttm
+# Local segmentation only (EEND).
+# Not intended for long file recordings without clustering.
 ```
 
 ## 🔀 SepRQ — separation as the pretext task
