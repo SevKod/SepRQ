@@ -118,7 +118,11 @@ class SepRQEncoder(torch.nn.Module):
     def _local_path(path):
         """Return a local file path. A Hugging Face file URL is downloaded first."""
         path = os.fspath(path)
-        if not isinstance(path, str) or not path.startswith(("http://", "https://")):
+        if not isinstance(path, str):
+            return path
+        if path.startswith(("hf.co/", "huggingface.co/")):
+            path = "https://" + path
+        if not path.startswith(("http://", "https://")):
             return path
         from urllib.parse import urlparse
 
