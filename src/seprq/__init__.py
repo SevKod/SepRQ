@@ -17,7 +17,7 @@ from huggingface_hub import hf_hub_download
 SAMPLE_RATE = 16000
 
 __all__ = ["SepRQEncoder", "SepRQPipeline", "MODELS", "TORCHAUDIO_BUNDLES", "REPO_ID"]
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
 REPO_ID = "SevKod/SepRQ"
 

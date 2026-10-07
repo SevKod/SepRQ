@@ -7,6 +7,7 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 TARGET_TASKS = (
     "target-speaker-extraction",
+    "personalized-extraction",
     "personalized-vad",
     "target-speaker-asr",
 )
@@ -178,7 +179,7 @@ def build_target_head(blob):
     task = blob["task"]
     state = blob["state"]
     dim = int(blob["input_dim"])
-    if task == "target-speaker-extraction":
+    if task in ("target-speaker-extraction", "personalized-extraction"):
         head = _TSE(dim, blob["hidden_size"], blob["rnn_layers"], blob["dropout"], blob["n_filters"], blob["kernel"])
         head.stride = int(blob["stride"])
     elif task == "personalized-vad":

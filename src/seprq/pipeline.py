@@ -176,7 +176,9 @@ class SepRQPipeline(nn.Module):
 
         # ./output/0.wav
 
-        pipe = SepRQPipeline("target-speaker-extraction", upstream="SepRQ", streams=2)
+        pipe = SepRQPipeline("target-speaker-extraction",
+                             upstream="SepRQ",
+                             streams=2)
 
         # Input mixture - [num_samples]
         mixture = "mixture.wav"
@@ -366,7 +368,7 @@ class SepRQPipeline(nn.Module):
             for index, prob in enumerate(items):
                 (root / f"{index}.rttm").write_text(_rttm(prob.unsqueeze(-1), self.frame_shift, str(index)))
             return
-        if self.task in ("enhancement", "target-speaker-extraction"):
+        if self.task in ("enhancement", "target-speaker-extraction", "personalized-extraction"):
             if torch.is_tensor(result) and result.dim() == 1:
                 waves = [result]
             elif torch.is_tensor(result):
@@ -414,7 +416,7 @@ class SepRQPipeline(nn.Module):
         for mixture, enroll in zip(mixtures, enrollments):
             embed = self._speaker_embedding(enroll)
             feat = self._weighted(self.encoder.hidden_states(mixture))[0]
-            if self.task == "target-speaker-extraction":
+            if self.task in ("target-speaker-extraction", "personalized-extraction"):
                 outputs.append(self.head(feat, mixture, embed))
             elif self.task == "personalized-vad":
                 frames = torch.tensor([feat.shape[0]], device=feat.device)
