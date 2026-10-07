@@ -972,7 +972,12 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const DIHARD_NOTE = "Local segmentation. Not intended for long file recordings without clustering.";
+const DIHARD_LINES = [
+  "Local segmentation only (EEND).",
+  "Local segmentation.",
+  "Not intended for long file recordings without clustering.",
+];
+const DIHARD_NOTE = DIHARD_LINES.map(line => `# ${line}`).join("\n");
 const EX_FOLDER = {
   separation: "SS",
   diarization: "SD",
@@ -992,7 +997,7 @@ function hl(code) {
   let out = "", last = 0, m;
   while ((m = re.exec(code))) {
     out += esc(code.slice(last, m.index));
-    const c = m[1] ? (m[1].includes("Local segmentation") ? "w" : "c") : m[2] ? "s" : m[3] ? "k" : m[4] ? "n" : "f";
+    const c = m[1] ? (m[1].includes("Local segmentation") || m[1].includes("Not intended for long file recordings") ? "w" : "c") : m[2] ? "s" : m[3] ? "k" : m[4] ? "n" : "f";
     out += `<span class="t-${c}">${esc(m[0])}</span>`;
     last = re.lastIndex;
   }
@@ -1036,11 +1041,6 @@ const QS_DOWNS = [
 const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
 const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
 
-function callRows(prefix, args) {
-  const pad = " ".repeat(prefix.length);
-  return args.map((a, i) => `${i === 0 ? prefix : pad}${a}${i === args.length - 1 ? ")" : ","}`).join("\n");
-}
-
 const snipFeatures = (u) => {
   const encArgs = [`"${u.code}"`];
   if (u.streams) encArgs.push(`streams=${u.streams}`);
@@ -1050,10 +1050,11 @@ wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 # wav = torchaudio.load("path/to/audio.wav")
 
 # "${u.code}" — see "Available models" for every name
-${callRows("encoder = SepRQEncoder(", encArgs)}
+encoder = SepRQEncoder(${encArgs.join(", ")})
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
+
 features = encoder(wav)`;
 };
 
@@ -1070,8 +1071,8 @@ const snipTask = (u, d) => {
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
   const folder = EX_FOLDER[d.id];
   const wav = folder ? `${ex}/${folder}/mix1.wav` : `${ex}/mix.wav`;
-  const setup = [`mix = "${wav}"`];
-  const callArgs = ["mix"];
+  const setup = [`mixture = "${wav}"`];
+  const callArgs = ["mixture"];
   if (d.enroll) {
     setup.push(`enrollment = "${ex}/${folder}/enroll1.wav"`);
     callArgs.push("enrollment=enrollment");
@@ -1080,14 +1081,15 @@ const snipTask = (u, d) => {
   callArgs.push("save_to=save_to");
   const speakers = d.wsj ? state.qsWsj : (d.save === "wav" && d.id === "separation" ? 2 : 1);
   const shape = d.shape ? `\n# ${d.shape}` : "";
-  const dihard = d.id === "diarization-dihard3" ? `\n# ${DIHARD_NOTE}` : "";
+  const dihard = d.id === "diarization-dihard3" ? `\n${DIHARD_NOTE}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
-${callRows("pipe = SepRQPipeline(", ctor)}
-${setup.join("\n")}
-# ${savedFiles(d.save, d.save === "wav" ? speakers : 1)}
-${d.var} = pipe(${callArgs.join(", ")})${shape}${dihard}`;
+pipe = SepRQPipeline(${ctor.join(", ")})
+${setup.join("\n\n")}
+${d.var} = pipe(${callArgs.join(", ")})${shape}
+
+# ${savedFiles(d.save, d.save === "wav" ? speakers : 1)}${dihard}`;
 };
 
 const QS_TASK_UPS = QS_UPS.filter(u => u.id !== "bestrq" && u.id !== "wavlmlarge");
@@ -1364,7 +1366,7 @@ function renderDemo() {
     <div class="blk-h"><span class="bt">Downstream</span><span class="bs">🔥 trained</span></div>
     <div class="ds-name">${esc(task.name)}${task.tag || task.short ? `<span class="tag">${esc(task.tag || task.short)}</span>` : ""}</div>
     <div class="ds-meta">${esc(task.group)} · ${esc(set.label)}</div>
-    ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_NOTE}</p>` : ""}
+    ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_LINES.join("<br>")}</p>` : ""}
     <dl class="ds-facts">
       <div><dt>Inputs</dt><dd>${esc(set.label)}${task.enroll ? " + enrollment" : ""}</dd></div>
       <div><dt>Output</dt><dd>${esc(outDesc)}</dd></div>
@@ -1383,17 +1385,13 @@ function renderDemo() {
   const hubFolder = EX_FOLDER[task.api];
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
   const setup = [];
-  const callArgs = [];
-  if (hubFolder && mix.n) {
-    setup.push(`mix = "${ex}/${hubFolder}/mix${mix.n}.wav"`);
-    callArgs.push("mix");
-    if (task.enroll) {
-      setup.push(`enrollment = "${ex}/${hubFolder}/enroll${mix.n}.wav"`);
-      callArgs.push("enrollment=enrollment");
-    }
-  } else {
-    callArgs.push(mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`);
-    if (task.enroll) callArgs.push(mix.n ? `enrollment="enroll${mix.n}.wav"` : `enrollment="enrollment.wav"`);
+  const callArgs = ["mixture"];
+  if (hubFolder && mix.n) setup.push(`mixture = "${ex}/${hubFolder}/mix${mix.n}.wav"`);
+  else setup.push(`mixture = ${mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`}`);
+  if (task.enroll) {
+    const enroll = hubFolder && mix.n ? `"${ex}/${hubFolder}/enroll${mix.n}.wav"` : (mix.n ? `"enroll${mix.n}.wav"` : `"enrollment.wav"`);
+    setup.push(`enrollment = ${enroll}`);
+    callArgs.push("enrollment=enrollment");
   }
   setup.push('save_to = "./output"');
   callArgs.push("save_to=save_to");
@@ -1401,13 +1399,13 @@ function renderDemo() {
     : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
     : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
   const save = task.kind === "text" ? "txt" : task.kind === "activation" ? "rttm" : "wav";
-  const dihard = task.id === "dh3" ? `\n# ${DIHARD_NOTE}` : "";
-  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\n${setup.join("\n")}\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}${dihard}`;
+  const dihard = task.id === "dh3" ? `\n${DIHARD_NOTE}` : "";
+  const code = `from seprq import SepRQPipeline\n\npipe = SepRQPipeline(${ctor.join(", ")})\n${setup.join("\n\n")}\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}\n\n# ${savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1)}${dihard}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
       <pre class="code" id="repro-code">${hl(code)}</pre>
-      ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_NOTE}</p>` : ""}</div>`;
+      ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_LINES.join("<br>")}</p>` : ""}</div>`;
 
   if (fsel) $(fsel)?.focus({ preventScroll: true });
 }
