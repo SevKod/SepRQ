@@ -1013,7 +1013,7 @@ const snipTask = (u, d) => {
   const taskId = d.wsj ? (u.streams === 3 ? "separation-wsj0-3mix" : "separation-wsj0-2mix") : d.id;
   const call = d.id === "enhancement"
     ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav")`
-    : d.enroll ? `pipe("mixture.wav", enrollment="speaker.wav")` : `pipe("mixture.wav")`;
+    : d.enroll ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav", enrollment="speaker.wav")` : `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav")`;
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
