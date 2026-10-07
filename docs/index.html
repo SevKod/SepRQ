@@ -1007,7 +1007,9 @@ features = encoder(wav)`;
 
 const snipTask = (u, d) => {
   const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
-  const call = d.enroll ? `pipe("mixture.wav", enrollment="speaker.wav")` : `pipe("mixture.wav")`;
+  const call = d.id === "enhancement"
+    ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav")`
+    : d.enroll ? `pipe("mixture.wav", enrollment="speaker.wav")` : `pipe("mixture.wav")`;
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
@@ -1015,11 +1017,13 @@ pipe = SepRQPipeline("${d.id}", ${up})
 ${d.var} = ${call}   ${d.ret}`;
 };
 
-function qsUpsHTML() {
+const QS_TASK_UPS = QS_UPS.filter(u => u.id !== "bestrq" && u.id !== "wavlmlarge");
+function qsUpsHTML(list) {
+  const ups = list || QS_UPS;
   const cur = state.qsUp;
   const seprq = `<div class="qs-up-grp ours"><span class="qs-up-nm">SepRQ</span>
-      <span class="seg">${QS_UPS.filter(u => u.ours).map(u => `<button class="seg-b" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.tag)}</button>`).join("")}</span></div>`;
-  const others = QS_UPS.filter(u => !u.ours).map(u => `<button class="qs-up" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.name)}</button>`).join("");
+      <span class="seg">${ups.filter(u => u.ours).map(u => `<button class="seg-b" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.tag)}</button>`).join("")}</span></div>`;
+  const others = ups.filter(u => !u.ours).map(u => `<button class="qs-up" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.name)}</button>`).join("");
   return seprq + others;
 }
 const qsDownsHTML = () => QS_DOWNS.map(d => `<button class="qs-down" data-qsdown="${d.id}" aria-pressed="${d.id === state.qsDown}">${esc(d.label)}</button>`).join("");
@@ -1036,7 +1040,7 @@ function sideFeatures() {
 }
 function sideTask() {
   return `<h3>How to use</h3>
-    <div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>
+    <div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(QS_TASK_UPS)}</div></div>
     <div class="qs-pick"><div class="qs-pick-lab">Select the downstream</div><div class="qs-downs">${qsDownsHTML()}</div></div>
     <ul>
       <li>The matching downstream head is downloaded next to the upstream.</li>
@@ -1048,7 +1052,11 @@ function renderQS() {
   $("#qs-code").innerHTML = hl(state.qsTab === "features" ? snipFeatures(qsUp()) : snipTask(qsUp(), qsDown()));
   $("#qs-side").innerHTML = state.qsTab === "features" ? sideFeatures() : sideTask();
 }
-document.querySelectorAll('.qs-grid .tab').forEach(t => t.addEventListener("click", () => { state.qsTab = t.dataset.tab; renderQS(); }));
+document.querySelectorAll('.qs-grid .tab').forEach(t => t.addEventListener("click", () => {
+  state.qsTab = t.dataset.tab;
+  if (state.qsTab === "task" && !QS_TASK_UPS.some(u => u.id === state.qsUp)) state.qsUp = "seprq_k2";
+  renderQS();
+}));
 document.addEventListener("click", (e) => {
   const u = e.target.closest("[data-qsup]");
   if (u) { state.qsUp = u.dataset.qsup; renderQS(); return; }

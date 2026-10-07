@@ -92,6 +92,7 @@ and `WavLM_BASE_PLUS`.
 from seprq import SepRQPipeline
 
 wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
+noisy = "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
 
 # Separation — one waveform per speaker
 pipe = SepRQPipeline("separation-2spk", upstream="SepRQ", streams=2)
@@ -101,9 +102,9 @@ sources = pipe(wav)
 pipe = SepRQPipeline("diarization", upstream="SepRQ", streams=2)
 activations = pipe(wav)
 
-# Enhancement — enhanced waveform
+# Enhancement — VoiceBank-DEMAND noisy speech
 pipe = SepRQPipeline("enhancement", upstream="SepRQ", streams=2)
-clean = pipe(wav)
+clean = pipe(noisy)
 ```
 
 ## 🔀 SepRQ — separation as the pretext task
