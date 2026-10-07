@@ -154,6 +154,7 @@ section.block{padding:72px 0 8px}
 .tab{white-space:nowrap;appearance:none;background:none;border:0;cursor:pointer;color:var(--code-dim);font:600 13.5px Inter,sans-serif;padding:10px 14px 12px;border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;gap:8px;align-items:center}
 .tab:hover{color:var(--code-ink)}
 .tab[aria-selected=true]{color:#fff;border-bottom-color:var(--accent)}
+.badge{font:700 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.02em;padding:2px 7px;border-radius:6px;background:rgba(240,122,26,.2);color:#FFB36B;text-transform:uppercase}
 .code-top .copy{margin-left:auto;padding:7px 12px;font-size:13px;border-radius:9px;background:rgba(255,255,255,.08);color:var(--code-ink)}
 .code-top .copy:hover{background:rgba(255,255,255,.16)}
 .code-top .copy.done{background:#3E9A6A;color:#fff}
@@ -203,7 +204,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 /* ---------- demo ---------- */
 .demo{padding:26px}
 @media (max-width:640px){.demo{padding:16px}}
-@media (max-width:420px){.tab{padding:10px 10px 12px}}
+@media (max-width:420px){.code-top .badge{display:none}.tab{padding:10px 10px 12px}}
 .opt:focus-visible,.tab:focus-visible,.copy:focus-visible,.btn:focus-visible,.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* pipeline figure */
@@ -634,7 +635,7 @@ footer .sp{margin-left:auto}
       <div class="code-card">
         <div class="code-top" role="tablist" aria-label="Quickstart examples">
           <button class="tab" role="tab" aria-selected="true" data-tab="features">Extract features</button>
-          <button class="tab" role="tab" aria-selected="false" data-tab="task">Run a task</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="task">Run a task <span class="badge">Soon</span></button>
           <button class="copy" data-copy-from="qs-code" aria-label="Copy code">Copy</button>
         </div>
         <pre class="code" id="qs-code"></pre>
@@ -1416,8 +1417,9 @@ function renderDemo() {
   const speakers = task.api.startsWith("separation") ? Math.max(task.streams || 1, 1) : 1;
   const fileNote = `\n\n# ${outputNote(task.api, speakers)}`;
   const code = `from seprq import SepRQPipeline\n\n${pipeCtor(task.api, ctor)}\n\n${setup}\n\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}${fileNote}${dihard}`;
+  const soon = String(up.id).startsWith("seprq") ? ` <span class="badge">Soon</span>` : "";
   $("#repro").innerHTML = `<div class="code-card repro">
-      <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
+      <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output${soon}</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
       <pre class="code" id="repro-code">${hl(code)}</pre>
       ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_LINES.join("<br>")}</p>` : ""}</div>`;
