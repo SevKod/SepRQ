@@ -123,8 +123,8 @@ class SepRQEncoder(torch.nn.Module):
         from urllib.parse import urlparse
 
         parts = urlparse(path).path.strip("/").split("/")
-        # https://huggingface.co/<ns>/<repo>/blob|resolve/<rev>/<file>
-        if urlparse(path).netloc == "huggingface.co" and len(parts) >= 5 and parts[2] in ("blob", "resolve"):
+        # https://hf.co/<ns>/<repo>/blob|resolve/<rev>/<file>
+        if urlparse(path).netloc in ("hf.co", "huggingface.co") and len(parts) >= 5 and parts[2] in ("blob", "resolve"):
             from huggingface_hub import hf_hub_download
 
             return hf_hub_download(
