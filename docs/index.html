@@ -1044,7 +1044,7 @@ const snipTask = (u, d) => {
 
 # ${u.name} · ${d.label}
 ${callRows("pipe = SepRQPipeline(", ctor)}
-save_to = "output"
+save_to = "./output"
 ${callRows(`${d.var} = pipe(`, callArgs)}${shape}`;
 };
 
@@ -1344,7 +1344,7 @@ function renderDemo() {
   const shape = task.kind === "text" ? ""
     : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
     : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
-  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\nsave_to = "output"\n${callRows("out = pipe(", callArgs)}${shape ? `\n# ${shape}` : ""}`;
+  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\nsave_to = "./output"\n${callRows("out = pipe(", callArgs)}${shape ? `\n# ${shape}` : ""}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>

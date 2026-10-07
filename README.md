@@ -97,9 +97,9 @@ from seprq import SepRQPipeline
 wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 noisy = "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
 
-save_to = "output"
+save_to = "./output"
 
-# Separation — writes output/0.wav, output/1.wav
+# Separation — writes ./output/0.wav, ./output/1.wav
 pipe = SepRQPipeline("separation",
                      upstream="SepRQ",
                      streams=2)
@@ -107,7 +107,7 @@ sources = pipe(wav,
                save_to=save_to)
 # [num_speakers, num_samples]
 
-# Diarization — writes output/0.rttm
+# Diarization — writes ./output/0.rttm
 pipe = SepRQPipeline("diarization",
                      upstream="SepRQ",
                      streams=2)
@@ -115,7 +115,7 @@ activations = pipe(wav,
                    save_to=save_to)
 # [time, num_speakers]
 
-# Enhancement — writes output/0.wav
+# Enhancement — writes ./output/0.wav
 pipe = SepRQPipeline("enhancement",
                      upstream="SepRQ",
                      streams=2)
