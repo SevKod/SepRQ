@@ -154,7 +154,6 @@ section.block{padding:72px 0 8px}
 .tab{white-space:nowrap;appearance:none;background:none;border:0;cursor:pointer;color:var(--code-dim);font:600 13.5px Inter,sans-serif;padding:10px 14px 12px;border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;gap:8px;align-items:center}
 .tab:hover{color:var(--code-ink)}
 .tab[aria-selected=true]{color:#fff;border-bottom-color:var(--accent)}
-.badge{font:700 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.02em;padding:2px 7px;border-radius:6px;background:rgba(240,122,26,.2);color:#FFB36B;text-transform:uppercase}
 .code-top .copy{margin-left:auto;padding:7px 12px;font-size:13px;border-radius:9px;background:rgba(255,255,255,.08);color:var(--code-ink)}
 .code-top .copy:hover{background:rgba(255,255,255,.16)}
 .code-top .copy.done{background:#3E9A6A;color:#fff}
@@ -202,7 +201,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 /* ---------- demo ---------- */
 .demo{padding:26px}
 @media (max-width:640px){.demo{padding:16px}}
-@media (max-width:420px){.code-top .badge{display:none}.tab{padding:10px 10px 12px}}
+@media (max-width:420px){.tab{padding:10px 10px 12px}}
 .opt:focus-visible,.tab:focus-visible,.copy:focus-visible,.btn:focus-visible,.row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* pipeline figure */
@@ -633,7 +632,7 @@ footer .sp{margin-left:auto}
       <div class="code-card">
         <div class="code-top" role="tablist" aria-label="Quickstart examples">
           <button class="tab" role="tab" aria-selected="true" data-tab="features">Extract features</button>
-          <button class="tab" role="tab" aria-selected="false" data-tab="task">Run a task <span class="badge">Soon</span></button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="task">Run a task</button>
           <button class="copy" data-copy-from="qs-code" aria-label="Copy code">Copy</button>
         </div>
         <pre class="code" id="qs-code"></pre>
@@ -1000,9 +999,9 @@ const QS_DOWNS = [
   { id: "separation",                 label: "Separation",                 short: "SS",     group: "SUPERB",         enroll: false, var: "sources",     ret: "# one waveform per speaker" },
   { id: "diarization",                label: "Diarization",                short: "SD",     group: "SUPERB",         enroll: false, var: "activations", ret: "# [T, num_speakers]" },
   { id: "enhancement",                label: "Enhancement",                short: "SE",     group: "SUPERB",         enroll: false, var: "clean",       ret: "" },
-  { id: "target-speaker-extraction",  label: "Target Speaker Extraction",  short: "TSE",    group: "TS-SUPERB",      enroll: true,  var: "target",      ret: "# target-speaker waveform" },
-  { id: "personalized-vad",           label: "Personalized VAD",           short: "PVAD",   group: "TS-SUPERB",      enroll: true,  var: "activations", ret: "# [T] target-speaker activity" },
-  { id: "target-speaker-asr",         label: "Target-Speaker ASR",         short: "TS-ASR", group: "TS-SUPERB",      enroll: true,  var: "text",        ret: "# transcript string" },
+  { id: "target-speaker-extraction",  label: "Target Speaker Extraction",  short: "TSE",    group: "Target Speaker", enroll: true,  var: "target",      ret: "# target-speaker waveform" },
+  { id: "personalized-vad",           label: "Personalized VAD",           short: "PVAD",   group: "Target Speaker", enroll: true,  var: "activations", ret: "# [T] target-speaker activity" },
+  { id: "target-speaker-asr",         label: "Target-Speaker ASR",         short: "TS-ASR", group: "Target Speaker", enroll: true,  var: "text",        ret: "# transcript string" },
   { id: "diarization-dihard3",        label: "Diarization",                short: "SD",     group: "Out-of-domain",  enroll: false, var: "activations", ret: "# [T, num_speakers]", ood: true },
   { id: "separation-wsj",             label: "Separation",                 short: "SS",     group: "Out-of-domain",  enroll: false, var: "sources",     ret: "# one waveform per speaker", ood: true, wsj: true },
 ];
@@ -1070,7 +1069,7 @@ function qsDownBtn(d) {
   return `<div class="qs-down-grp" aria-pressed="${pressed}" ${on ? "" : "aria-disabled=\"true\""}><button class="qs-down" data-qsdown="${d.id}" aria-pressed="${pressed}" ${on ? "" : "disabled"}>${label}</button><span class="seg">${seg}</span></div>`;
 }
 const qsDownsHTML = () => [...new Set(QS_DOWNS.map(d => d.group))].map(g =>
-  `<div class="qs-down-cat"><div class="qs-cat">${esc(g)}</div>${QS_DOWNS.filter(d => d.group === g).map(qsDownBtn).join("")}</div>`
+  `<div class="qs-down-cat">${g === "SUPERB" ? "" : `<div class="qs-cat">${esc(g)}</div>`}${QS_DOWNS.filter(d => d.group === g).map(qsDownBtn).join("")}</div>`
 ).join("");
 const pickUp = () => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>`;
 
@@ -1084,11 +1083,10 @@ function sideFeatures() {
     </ul>`;
 }
 function sideTask() {
-  return `<h3>How to use</h3>
+  return `<h3>Run a task</h3>
     <div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(QS_TASK_UPS)}</div></div>
     <div class="qs-pick"><div class="qs-pick-lab">Select the downstream</div><div class="qs-downs">${qsDownsHTML()}</div></div>
     <ul>
-      <li>The matching downstream head is downloaded next to the upstream.</li>
       <li>Target-speaker tasks take an <code>enrollment</code> utterance.</li>
     </ul>`;
 }
