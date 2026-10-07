@@ -106,7 +106,8 @@ save_to = "./output"
 sources = pipe(mixture, save_to=save_to)
 # [num_speakers, num_samples]
 
-# ./output/source1.wav, ./output/source2.wav
+# ./output/source1.wav
+# ./output/source2.wav
 
 # Diarization
 pipe = SepRQPipeline("diarization", upstream="SepRQ", streams=2)

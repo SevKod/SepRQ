@@ -1073,7 +1073,7 @@ function outputNote(taskId, speakers) {
   if (taskId === "enhancement") return "./output/cleaned.wav";
   if (taskId === "target-speaker-extraction" || taskId === "personalized-extraction") return "./output/extracted_audio.wav";
   const n = speakers || 2;
-  return Array.from({ length: n }, (_, i) => `./output/source${i + 1}.wav`).join(", ");
+  return Array.from({ length: n }, (_, i) => `./output/source${i + 1}.wav`).join("\n# ");
 }
 const snipTask = (u, d) => {
   const taskId = d.wsj ? `separation-wsj0-${state.qsWsj}mix` : d.id;
