@@ -125,8 +125,8 @@ clean = pipe(noisy,
 # [num_samples]
 
 # Target speaker extraction — writes ./output/0.wav
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/1188-133604-0025_4992-23283-0016/mixture.wav"
-enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/1188-133604-0025_4992-23283-0016/enrollment.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/mix1.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/enroll1.wav"
 pipe = SepRQPipeline("target-speaker-extraction",
                      upstream="SepRQ",
                      streams=2)
@@ -136,8 +136,8 @@ target = pipe(mix,
 # [num_samples]
 
 # Personalized VAD — writes ./output/0.rttm
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/mix_0000001/mixture.wav"
-enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/mix_0000001/enrollment.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/mix1.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/enroll1.wav"
 pipe = SepRQPipeline("personalized-vad",
                      upstream="SepRQ",
                      streams=2)
@@ -147,8 +147,8 @@ activations = pipe(mix,
 # [time]
 
 # Target-speaker ASR — writes ./output/0.txt
-mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/4446-2271-0014_3570-5694-0003/mixture.wav"
-enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/4446-2271-0014_3570-5694-0003/enrollment.wav"
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/mix1.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/enroll1.wav"
 pipe = SepRQPipeline("target-speaker-asr",
                      upstream="SepRQ",
                      streams=2)
