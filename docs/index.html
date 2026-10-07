@@ -1067,11 +1067,13 @@ encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
 features = encoder(wav)`;
 };
 
-function savedFiles(save, speakers) {
-  if (save === "rttm") return "./output/0.rttm";
-  if (save === "txt") return "./output/0.txt";
-  const n = speakers || 1;
-  return Array.from({ length: n }, (_, i) => `./output/${i}.wav`).join(", ");
+function outputNote(taskId, speakers) {
+  if (taskId === "diarization" || taskId === "diarization-dihard3" || taskId === "personalized-vad") return "./output/activations.rttm";
+  if (taskId === "target-speaker-asr") return "./output/extracted_transcript.txt";
+  if (taskId === "enhancement") return "./output/cleaned.wav";
+  if (taskId === "target-speaker-extraction" || taskId === "personalized-extraction") return "./output/extracted_audio.wav";
+  const n = speakers || 2;
+  return Array.from({ length: n }, (_, i) => `./output/source${i + 1}.wav`).join(", ");
 }
 const snipTask = (u, d) => {
   const taskId = d.wsj ? `separation-wsj0-${state.qsWsj}mix` : d.id;
@@ -1091,8 +1093,7 @@ const snipTask = (u, d) => {
   const speakers = d.wsj ? state.qsWsj : (d.save === "wav" && d.id === "separation" ? 2 : 1);
   const shape = d.shape ? `\n# ${d.shape}` : "";
   const dihard = d.id === "diarization-dihard3" ? `\n${DIHARD_NOTE}` : "";
-  const files = savedFiles(d.save, d.save === "wav" ? speakers : 1);
-  const fileNote = files === "./output/0.wav" ? "" : `\n\n# ${files}`;
+  const fileNote = `\n\n# ${outputNote(taskId, speakers)}`;
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
@@ -1408,10 +1409,9 @@ function renderDemo() {
   const shape = task.kind === "text" ? ""
     : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
     : (task.streams > 1 ? "[num_speakers, num_samples]" : "[num_samples]");
-  const save = task.kind === "text" ? "txt" : task.kind === "activation" ? "rttm" : "wav";
   const dihard = task.id === "dh3" ? `\n${DIHARD_NOTE}` : "";
-  const files = savedFiles(save, save === "wav" ? Math.max(task.streams || 1, 1) : 1);
-  const fileNote = files === "./output/0.wav" ? "" : `\n\n# ${files}`;
+  const speakers = task.api.startsWith("separation") ? Math.max(task.streams || 1, 1) : 1;
+  const fileNote = `\n\n# ${outputNote(task.api, speakers)}`;
   const code = `from seprq import SepRQPipeline\n\n${pipeCtor(task.api, ctor)}\n\n${setup}\n\nout = pipe(${callArgs.join(", ")})${shape ? `\n# ${shape}` : ""}${fileNote}${dihard}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
