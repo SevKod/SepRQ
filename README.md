@@ -49,7 +49,8 @@ wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 # wav = torchaudio.load("path/to/audio.wav")
 
 # "SepRQ" — see "Available models" for every name
-encoder = SepRQEncoder("SepRQ", streams=2)
+encoder = SepRQEncoder("SepRQ",
+                       streams=2)
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
@@ -64,7 +65,9 @@ SepRQ ships in variants trained to separate a different number of speakers —
 select one with `streams` (default `2`):
 
 ```python
-encoder = SepRQEncoder("SepRQ", streams=3)   # 3-speaker variant
+encoder = SepRQEncoder("SepRQ",
+                       streams=3)
+# 3-speaker variant
 ```
 
 **Available models**
@@ -95,15 +98,21 @@ wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 noisy = "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
 
 # Separation — one waveform per speaker
-pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("separation",
+                     upstream="SepRQ",
+                     streams=2)
 sources = pipe(wav)
 
 # Diarization — [T, num_speakers]
-pipe = SepRQPipeline("diarization", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("diarization",
+                     upstream="SepRQ",
+                     streams=2)
 activations = pipe(wav)
 
 # Enhancement — VoiceBank-DEMAND noisy speech
-pipe = SepRQPipeline("enhancement", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("enhancement",
+                     upstream="SepRQ",
+                     streams=2)
 clean = pipe(noisy)
 ```
 

@@ -100,15 +100,19 @@ class SepRQPipeline(nn.Module):
 
     .. code-block:: python
 
-        pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
+        pipe = SepRQPipeline("separation",
+                             upstream="SepRQ",
+                             streams=2)
         sources = pipe("mixture.wav")
         # one waveform per speaker
 
-        pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
+        pipe = SepRQPipeline("diarization",
+                             upstream="HuBERT_BASE")
         activations = pipe("mixture.wav")
         # [T, num_speakers]
 
-        pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
+        pipe = SepRQPipeline("enhancement",
+                             upstream="WavLM_BASE")
         clean = pipe("noisy.wav")
         # enhanced waveform
     """
