@@ -319,6 +319,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 @media (max-width:640px){.blk-h .hint{display:none}}
 /* downstream summary */
 .ds-name{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1.2;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.ds-about{margin:8px 0 0;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
 .ds-name .tag{font:700 11px "JetBrains Mono",ui-monospace,monospace;padding:2px 7px;border-radius:6px;background:var(--accent);color:#fff}
 .ds-meta{font-size:13px;color:var(--ink-3);margin-top:4px}
 .ds-facts{margin:16px 0 0;display:grid;gap:10px}
@@ -912,29 +913,39 @@ function normUp(id, task) {
    metric.values: paper numbers per upstream (null = not reported)            */
 const TASKS = [
   { id: "sd", inputs: "l2m_diar", api: "diarization", group: "SUPERB", name: "Speaker diarization", short: "SD", kind: "activation", streams: 2, dataset: "Libri2Mix",
+    about: "Mark which of the two speakers is talking at each moment.",
     metric: { label: "DER ↓", unit: "%", values: { hubert: "5.88", wavlm: "4.55", wavlmplus: "3.50", seprq: "2.08" } } },
   { id: "ss2", inputs: "l2m_sep", api: "separation", group: "SUPERB", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "Libri2Mix",
+    about: "Split a two-speaker mixture into one waveform per speaker.",
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "9.36", wavlm: "10.37", wavlmplus: "10.85", seprq: "12.10" } } },
   { id: "se", inputs: "voicebank", api: "enhancement", group: "SUPERB", name: "Speech enhancement", short: "SE", kind: "audio", streams: 1, dataset: "VoiceBank-DEMAND",
+    about: "Remove background noise and return the clean speech.",
     labels: ["Enhanced", "Clean reference"],
     metric: { label: "PESQ ↑ / STOI ↑", unit: "", values: { hubert: "2.58 / 93.9", wavlm: "2.58 / 94.0", wavlmplus: "2.63 / 94.3", seprq: "2.67 / 94.4" } } },
   { id: "tse", inputs: "tse_in", api: "target-speaker-extraction", group: "TS-SUPERB", name: "Target speaker extraction", short: "TSE", kind: "audio", streams: 1, enroll: true, dataset: "Libri2Mix",
+    about: "Extract the enrolled speaker's voice from a two-speaker mixture.",
     labels: ["Extracted target", "Target reference"],
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "9.64", wavlm: "10.26", wavlmplus: "10.69", seprq: "12.53" } } },
   { id: "pse", inputs: "slm_in", api: "personalized-extraction", group: "TS-SUPERB", name: "Personalized speech extraction", short: "PSE", kind: "audio", streams: 1, enroll: true, dataset: "SparseLibriMix", overlaps: [0, 20, 40, 60],
+    about: "Extract the enrolled speaker when the amount of overlap changes.",
     labels: ["Extracted target", "Target reference"],
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "8.61", wavlm: "9.65", wavlmplus: "10.01", seprq: "11.18" } } },
   { id: "pvad", inputs: "slm_in", api: "personalized-vad", group: "TS-SUPERB", name: "Personalized VAD", short: "PVAD", kind: "activation", streams: 1, enroll: true, dataset: "SparseLibriMix", overlaps: [0, 20, 40, 60],
+    about: "Find the moments when the enrolled speaker is talking.",
     metric: { label: "mAP ↑", unit: "", values: { hubert: "94.60", wavlm: "94.40", wavlmplus: "95.00", seprq: "96.61" } } },
   { id: "tsasr", inputs: "tsasr_in", api: "target-speaker-asr", group: "TS-SUPERB", name: "Target-speaker ASR", short: "TS-ASR", kind: "text", enroll: true, dataset: "Libri2Mix",
+    about: "Transcribe only what the enrolled speaker said.",
     metric: { label: "WER ↓ (w/o LM / w/ LM)", unit: "", values: { hubert: "36.86% / 30.52%", wavlm: "27.82% / 22.68%", wavlmplus: "24.75% / 20.06%", seprq: "22.26% / 16.78%" } } },
   /* Out-of-domain: EEND diarization on DIHARD 3 (multi-domain conversational recordings) */
   { id: "dh3", inputs: "dihard3", api: "diarization-dihard3", group: "Out-of-domain", name: "Speaker diarization", short: "SD", kind: "activation", streams: 0, dataset: "DIHARD 3 · EEND", seprqVariants: [2, 3], seprqDefault: 2,
+    about: "Estimate who is speaking in a short multi-domain conversation.",
     metric: { label: "DER ↓", unit: "%", values: { hubert: "17.7", wavlm: "17.3", wavlmplus: "16.6", seprq_k2: "16.1", seprq_k3: "16.4" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
   /* Out-of-domain: ConvTasNet separation on WSJ0-2mix / WSJ0-3mix (one button, 2 or 3 speakers) */
   { id: "wsj2", inputs: "wsj0_2mix", api: "separation-wsj0-2mix", group: "Out-of-domain", combo: "wsjsep", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "WSJ0-2mix · ConvTasNet", seprqVariants: [2, 3], seprqDefault: 2,
+    about: "Separate two Wall Street Journal speakers mixed outside the training set.",
     metric: { label: "SDRi ↑", unit: " dB", values: { hubert: "17.0", wavlm: "17.5", wavlmplus: "18.2", seprq_k2: "19.8", seprq_k3: "19.4" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
   { id: "wsj3", inputs: "wsj0_3mix", api: "separation-wsj0-3mix", group: "Out-of-domain", combo: "wsjsep", name: "Speech separation", short: "SS", tag: "3 spk", kind: "audio", streams: 3, dataset: "WSJ0-3mix · ConvTasNet", seprqVariants: [2, 3], seprqDefault: 3,
+    about: "Separate three Wall Street Journal speakers mixed outside the training set.",
     metric: { label: "SDRi ↑", unit: " dB", values: { hubert: "12.7", wavlm: "13.2", wavlmplus: "13.4", seprq_k2: "14.5", seprq_k3: "17.2" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
 ];
 
@@ -1382,6 +1393,7 @@ function renderDemo() {
   setHTML("blk-down", `${task.id}|${up.id}|${state.cmp}`, `
     <div class="blk-h"><span class="bt">Downstream</span><span class="bs">🔥 trained</span></div>
     <div class="ds-name">${esc(task.name)}${task.tag || task.short ? `<span class="tag">${esc(task.tag || task.short)}</span>` : ""}</div>
+    <p class="ds-about">${esc(task.about)}</p>
     <div class="ds-meta">${esc(task.group)} · ${esc(set.label)}</div>
     ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_LINES.join("<br>")}</p>` : ""}
     <dl class="ds-facts">
