@@ -1040,7 +1040,8 @@ const QS_DOWNS = [
   { id: "separation-wsj",             label: "Separation",                 short: "SS",     group: "Out-of-domain",  enroll: false, var: "sources",     shape: "[num_speakers, num_samples]", save: "wav", ood: true, wsj: true },
 ];
 function pipeCtor(taskId, args) {
-  const rows = taskId === "target-speaker-extraction" || taskId === "personalized-extraction" || taskId === "target-speaker-asr";
+  const rows = taskId === "target-speaker-extraction" || taskId === "personalized-extraction" || taskId === "target-speaker-asr"
+    || taskId === "diarization-dihard3" || taskId === "separation-wsj0-2mix" || taskId === "separation-wsj0-3mix";
   if (!rows) return `pipe = SepRQPipeline(${args.join(", ")})`;
   const prefix = "pipe = SepRQPipeline(";
   const pad = " ".repeat(prefix.length);
