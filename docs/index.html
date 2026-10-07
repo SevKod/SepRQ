@@ -861,6 +861,7 @@ footer .sp{margin-left:auto}
      samples/inputs/<set>/<item>/mixture_mel.png   its mel-spectrogram
      samples/inputs/<set>/<item>/enrollment.wav    enrollment (target-speaker tasks)
      samples/inputs/<set>/<item>/enrollment_mel.png
+     Target-speaker sets use mix<N>.wav and enroll<N>.wav in that folder instead.
      samples/references/<task>/<item>/...          reference annotations
      samples/outputs/<upstream>/<task>/<item>/...  model outputs
 
@@ -880,9 +881,9 @@ const INPUT_SETS = {
   wsj0_3mix:      { label: "WSJ0-3mix",        noun: "3-spk mixture", items: [{ id: "442o030f_1.7037_422c020a_-1.7037_443o0306_0", title: "3-spk mixture 1", meta: "3 speakers · 1.9s" }, { id: "050o020a_2.1724_441o030p_-2.1724_442c0213_0", title: "3-spk mixture 2", meta: "3 speakers · 2.4s" }, { id: "22ho0114_0.2961_440c0203_-0.2961_446c0204_0", title: "3-spk mixture 3", meta: "3 speakers · 4.6s" }, { id: "052o020n_0.48935_441o0304_-0.48935_421c020h_0", title: "3-spk mixture 4", meta: "3 speakers · 5.6s" }, { id: "440c0214_0.30311_050o020j_-0.30311_447o0312_0", title: "3-spk mixture 5", meta: "3 speakers · 4.3s" }] },
   voicebank:      { label: "VoiceBank-DEMAND", noun: "noisy speech", items: [{ id: "p232_001", title: "Noisy clip 1", meta: "p232 · 1.7s" }, { id: "p232_211", title: "Noisy clip 2", meta: "p232 · 1.4s" }, { id: "p257_008", title: "Noisy clip 3", meta: "p257 · 5.6s" }, { id: "p257_210", title: "Noisy clip 4", meta: "p257 · 2.5s" }, { id: "p257_410", title: "Noisy clip 5", meta: "p257 · 3.6s" }] },
   sparselibrimix: { label: "SparseLibriMix",   noun: "sparse mixture", items: placeholder("slm", "Sparse mixture") },
-  tse_in:         { label: "Libri2Mix", noun: "mixture", items: [{ id: "1188-133604-0025_4992-23283-0016", title: "Mixture 1", meta: "2 speakers · 4.5s" }, { id: "1995-1837-0025_5142-36377-0017", title: "Mixture 2", meta: "2 speakers · 4.7s" }, { id: "4077-13754-0001_5142-33396-0065", title: "Mixture 3", meta: "2 speakers · 3.8s" }, { id: "5683-32866-0012_121-121726-0001", title: "Mixture 4", meta: "2 speakers · 5.9s" }, { id: "6930-76324-0027_5683-32879-0011", title: "Mixture 5", meta: "2 speakers · 8.3s" }] },
-  slm_in:         { label: "SparseLibriMix", noun: "sparse mixture", items: [{ id: "mix_0000001", title: "Sparse mixture 1", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000002", title: "Sparse mixture 2", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000003", title: "Sparse mixture 3", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000004", title: "Sparse mixture 4", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000005", title: "Sparse mixture 5", meta: "2 speakers · adjustable overlap" }] },
-  tsasr_in:       { label: "Libri2Mix", noun: "mixture", items: [{ id: "4446-2271-0014_3570-5694-0003", title: "Mixture 1", meta: "2 speakers · 19.0s" }, { id: "7176-88083-0005_672-122797-0022", title: "Mixture 2", meta: "2 speakers · 19.0s" }, { id: "260-123440-0017_7729-102255-0008", title: "Mixture 3", meta: "2 speakers · 19.1s" }, { id: "8230-279154-0017_8224-274384-0004", title: "Mixture 4", meta: "2 speakers · 20.6s" }, { id: "8463-294828-0013_8224-274381-0004", title: "Mixture 5", meta: "2 speakers · 21.3s" }] },
+  tse_in:         { label: "Libri2Mix", noun: "mixture", items: [{ id: "1188-133604-0025_4992-23283-0016", n: 1, title: "Mixture 1", meta: "2 speakers · 4.5s" }, { id: "1995-1837-0025_5142-36377-0017", n: 2, title: "Mixture 2", meta: "2 speakers · 4.7s" }, { id: "4077-13754-0001_5142-33396-0065", n: 3, title: "Mixture 3", meta: "2 speakers · 3.8s" }, { id: "5683-32866-0012_121-121726-0001", n: 4, title: "Mixture 4", meta: "2 speakers · 5.9s" }, { id: "6930-76324-0027_5683-32879-0011", n: 5, title: "Mixture 5", meta: "2 speakers · 8.3s" }] },
+  slm_in:         { label: "SparseLibriMix", noun: "sparse mixture", items: [{ id: "mix_0000001", n: 1, title: "Sparse mixture 1", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000002", n: 2, title: "Sparse mixture 2", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000003", n: 3, title: "Sparse mixture 3", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000004", n: 4, title: "Sparse mixture 4", meta: "2 speakers · adjustable overlap" }, { id: "mix_0000005", n: 5, title: "Sparse mixture 5", meta: "2 speakers · adjustable overlap" }] },
+  tsasr_in:       { label: "Libri2Mix", noun: "mixture", items: [{ id: "4446-2271-0014_3570-5694-0003", n: 1, title: "Mixture 1", meta: "2 speakers · 19.0s" }, { id: "7176-88083-0005_672-122797-0022", n: 2, title: "Mixture 2", meta: "2 speakers · 19.0s" }, { id: "260-123440-0017_7729-102255-0008", n: 3, title: "Mixture 3", meta: "2 speakers · 19.1s" }, { id: "8230-279154-0017_8224-274384-0004", n: 4, title: "Mixture 4", meta: "2 speakers · 20.6s" }, { id: "8463-294828-0013_8224-274381-0004", n: 5, title: "Mixture 5", meta: "2 speakers · 21.3s" }] },
 };
 
 const UPSTREAMS = [
@@ -934,10 +935,16 @@ const TASKS = [
     metric: { label: "SDRi ↑", unit: " dB", values: { hubert: "12.7", wavlm: "13.2", wavlmplus: "13.4", seprq_k2: "14.5", seprq_k3: "17.2" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
 ];
 
+function clipWav(set, m, kind) {
+  const id = String(m).split("/")[0];
+  const item = ((INPUT_SETS[set] || {}).items || []).find(x => x.id === id);
+  if (item && item.n) return kind === "mix" ? `mix${item.n}.wav` : `enroll${item.n}.wav`;
+  return kind === "mix" ? "mixture.wav" : "enrollment.wav";
+}
 const PATHS = {
-  mixture:    (set, m) => `${ROOT}/inputs/${set}/${m}/mixture.wav`,
+  mixture:    (set, m) => `${ROOT}/inputs/${set}/${m}/${clipWav(set, m, "mix")}`,
   mixtureMel: (set, m) => `${ROOT}/inputs/${set}/${m}/mixture_mel.png`,
-  enrollment: (set, m) => `${ROOT}/inputs/${set}/${m}/enrollment.wav`,
+  enrollment: (set, m) => `${ROOT}/inputs/${set}/${m}/${clipWav(set, m, "enroll")}`,
   enrollMel:  (set, m) => `${ROOT}/inputs/${set}/${m}/enrollment_mel.png`,
   ref:        (t, m, f) => `${ROOT}/references/${t}/${m}/${f}`,
   out:        (u, t, m, f) => `${ROOT}/outputs/${u}/${t}/${m}/${f}`,
@@ -1035,15 +1042,15 @@ const snipTask = (u, d) => {
   if (u.streams) ctor.push(`streams=${u.streams}`);
   const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
   const prepared = {
-    "target-speaker-extraction": "target-speaker-extraction/1188-133604-0025_4992-23283-0016",
-    "personalized-vad": "personalized-vad/mix_0000001",
-    "target-speaker-asr": "target-speaker-asr/4446-2271-0014_3570-5694-0003",
+    "target-speaker-extraction": "target-speaker-extraction",
+    "personalized-vad": "personalized-vad",
+    "target-speaker-asr": "target-speaker-asr",
   };
   const wav = d.id === "enhancement" ? `${ex}/noisy.wav`
-    : prepared[d.id] ? `${ex}/${prepared[d.id]}/mixture.wav`
+    : prepared[d.id] ? `${ex}/${prepared[d.id]}/mix1.wav`
     : `${ex}/mix.wav`;
   const callArgs = [`"${wav}"`];
-  if (d.enroll) callArgs.push(`enrollment="${ex}/${prepared[d.id]}/enrollment.wav"`);
+  if (d.enroll) callArgs.push(`enrollment="${ex}/${prepared[d.id]}/enroll1.wav"`);
   callArgs.push("save_to=save_to");
   const shape = d.shape ? `\n# ${d.shape}` : "";
   return `from seprq import SepRQPipeline
@@ -1344,8 +1351,8 @@ function renderDemo() {
   const demoUp = { seprq: ["SepRQ"], seprq_k2: ["SepRQ", 2], seprq_k3: ["SepRQ", 3], hubert: ["HuBERT_BASE"], wavlm: ["WavLM_BASE"], wavlmplus: ["WavLM_BASE_PLUS"] }[up.id];
   const ctor = [`"${task.api}"`, `upstream="${demoUp[0]}"`];
   if (demoUp[1]) ctor.push(`streams=${demoUp[1]}`);
-  const callArgs = [`"${mix.id}.wav"`];
-  if (task.enroll) callArgs.push(`enrollment="enrollment.wav"`);
+  const callArgs = [mix.n ? `"mix${mix.n}.wav"` : `"${mix.id}.wav"`];
+  if (task.enroll) callArgs.push(mix.n ? `enrollment="enroll${mix.n}.wav"` : `enrollment="enrollment.wav"`);
   callArgs.push("save_to=save_to");
   const shape = task.kind === "text" ? ""
     : task.kind === "activation" ? (task.id === "pvad" ? "[time]" : "[time, num_speakers]")
