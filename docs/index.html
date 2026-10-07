@@ -995,14 +995,15 @@ const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
 const snipFeatures = (u) =>
 `from seprq import SepRQEncoder
 
-path = "https://hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
+wav = "https://hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
+# wav = torchaudio.load("path/to/audio.wav")
 
 # "${u.code}" — see "Available models" for every name
 encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u.code}"`})
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
-features = encoder(path)`;
+features = encoder(wav)`;
 
 const snipTask = (u, d) => {
   const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
