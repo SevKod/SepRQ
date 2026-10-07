@@ -183,6 +183,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .qs-down{font:600 12px Inter,sans-serif;color:var(--ink-2);background:var(--bg-2);border:1.5px solid var(--line);padding:6px 11px;border-radius:9px;cursor:pointer}
 .qs-down[aria-pressed=true]{border-color:var(--accent);background:var(--accent-softer);color:var(--accent-ink)}
 .qs-up:hover,.qs-down:hover,.qs-up-grp .seg-b:hover{filter:brightness(.97)}
+.qs-down:disabled{opacity:.38;cursor:not-allowed;filter:none}
 
 /* ---------- demo ---------- */
 .demo{padding:26px}
@@ -988,6 +989,8 @@ const QS_DOWNS = [
   { id: "target-speaker-extraction",  label: "Target extraction", enroll: true, var: "target",    ret: "# target-speaker waveform" },
   { id: "personalized-vad",           label: "Personal VAD",    enroll: true,  var: "activations", ret: "# [T] target-speaker activity" },
   { id: "target-speaker-asr",         label: "Target ASR",      enroll: true,  var: "text",        ret: "# transcript string" },
+  { id: "diarization-dihard3",        label: "OOD diarization", enroll: false, var: "activations", ret: "# [T, num_speakers]", ood: true },
+  { id: "separation-wsj",             label: "OOD separation",  enroll: false, var: "sources",     ret: "# one waveform per speaker", ood: true, wsj: true },
 ];
 const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
 const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
@@ -1007,13 +1010,14 @@ features = encoder(wav)`;
 
 const snipTask = (u, d) => {
   const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
+  const taskId = d.wsj ? (u.streams === 3 ? "separation-wsj0-3mix" : "separation-wsj0-2mix") : d.id;
   const call = d.id === "enhancement"
     ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav")`
     : d.enroll ? `pipe("mixture.wav", enrollment="speaker.wav")` : `pipe("mixture.wav")`;
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
-pipe = SepRQPipeline("${d.id}", ${up})
+pipe = SepRQPipeline("${taskId}", ${up})
 ${d.var} = ${call}   ${d.ret}`;
 };
 
@@ -1026,7 +1030,12 @@ function qsUpsHTML(list) {
   const others = ups.filter(u => !u.ours).map(u => `<button class="qs-up" data-qsup="${u.id}" aria-pressed="${u.id === cur}">${esc(u.name)}</button>`).join("");
   return seprq + others;
 }
-const qsDownsHTML = () => QS_DOWNS.map(d => `<button class="qs-down" data-qsdown="${d.id}" aria-pressed="${d.id === state.qsDown}">${esc(d.label)}</button>`).join("");
+const qs3spk = () => state.qsUp === "seprq_k3";
+const qsDownOn = (d) => !qs3spk() || d.ood;
+function syncQsDown() {
+  if (qs3spk() && !qsDownOn(qsDown())) state.qsDown = "diarization-dihard3";
+}
+const qsDownsHTML = () => QS_DOWNS.map(d => `<button class="qs-down" data-qsdown="${d.id}" aria-pressed="${d.id === state.qsDown}" ${qsDownOn(d) ? "" : "disabled"}>${esc(d.label)}</button>`).join("");
 const pickUp = () => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>`;
 
 function sideFeatures() {
@@ -1048,6 +1057,7 @@ function sideTask() {
     </ul>`;
 }
 function renderQS() {
+  if (state.qsTab === "task") syncQsDown();
   document.querySelectorAll('.qs-grid .tab').forEach(t => t.setAttribute("aria-selected", t.dataset.tab === state.qsTab));
   $("#qs-code").innerHTML = hl(state.qsTab === "features" ? snipFeatures(qsUp()) : snipTask(qsUp(), qsDown()));
   $("#qs-side").innerHTML = state.qsTab === "features" ? sideFeatures() : sideTask();
