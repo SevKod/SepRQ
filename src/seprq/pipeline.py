@@ -16,8 +16,9 @@ from torch.nn.utils.rnn import pack_sequence, pad_packed_sequence
 from .targets import TARGET_TASKS, build_target_head
 
 SUPERB_TASKS = ("separation", "diarization", "enhancement")
-# DIHARD 3 is local segmentation (powerset over 3 speakers), not the SUPERB LSTM.
-OOD_TASKS = ("diarization-dihard3",)
+# DIHARD 3 is local segmentation. WSJ0-mix is an 8 kHz ConvTasNet.
+OOD_TASKS = ("diarization-dihard3", "separation-wsj0-2mix", "separation-wsj0-3mix")
+_SEPRQ3_TASKS = OOD_TASKS
 TASKS = SUPERB_TASKS + TARGET_TASKS
 # The SUPERB separation head is the 2-speaker setup. Checkpoints stay in the
 # folder they were uploaded under.
@@ -111,6 +112,14 @@ class _LocalDiarization(nn.Module):
         return classes @ self.mapping
 
 
+def _fit_samples(wave, length):
+    if wave.shape[-1] == length:
+        return wave
+    if wave.shape[-1] > length:
+        return wave[..., :length]
+    return torch.nn.functional.pad(wave, (0, length - wave.shape[-1]))
+
+
 def _match_length(feat, n_frames):
     """Trim or pad a [T, D] feature so it lines up with an STFT of n_frames."""
     if abs(feat.size(0) - n_frames) >= 5:
@@ -132,7 +141,7 @@ def _is_path(value):
 
 def _head_path(task, upstream, streams):
     folder = _HUB_TASK.get(task, task)
-    if task == "diarization-dihard3" and upstream == "SepRQ" and streams == 3:
+    if task in _SEPRQ3_TASKS and upstream == "SepRQ" and streams == 3:
         return f"superb/{folder}/{upstream}/3_streams/head.ckpt"
     return f"superb/{folder}/{upstream}/head.ckpt"
 
@@ -147,7 +156,11 @@ def _write_wav(path, wave):
     import soundfile as sf
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    sf.write(str(path), wave.detach().cpu().numpy(), 16000, subtype="PCM_16")
+    audio = wave.detach().float().cpu()
+    peak = audio.abs().max()
+    if peak > 1:
+        audio = audio * (0.99 / peak)
+    sf.write(str(path), audio.numpy(), 16000, subtype="PCM_16")
 
 
 def _rttm(prob, frame_shift, uri):
@@ -280,7 +293,7 @@ class SepRQPipeline(nn.Module):
                 f"task must be one of {list(TASKS + OOD_TASKS)}, got {task!r}"
             )
         if upstream == "SepRQ" and streams != 2:
-            if not (task == "diarization-dihard3" and streams == 3):
+            if not (task in _SEPRQ3_TASKS and streams == 3):
                 raise ValueError(
                     "Published heads are for SepRQ with streams=2. "
                     f"Got streams={streams!r}."
@@ -295,9 +308,9 @@ class SepRQPipeline(nn.Module):
         self.upstream_name = upstream
         self.repo_id = repo_id or REPO_ID
         self.encoder = SepRQEncoder(upstream, streams=streams, repo_id=self.repo_id, device=device)
-        # The published SepRQ/2_streams encoder is the SUPERB one. The DIHARD 3
-        # head was trained on a different 2-stream checkpoint of the same architecture.
-        if task == "diarization-dihard3" and upstream == "SepRQ" and streams == 2:
+        # The published SepRQ/2_streams encoder is the SUPERB one. These heads
+        # were trained on a different 2-stream checkpoint of the same architecture.
+        if task in _SEPRQ3_TASKS and upstream == "SepRQ" and streams == 2:
             from huggingface_hub import hf_hub_download
 
             self.encoder._load_seprq_checkpoint(
@@ -322,6 +335,14 @@ class SepRQPipeline(nn.Module):
             self.register_buffer("layer_weights_v", blob["featurizer_v"].float())
             self.frame_shift = int(blob.get("frame_shift", 320))
             self.head = build_target_head(blob)
+            return
+        if self.task in ("separation-wsj0-2mix", "separation-wsj0-3mix"):
+            from .convtasnet import WSJSeparator
+
+            self.layer_outputs = bool(blob["layer_outputs"])
+            self.num_speakers = int(blob["n_src"])
+            self.head = WSJSeparator(blob["n_filters"], self.num_speakers, blob["ssl_dim"])
+            self.head.load(blob)
             return
         weights = blob["model"]
         if self.task == "diarization":
@@ -413,6 +434,17 @@ class SepRQPipeline(nn.Module):
                 torch.from_numpy(np.ascontiguousarray(_suppress_impulse(wave))).float().to(wav.device)
             )
         return waves
+
+    def _separate_wsj(self, wav):
+        """16 kHz mixture -> one 16 kHz waveform per speaker."""
+        wav8 = self.head.downsampler(wav)
+        wide = self.head.upsampler(wav8.unsqueeze(0))[0]
+        if self.layer_outputs:
+            states = self.encoder(wide)
+        else:
+            states = self.encoder.hidden_states(wide)
+        sources = self.head(wav8, self._weighted(states))[0]
+        return [_fit_samples(self.head.upsampler(source), wav.shape[-1]) for source in sources]
 
     def _collate(self, audio, wav_lens):
         """Return ``[batch, num_samples]``, per-item lengths, and relative lengths."""
@@ -585,6 +617,12 @@ class SepRQPipeline(nn.Module):
                 trimmed.append(prob[index, :frames])
             result = trimmed[0] if len(trimmed) == 1 else (
                 torch.stack(trimmed) if len({item.shape[0] for item in trimmed}) == 1 else trimmed
+            )
+        elif self.task in ("separation-wsj0-2mix", "separation-wsj0-3mix"):
+            outs = [self._separate_wsj(batch[index, :lengths[index]]) for index in range(batch.shape[0])]
+            stacked = [torch.stack(item) for item in outs]
+            result = stacked[0] if len(stacked) == 1 else (
+                torch.stack(stacked) if len({item.shape[1] for item in stacked}) == 1 else stacked
             )
         else:
             outs = [self._separate(batch[index, :lengths[index]]) for index in range(batch.shape[0])]
