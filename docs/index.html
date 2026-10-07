@@ -1028,7 +1028,7 @@ const snipTask = (u, d) => {
   const call = d.id === "enhancement"
     ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav")`
     : d.enroll ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav", enrollment="speaker.wav")` : `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav")`;
-  const note = d.ret ? `   ${d.ret}` : "";
+  const note = d.ret ? `\n${d.ret}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
@@ -1327,7 +1327,7 @@ function renderDemo() {
   const call = task.enroll ? `pipe("${mix.id}.wav", enrollment="enrollment.wav")` : `pipe("${mix.id}.wav")`;
   const ret = task.kind === "audio" ? (task.streams > 1 ? `# list of ${task.streams} waveforms` : "# enhanced / extracted waveform")
             : task.kind === "activation" ? "# frame-level activations" : "# transcription (str)";
-  const code = `from seprq import SepRQPipeline\n\npipe = SepRQPipeline("${task.api}", upstream=${upArg})\nout = ${call}   ${ret}`;
+  const code = `from seprq import SepRQPipeline\n\npipe = SepRQPipeline("${task.api}", upstream=${upArg})\nout = ${call}\n${ret}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
