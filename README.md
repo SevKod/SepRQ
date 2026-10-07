@@ -95,32 +95,32 @@ and `WavLM_BASE_PLUS`. Target-speaker tasks take an enrollment utterance.
 ```python
 from seprq import SepRQPipeline
 
-wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
-noisy = "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
-
 save_to = "./output"
 
 # Separation — writes ./output/0.wav, ./output/1.wav
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/separation/mix1.wav"
 pipe = SepRQPipeline("separation",
                      upstream="SepRQ",
                      streams=2)
-sources = pipe(wav,
+sources = pipe(mix,
                save_to=save_to)
 # [num_speakers, num_samples]
 
 # Diarization — writes ./output/0.rttm
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/diarization/mix1.wav"
 pipe = SepRQPipeline("diarization",
                      upstream="SepRQ",
                      streams=2)
-activations = pipe(wav,
+activations = pipe(mix,
                    save_to=save_to)
 # [time, num_speakers]
 
 # Enhancement — writes ./output/0.wav
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/enhancement/mix1.wav"
 pipe = SepRQPipeline("enhancement",
                      upstream="SepRQ",
                      streams=2)
-clean = pipe(noisy,
+clean = pipe(mix,
              save_to=save_to)
 # [num_samples]
 
