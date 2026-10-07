@@ -156,7 +156,8 @@ class SepRQPipeline(nn.Module):
         sources = pipe(mixture, save_to=save_to)
         # [num_speakers, num_samples]
 
-        # ./output/source1.wav, ./output/source2.wav
+        # ./output/source1.wav
+        # ./output/source2.wav
 
         pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
 
