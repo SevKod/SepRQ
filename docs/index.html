@@ -319,7 +319,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 @media (max-width:640px){.blk-h .hint{display:none}}
 /* downstream summary */
 .ds-name{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1.2;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.ds-about{margin:8px 0 0;font-size:14.5px;line-height:1.45;color:var(--ink-2)}
+.tp-about{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--line-2);font-size:14.5px;line-height:1.45;color:var(--ink-2)}
 .ds-name .tag{font:700 11px "JetBrains Mono",ui-monospace,monospace;padding:2px 7px;border-radius:6px;background:var(--accent);color:#fff}
 .ds-meta{font-size:13px;color:var(--ink-3);margin-top:4px}
 .ds-facts{margin:16px 0 0;display:grid;gap:10px}
@@ -913,7 +913,7 @@ function normUp(id, task) {
    metric.values: paper numbers per upstream (null = not reported)            */
 const TASKS = [
   { id: "sd", inputs: "l2m_diar", api: "diarization", group: "SUPERB", name: "Speaker diarization", short: "SD", kind: "activation", streams: 2, dataset: "Libri2Mix",
-    about: "Mark which of the two speakers is talking at each moment.",
+    about: "Mark who is speaking at each moment.",
     metric: { label: "DER ↓", unit: "%", values: { hubert: "5.88", wavlm: "4.55", wavlmplus: "3.50", seprq: "2.08" } } },
   { id: "ss2", inputs: "l2m_sep", api: "separation", group: "SUPERB", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "Libri2Mix",
     about: "Split a two-speaker mixture into one waveform per speaker.",
@@ -938,14 +938,14 @@ const TASKS = [
     metric: { label: "WER ↓ (w/o LM / w/ LM)", unit: "", values: { hubert: "36.86% / 30.52%", wavlm: "27.82% / 22.68%", wavlmplus: "24.75% / 20.06%", seprq: "22.26% / 16.78%" } } },
   /* Out-of-domain: EEND diarization on DIHARD 3 (multi-domain conversational recordings) */
   { id: "dh3", inputs: "dihard3", api: "diarization-dihard3", group: "Out-of-domain", name: "Speaker diarization", short: "SD", kind: "activation", streams: 0, dataset: "DIHARD 3 · EEND", seprqVariants: [2, 3], seprqDefault: 2,
-    about: "Estimate who is speaking in a short multi-domain conversation.",
+    about: "Mark who is speaking at each moment.",
     metric: { label: "DER ↓", unit: "%", values: { hubert: "17.7", wavlm: "17.3", wavlmplus: "16.6", seprq_k2: "16.1", seprq_k3: "16.4" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
   /* Out-of-domain: ConvTasNet separation on WSJ0-2mix / WSJ0-3mix (one button, 2 or 3 speakers) */
   { id: "wsj2", inputs: "wsj0_2mix", api: "separation-wsj0-2mix", group: "Out-of-domain", combo: "wsjsep", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "WSJ0-2mix · ConvTasNet", seprqVariants: [2, 3], seprqDefault: 2,
-    about: "Separate two Wall Street Journal speakers mixed outside the training set.",
+    about: "Separate a mixture into one waveform for each of 2 speakers.",
     metric: { label: "SDRi ↑", unit: " dB", values: { hubert: "17.0", wavlm: "17.5", wavlmplus: "18.2", seprq_k2: "19.8", seprq_k3: "19.4" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
   { id: "wsj3", inputs: "wsj0_3mix", api: "separation-wsj0-3mix", group: "Out-of-domain", combo: "wsjsep", name: "Speech separation", short: "SS", tag: "3 spk", kind: "audio", streams: 3, dataset: "WSJ0-3mix · ConvTasNet", seprqVariants: [2, 3], seprqDefault: 3,
-    about: "Separate three Wall Street Journal speakers mixed outside the training set.",
+    about: "Separate a mixture into one waveform for each of 3 speakers.",
     metric: { label: "SDRi ↑", unit: " dB", values: { hubert: "12.7", wavlm: "13.2", wavlmplus: "13.4", seprq_k2: "14.5", seprq_k3: "17.2" }, note: "SepRQ is available pre-trained with 2 or 3 sources" } },
 ];
 
@@ -1366,7 +1366,8 @@ function renderDemo() {
           <span class="nm">${esc(t.name)}<small>${esc(INPUT_SETS[t.inputs].label)}</small></span>${t.short || t.tag ? `<span class="tag">${esc(t.short || t.tag)}</span>` : ""}</button>`;
         }).join("")}
       </div>`).join("")}
-    </div>`);
+    </div>
+    <p class="tp-about">${esc(task.about)}</p>`);
 
   // DOWNSTREAM (summary of the chosen task)
   const outDesc = task.kind === "audio"
@@ -1393,7 +1394,6 @@ function renderDemo() {
   setHTML("blk-down", `${task.id}|${up.id}|${state.cmp}`, `
     <div class="blk-h"><span class="bt">Downstream</span><span class="bs">🔥 trained</span></div>
     <div class="ds-name">${esc(task.name)}${task.tag || task.short ? `<span class="tag">${esc(task.tag || task.short)}</span>` : ""}</div>
-    <p class="ds-about">${esc(task.about)}</p>
     <div class="ds-meta">${esc(task.group)} · ${esc(set.label)}</div>
     ${task.id === "dh3" ? `<p class="dh3-note">${DIHARD_LINES.join("<br>")}</p>` : ""}
     <dl class="ds-facts">
