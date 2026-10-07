@@ -83,6 +83,12 @@ def _is_path(value):
     return isinstance(value, (str, bytes)) or hasattr(value, "__fspath__")
 
 
+def _item_dir(root, index, count):
+    folder = root if count == 1 else root / str(index)
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder
+
+
 def _write_wav(path, wave):
     import soundfile as sf
 
@@ -150,7 +156,7 @@ class SepRQPipeline(nn.Module):
         sources = pipe(mixture, save_to=save_to)
         # [num_speakers, num_samples]
 
-        # ./output/0.wav, ./output/1.wav
+        # ./output/source1.wav, ./output/source2.wav
 
         pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
 
@@ -162,7 +168,7 @@ class SepRQPipeline(nn.Module):
         activations = pipe(mixture, save_to=save_to)
         # [time, num_speakers]
 
-        # ./output/0.rttm
+        # ./output/activations.rttm
 
         pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
 
@@ -173,6 +179,8 @@ class SepRQPipeline(nn.Module):
 
         clean = pipe(mixture, save_to=save_to)
         # [num_samples]
+
+        # ./output/cleaned.wav
 
         pipe = SepRQPipeline("target-speaker-extraction",
                              upstream="SepRQ",
@@ -186,6 +194,8 @@ class SepRQPipeline(nn.Module):
 
         target = pipe(mixture, enrollment=enrollment, save_to=save_to)
         # [num_samples]
+
+        # ./output/extracted_audio.wav
     """
 
     def __init__(self, task, upstream="SepRQ", streams=2, repo_id=None, device=None):
@@ -346,12 +356,16 @@ class SepRQPipeline(nn.Module):
             else:
                 items = result
             for index, prob in enumerate(items):
-                (root / f"{index}.rttm").write_text(_rttm(prob, self.frame_shift, str(index)))
+                (_item_dir(root, index, len(items)) / "activations.rttm").write_text(
+                    _rttm(prob, self.frame_shift, str(index))
+                )
             return
         if self.task == "target-speaker-asr":
             texts = [result] if isinstance(result, str) else list(result)
             for index, text in enumerate(texts):
-                (root / f"{index}.txt").write_text(text + "\n", encoding="utf-8")
+                (_item_dir(root, index, len(texts)) / "extracted_transcript.txt").write_text(
+                    text + "\n", encoding="utf-8"
+                )
             return
         if self.task == "personalized-vad":
             if torch.is_tensor(result) and result.dim() == 1:
@@ -361,9 +375,12 @@ class SepRQPipeline(nn.Module):
             else:
                 items = result
             for index, prob in enumerate(items):
-                (root / f"{index}.rttm").write_text(_rttm(prob.unsqueeze(-1), self.frame_shift, str(index)))
+                (_item_dir(root, index, len(items)) / "activations.rttm").write_text(
+                    _rttm(prob.unsqueeze(-1), self.frame_shift, str(index))
+                )
             return
         if self.task in ("enhancement", "target-speaker-extraction", "personalized-extraction"):
+            name = "cleaned.wav" if self.task == "enhancement" else "extracted_audio.wav"
             if torch.is_tensor(result) and result.dim() == 1:
                 waves = [result]
             elif torch.is_tensor(result):
@@ -371,7 +388,7 @@ class SepRQPipeline(nn.Module):
             else:
                 waves = result
             for index, wave in enumerate(waves):
-                _write_wav(root / f"{index}.wav", wave)
+                _write_wav(_item_dir(root, index, len(waves)) / name, wave)
             return
         # separation: [speakers, samples], [batch, speakers, samples], or a list of the first
         if torch.is_tensor(result) and result.dim() == 2:
@@ -381,9 +398,9 @@ class SepRQPipeline(nn.Module):
         else:
             items = result
         for index, item in enumerate(items):
-            folder = root if len(items) == 1 else root / str(index)
+            folder = _item_dir(root, index, len(items))
             for speaker in range(item.shape[0]):
-                _write_wav(folder / f"{speaker}.wav", item[speaker])
+                _write_wav(folder / f"source{speaker + 1}.wav", item[speaker])
 
     def _utterances(self, audio, wav_lens):
         batch, lengths, _relative = self._collate(audio, wav_lens)

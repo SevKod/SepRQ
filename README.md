@@ -106,7 +106,7 @@ save_to = "./output"
 sources = pipe(mixture, save_to=save_to)
 # [num_speakers, num_samples]
 
-# ./output/0.wav, ./output/1.wav
+# ./output/source1.wav, ./output/source2.wav
 
 # Diarization
 pipe = SepRQPipeline("diarization", upstream="SepRQ", streams=2)
@@ -119,7 +119,7 @@ save_to = "./output"
 activations = pipe(mixture, save_to=save_to)
 # [time, num_speakers]
 
-# ./output/0.rttm
+# ./output/activations.rttm
 
 # Enhancement
 pipe = SepRQPipeline("enhancement", upstream="SepRQ", streams=2)
@@ -131,6 +131,8 @@ save_to = "./output"
 
 clean = pipe(mixture, save_to=save_to)
 # [num_samples]
+
+# ./output/cleaned.wav
 
 # Target speaker extraction
 pipe = SepRQPipeline("target-speaker-extraction",
@@ -146,6 +148,8 @@ save_to = "./output"
 target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
+# ./output/extracted_audio.wav
+
 # Personalized speech extraction
 pipe = SepRQPipeline("personalized-extraction",
                      upstream="SepRQ",
@@ -160,6 +164,8 @@ save_to = "./output"
 target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
+# ./output/extracted_audio.wav
+
 # Personalized VAD
 pipe = SepRQPipeline("personalized-vad", upstream="SepRQ", streams=2)
 
@@ -172,7 +178,7 @@ save_to = "./output"
 activations = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [time]
 
-# ./output/0.rttm
+# ./output/activations.rttm
 
 # Target-speaker ASR
 pipe = SepRQPipeline("target-speaker-asr",
@@ -187,7 +193,7 @@ save_to = "./output"
 
 text = pipe(mixture, enrollment=enrollment, save_to=save_to)
 
-# ./output/0.txt
+# ./output/extracted_transcript.txt
 ```
 
 ## 🔀 SepRQ — separation as the pretext task
