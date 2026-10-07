@@ -320,6 +320,7 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 /* downstream summary */
 .ds-name{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:21px;letter-spacing:-.02em;line-height:1.2;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .tp-about{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--line-2);font-size:14.5px;line-height:1.45;color:var(--ink-2)}
+.tp-about b{color:var(--ink);font-weight:700}
 .ds-name .tag{font:700 11px "JetBrains Mono",ui-monospace,monospace;padding:2px 7px;border-radius:6px;background:var(--accent);color:#fff}
 .ds-meta{font-size:13px;color:var(--ink-3);margin-top:4px}
 .ds-facts{margin:16px 0 0;display:grid;gap:10px}
@@ -1367,7 +1368,7 @@ function renderDemo() {
         }).join("")}
       </div>`).join("")}
     </div>
-    <p class="tp-about">${esc(task.about)}</p>`);
+    <p class="tp-about"><b>${esc(task.name)} :</b> ${esc(task.about)}</p>`);
 
   // DOWNSTREAM (summary of the chosen task)
   const outDesc = task.kind === "audio"
