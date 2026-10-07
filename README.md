@@ -87,9 +87,10 @@ from the torchaudio pipelines, nothing extra to host.
 ## Run a task
 
 SUPERB separation, diarization, and enhancement, plus target-speaker
-extraction, personalized VAD, and target-speaker ASR. The head is chosen from
-the upstream. Published for `SepRQ` (`streams=2`), `HuBERT_BASE`, `WavLM_BASE`,
-and `WavLM_BASE_PLUS`. Target-speaker tasks take an enrollment utterance.
+extraction, personalized speech extraction, personalized VAD, and
+target-speaker ASR. The head is chosen from the upstream. Published for
+`SepRQ` (`streams=2`), `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
+Target-speaker tasks take an enrollment utterance.
 
 ```python
 from seprq import SepRQPipeline
@@ -134,12 +135,29 @@ clean = pipe(mixture, save_to=save_to)
 # ./output/0.wav
 
 # Target speaker extraction
-pipe = SepRQPipeline("target-speaker-extraction", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("target-speaker-extraction",
+                     upstream="SepRQ",
+                     streams=2)
 
 # Input mixture - [num_samples]
 mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/TSE/mix1.wav"
 
 enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/TSE/enroll1.wav"
+
+save_to = "./output"
+
+target = pipe(mixture, enrollment=enrollment, save_to=save_to)
+# [num_samples]
+
+# ./output/0.wav
+
+# Personalized speech extraction
+pipe = SepRQPipeline("personalized-extraction", upstream="SepRQ", streams=2)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/PSE/mix1.wav"
+
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/PSE/enroll1.wav"
 
 save_to = "./output"
 
@@ -164,7 +182,9 @@ activations = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # ./output/0.rttm
 
 # Target-speaker ASR
-pipe = SepRQPipeline("target-speaker-asr", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("target-speaker-asr",
+                     upstream="SepRQ",
+                     streams=2)
 
 # Input mixture - [num_samples]
 mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/TS-ASR/mix1.wav"
