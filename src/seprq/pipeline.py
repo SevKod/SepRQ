@@ -140,39 +140,51 @@ class SepRQPipeline(nn.Module):
 
     .. code-block:: python
 
+        pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
+
+        # Input mixture - [num_samples]
         mixture = "mixture.wav"
 
         save_to = "./output"
-        pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
+
         sources = pipe(mixture, save_to=save_to)
         # [num_speakers, num_samples]
 
         # ./output/0.wav, ./output/1.wav
 
+        pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
+
+        # Input mixture - [num_samples]
         mixture = "mixture.wav"
 
         save_to = "./output"
-        pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
+
         activations = pipe(mixture, save_to=save_to)
         # [time, num_speakers]
 
         # ./output/0.rttm
 
+        pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
+
+        # Input mixture - [num_samples]
         mixture = "noisy.wav"
 
         save_to = "./output"
-        pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
+
         clean = pipe(mixture, save_to=save_to)
         # [num_samples]
 
         # ./output/0.wav
 
+        pipe = SepRQPipeline("target-speaker-extraction", upstream="SepRQ", streams=2)
+
+        # Input mixture - [num_samples]
         mixture = "mixture.wav"
 
         enrollment = "enrollment.wav"
 
         save_to = "./output"
-        pipe = SepRQPipeline("target-speaker-extraction", upstream="SepRQ", streams=2)
+
         target = pipe(mixture, enrollment=enrollment, save_to=save_to)
         # [num_samples]
 
