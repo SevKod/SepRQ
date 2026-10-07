@@ -90,8 +90,8 @@ SUPERB separation, diarization, and enhancement, plus target-speaker
 extraction, personalized speech extraction, personalized VAD,
 target-speaker ASR, DIHARD 3 diarization (local segmentation), and
 WSJ0-2mix / WSJ0-3mix separation. The head is chosen from the upstream.
-Published for `SepRQ` (`streams=2`, and `streams=3` on DIHARD 3 and WSJ0-mix),
-`HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
+Published for `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
+SepRQ downstream heads are not on the public Hub yet.
 Target-speaker tasks take an enrollment utterance.
 
 ```python
