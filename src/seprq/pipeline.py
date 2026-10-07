@@ -13,7 +13,10 @@ import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_sequence, pad_packed_sequence
 
+from .targets import TARGET_TASKS, build_target_head
+
 SUPERB_TASKS = ("separation", "diarization", "enhancement")
+TASKS = SUPERB_TASKS + TARGET_TASKS
 # The SUPERB separation head is the 2-speaker setup. Checkpoints stay in the
 # folder they were uploaded under.
 _HUB_TASK = {"separation": "separation-2spk"}
@@ -156,6 +159,14 @@ class SepRQPipeline(nn.Module):
         clean = pipe("noisy.wav",
                      save_to=save_to)
         # [num_samples]
+
+        pipe = SepRQPipeline("target-speaker-extraction",
+                             upstream="SepRQ",
+                             streams=2)
+        target = pipe("mixture.wav",
+                      enrollment="enrollment.wav",
+                      save_to=save_to)
+        # [num_samples]
     """
 
     def __init__(self, task, upstream="SepRQ", streams=2, repo_id=None, device=None):
@@ -164,18 +175,18 @@ class SepRQPipeline(nn.Module):
 
         if task == "separation-2spk":
             task = "separation"
-        if task not in SUPERB_TASKS:
+        if task not in TASKS:
             raise ValueError(
-                f"task must be one of {list(SUPERB_TASKS)}, got {task!r}"
+                f"task must be one of {list(TASKS)}, got {task!r}"
             )
         if upstream == "SepRQ" and streams != 2:
             raise ValueError(
-                "SUPERB heads are published for SepRQ with streams=2. "
+                "Published heads are for SepRQ with streams=2. "
                 f"Got streams={streams!r}."
             )
         if upstream not in SUPERB_UPSTREAMS:
             raise ValueError(
-                f"No SUPERB head is published for {upstream!r} on {task!r}. "
+                f"No head is published for {upstream!r} on {task!r}. "
                 f"Available upstreams: {list(SUPERB_UPSTREAMS)}."
             )
 
@@ -198,6 +209,12 @@ class SepRQPipeline(nn.Module):
         self.eval()
 
     def _build_head(self, blob):
+        if self.task in TARGET_TASKS:
+            self.register_buffer("layer_weights_k", blob["featurizer_k"].float())
+            self.register_buffer("layer_weights_v", blob["featurizer_v"].float())
+            self.frame_shift = int(blob.get("frame_shift", 320))
+            self.head = build_target_head(blob)
+            return
         weights = blob["model"]
         if self.task == "diarization":
             self.frame_shift = int(blob["frame_shift"])
@@ -224,15 +241,16 @@ class SepRQPipeline(nn.Module):
             )
         self.head.load_state_dict(weights)
 
-    def _weighted(self, states):
+    def _weighted(self, states, weights=None):
         if len(states) != self.n_states:
             raise RuntimeError(
                 f"The {self.upstream_name} head expects {self.n_states} hidden states, "
                 f"got {len(states)}."
             )
+        layer_weights = self.layer_weights if weights is None else weights
         stacked = torch.stack([s.float() for s in states], dim=0)
-        weights = torch.softmax(self.layer_weights, dim=-1)
-        return (weights.view(-1, 1, 1, 1) * stacked).sum(dim=0)
+        mixture = torch.softmax(layer_weights, dim=-1)
+        return (mixture.view(-1, 1, 1, 1) * stacked).sum(dim=0)
 
     def _separate(self, wav):
         """wav: [N] on device. Returns a list of [N] waveforms."""
@@ -311,7 +329,22 @@ class SepRQPipeline(nn.Module):
             for index, prob in enumerate(items):
                 (root / f"{index}.rttm").write_text(_rttm(prob, self.frame_shift, str(index)))
             return
-        if self.task == "enhancement":
+        if self.task == "target-speaker-asr":
+            texts = [result] if isinstance(result, str) else list(result)
+            for index, text in enumerate(texts):
+                (root / f"{index}.txt").write_text(text + "\n", encoding="utf-8")
+            return
+        if self.task == "personalized-vad":
+            if torch.is_tensor(result) and result.dim() == 1:
+                items = [result]
+            elif torch.is_tensor(result):
+                items = [result[index] for index in range(result.shape[0])]
+            else:
+                items = result
+            for index, prob in enumerate(items):
+                (root / f"{index}.rttm").write_text(_rttm(prob.unsqueeze(-1), self.frame_shift, str(index)))
+            return
+        if self.task in ("enhancement", "target-speaker-extraction"):
             if torch.is_tensor(result) and result.dim() == 1:
                 waves = [result]
             elif torch.is_tensor(result):
@@ -333,17 +366,66 @@ class SepRQPipeline(nn.Module):
             for speaker in range(item.shape[0]):
                 _write_wav(folder / f"{speaker}.wav", item[speaker])
 
-    def forward(self, audio, save_to=None, wav_lens=None):
-        """Run the selected SUPERB task.
+    def _utterances(self, audio, wav_lens):
+        batch, lengths, _relative = self._collate(audio, wav_lens)
+        return [batch[index, : lengths[index]] for index in range(batch.shape[0])]
+
+    def _speaker_embedding(self, wave):
+        states = self.encoder.hidden_states(wave)
+        keys = self._weighted(states, self.layer_weights_k)
+        values = self._weighted(states, self.layer_weights_v)
+        return self.head.embed(keys, values, None)[0]
+
+    def _forward_target(self, audio, enrollment, save_to, wav_lens):
+        if enrollment is None:
+            raise ValueError(f"{self.task} takes an enrollment utterance (enrollment=).")
+        mixtures = self._utterances(audio, wav_lens)
+        enrollments = self._utterances(enrollment, None)
+        if len(enrollments) == 1 and len(mixtures) > 1:
+            enrollments = enrollments * len(mixtures)
+        if len(enrollments) != len(mixtures):
+            raise ValueError(
+                "Pass one enrollment, or one enrollment per mixture. "
+                f"Got {len(mixtures)} mixtures and {len(enrollments)} enrollments."
+            )
+        outputs = []
+        for mixture, enroll in zip(mixtures, enrollments):
+            embed = self._speaker_embedding(enroll)
+            feat = self._weighted(self.encoder.hidden_states(mixture))[0]
+            if self.task == "target-speaker-extraction":
+                outputs.append(self.head(feat, mixture, embed))
+            elif self.task == "personalized-vad":
+                frames = torch.tensor([feat.shape[0]], device=feat.device)
+                outputs.append(self.head(feat.unsqueeze(0), frames, embed.unsqueeze(0))[0])
+            else:
+                frames = torch.tensor([feat.shape[0]], device=feat.device)
+                outputs.append(self.head(feat.unsqueeze(0), frames, embed.unsqueeze(0), self.head.symbols)[0])
+        if self.task == "target-speaker-asr":
+            result = outputs[0] if len(outputs) == 1 else outputs
+        else:
+            result = outputs[0] if len(outputs) == 1 else (
+                torch.stack(outputs) if len({item.shape[0] for item in outputs}) == 1 else outputs
+            )
+        if save_to is not None:
+            self._write(result, save_to)
+        return result
+
+    def forward(self, audio, save_to=None, wav_lens=None, enrollment=None):
+        """Run the selected task.
 
         audio is one path, a list of paths, or a 16 kHz waveform shaped
         ``[num_samples]``, ``[batch, num_samples]`` or
         ``[batch, channel, num_samples]``. One utterance returns
-        ``[num_speakers, num_samples]``, ``[num_samples]``, or
-        ``[time, num_speakers]``. A batch keeps a leading batch dimension.
-        ``save_to`` is a relative directory: separation and enhancement write
-        wav files, diarization writes an RTTM per utterance.
+        ``[num_speakers, num_samples]``, ``[num_samples]``,
+        ``[time, num_speakers]``, ``[time]``, or a string. A batch keeps a
+        leading batch dimension. Target-speaker tasks also take ``enrollment``,
+        one utterance or one per mixture.
+        ``save_to`` is a relative directory: waveforms are wav files,
+        diarization and personalized VAD are RTTM files, and target-speaker
+        ASR is a text file per utterance.
         """
+        if self.task in TARGET_TASKS:
+            return self._forward_target(audio, enrollment, save_to, wav_lens)
         batch, lengths, relative = self._collate(audio, wav_lens)
         if self.task == "diarization":
             states = self.encoder.hidden_states(batch, relative)

@@ -1033,11 +1033,17 @@ const snipTask = (u, d) => {
   const taskId = d.wsj ? `separation-wsj0-${state.qsWsj}mix` : d.id;
   const ctor = [`"${taskId}"`, `upstream="${u.code}"`];
   if (u.streams) ctor.push(`streams=${u.streams}`);
-  const wav = d.id === "enhancement"
-    ? "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
-    : "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav";
+  const ex = "hf.co/SepRQ/SepRQ/blob/main/ex";
+  const prepared = {
+    "target-speaker-extraction": "target-speaker-extraction/1188-133604-0025_4992-23283-0016",
+    "personalized-vad": "personalized-vad/mix_0000001",
+    "target-speaker-asr": "target-speaker-asr/4446-2271-0014_3570-5694-0003",
+  };
+  const wav = d.id === "enhancement" ? `${ex}/noisy.wav`
+    : prepared[d.id] ? `${ex}/${prepared[d.id]}/mixture.wav`
+    : `${ex}/mix.wav`;
   const callArgs = [`"${wav}"`];
-  if (d.enroll) callArgs.push(`enrollment="speaker.wav"`);
+  if (d.enroll) callArgs.push(`enrollment="${ex}/${prepared[d.id]}/enrollment.wav"`);
   callArgs.push("save_to=save_to");
   const shape = d.shape ? `\n# ${d.shape}` : "";
   return `from seprq import SepRQPipeline

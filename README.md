@@ -87,9 +87,10 @@ from the torchaudio pipelines, nothing extra to host.
 
 ## Run a task
 
-SUPERB separation, diarization, and enhancement. The head is chosen from the
-upstream. Published for `SepRQ` (`streams=2`), `HuBERT_BASE`, `WavLM_BASE`,
-and `WavLM_BASE_PLUS`.
+SUPERB separation, diarization, and enhancement, plus target-speaker
+extraction, personalized VAD, and target-speaker ASR. The head is chosen from
+the upstream. Published for `SepRQ` (`streams=2`), `HuBERT_BASE`, `WavLM_BASE`,
+and `WavLM_BASE_PLUS`. Target-speaker tasks take an enrollment utterance.
 
 ```python
 from seprq import SepRQPipeline
@@ -122,6 +123,38 @@ pipe = SepRQPipeline("enhancement",
 clean = pipe(noisy,
              save_to=save_to)
 # [num_samples]
+
+# Target speaker extraction — writes ./output/0.wav
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/1188-133604-0025_4992-23283-0016/mixture.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-extraction/1188-133604-0025_4992-23283-0016/enrollment.wav"
+pipe = SepRQPipeline("target-speaker-extraction",
+                     upstream="SepRQ",
+                     streams=2)
+target = pipe(mix,
+              enrollment=enrollment,
+              save_to=save_to)
+# [num_samples]
+
+# Personalized VAD — writes ./output/0.rttm
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/mix_0000001/mixture.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/personalized-vad/mix_0000001/enrollment.wav"
+pipe = SepRQPipeline("personalized-vad",
+                     upstream="SepRQ",
+                     streams=2)
+activations = pipe(mix,
+                   enrollment=enrollment,
+                   save_to=save_to)
+# [time]
+
+# Target-speaker ASR — writes ./output/0.txt
+mix = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/4446-2271-0014_3570-5694-0003/mixture.wav"
+enrollment = "hf.co/SepRQ/SepRQ/blob/main/ex/target-speaker-asr/4446-2271-0014_3570-5694-0003/enrollment.wav"
+pipe = SepRQPipeline("target-speaker-asr",
+                     upstream="SepRQ",
+                     streams=2)
+text = pipe(mix,
+            enrollment=enrollment,
+            save_to=save_to)
 ```
 
 ## 🔀 SepRQ — separation as the pretext task
