@@ -30,7 +30,7 @@ runs on CPU or GPU.
 
 ---
 
-👉 Please visit **[https://sevkod.github.io/SepRQ/](https://sevkod.github.io/SepRQ/)** for the full usage and demo.
+**Refer to the [website](https://sevkod.github.io/SepRQ/) for complete usage of the package.**
 
 ---
 
