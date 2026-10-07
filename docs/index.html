@@ -180,9 +180,23 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .qs-up-grp .seg-b[aria-pressed=true]{background:var(--accent);color:#fff}
 .qs-up{font:600 12px Inter,sans-serif;color:var(--cmp);background:var(--cmp-soft);border:1.5px solid transparent;padding:6px 11px;border-radius:9px;cursor:pointer}
 .qs-up[aria-pressed=true]{background:var(--cmp);color:#fff;border-color:var(--cmp)}
+.qs-downs{flex-direction:column;align-items:stretch;gap:12px}
+.qs-down-cat{display:flex;flex-wrap:wrap;gap:7px}
+.qs-cat{flex-basis:100%;font:700 11px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3)}
 .qs-down{font:600 12px Inter,sans-serif;color:var(--ink-2);background:var(--bg-2);border:1.5px solid var(--line);padding:6px 11px;border-radius:9px;cursor:pointer}
 .qs-down[aria-pressed=true]{border-color:var(--accent);background:var(--accent-softer);color:var(--accent-ink)}
-.qs-up:hover,.qs-down:hover,.qs-up-grp .seg-b:hover{filter:brightness(.97)}
+.qs-init{font:700 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.04em;color:var(--accent);margin-left:6px}
+.qs-down-grp{display:inline-flex;align-items:center;gap:6px;padding:2px 4px 2px 2px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg-2)}
+.qs-down-grp[aria-pressed=true]{border-color:var(--accent);background:var(--accent-softer)}
+.qs-down-grp .qs-down{border:0;background:transparent;padding:4px 8px}
+.qs-down-grp .qs-down[aria-pressed=true]{border:0;background:transparent;color:var(--accent-ink)}
+.qs-down-grp .seg{display:inline-flex;gap:2px;background:#fff;border:1px solid var(--accent-soft);border-radius:7px;padding:2px}
+.qs-down-grp .seg-b{font:600 11.5px Inter,sans-serif;color:var(--accent-ink);background:transparent;border:0;padding:3px 8px;border-radius:6px;cursor:pointer}
+.qs-down-grp .seg-b[aria-pressed=true]{background:var(--accent);color:#fff}
+.qs-down-grp[aria-disabled=true]{opacity:.38}
+.qs-down-grp[aria-disabled=true] .seg-b,.qs-down-grp[aria-disabled=true] .qs-down{cursor:not-allowed}
+.qs-down-grp .qs-down:disabled{opacity:1}
+.qs-up:hover,.qs-down:hover,.qs-up-grp .seg-b:hover,.qs-down-grp .seg-b:hover{filter:brightness(.97)}
 .qs-down:disabled{opacity:.38;cursor:not-allowed;filter:none}
 
 /* ---------- demo ---------- */
@@ -896,7 +910,7 @@ function normUp(id, task) {
 const TASKS = [
   { id: "sd", inputs: "l2m_diar", api: "diarization", group: "SUPERB", name: "Speaker diarization", short: "SD", kind: "activation", streams: 2, dataset: "Libri2Mix",
     metric: { label: "DER ↓", unit: "%", values: { hubert: "5.88", wavlm: "4.55", wavlmplus: "3.50", seprq: "2.08" } } },
-  { id: "ss2", inputs: "l2m_sep", api: "separation-2spk", group: "SUPERB", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "Libri2Mix",
+  { id: "ss2", inputs: "l2m_sep", api: "separation", group: "SUPERB", name: "Speech separation", short: "SS", tag: "2 spk", kind: "audio", streams: 2, dataset: "Libri2Mix",
     metric: { label: "SI-SDRi ↑", unit: " dB", values: { hubert: "9.36", wavlm: "10.37", wavlmplus: "10.85", seprq: "12.10" } } },
   { id: "se", inputs: "voicebank", api: "enhancement", group: "SUPERB", name: "Speech enhancement", short: "SE", kind: "audio", streams: 1, dataset: "VoiceBank-DEMAND",
     labels: ["Enhanced", "Clean reference"],
@@ -940,7 +954,7 @@ const PATHS = {
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const SPK = ["var(--spk1)", "var(--spk2)", "var(--spk3)"];
-const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlm", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation-2spk", ov: 0, lm: 0 };  // comparison on by default (can be switched off)
+const state = { idx: 0, up: "seprq", task: "wsj3", cmp: "wavlm", qsTab: "features", qsUp: "seprq_k2", qsDown: "separation", qsWsj: 2, ov: 0, lm: 0 };  // comparison on by default (can be switched off)
 const defaultCmp = (up) => (up.startsWith("seprq") ? "wavlm" : "seprq");
 /* Sparse tasks (SparseLibriMix) carry an overlap dimension; assets live in an ov<NN> subfolder. */
 const ovSuffix = (task) => (task.overlaps ? "/ov" + String(state.ov).padStart(2, "0") : "");
@@ -983,14 +997,14 @@ const QS_UPS = [
   { id: "wavlmlarge", code: "WavLM_LARGE",    name: "WavLM Large" },
 ];
 const QS_DOWNS = [
-  { id: "separation-2spk",            label: "Separation",      enroll: false, var: "sources",     ret: "# one waveform per speaker" },
-  { id: "diarization",                label: "Diarization",     enroll: false, var: "activations", ret: "# [T, num_speakers]" },
-  { id: "enhancement",                label: "Enhancement",     enroll: false, var: "clean",       ret: "# enhanced waveform" },
-  { id: "target-speaker-extraction",  label: "Target extraction", enroll: true, var: "target",    ret: "# target-speaker waveform" },
-  { id: "personalized-vad",           label: "Personal VAD",    enroll: true,  var: "activations", ret: "# [T] target-speaker activity" },
-  { id: "target-speaker-asr",         label: "Target ASR",      enroll: true,  var: "text",        ret: "# transcript string" },
-  { id: "diarization-dihard3",        label: "OOD diarization", enroll: false, var: "activations", ret: "# [T, num_speakers]", ood: true },
-  { id: "separation-wsj",             label: "OOD separation",  enroll: false, var: "sources",     ret: "# one waveform per speaker", ood: true, wsj: true },
+  { id: "separation",                 label: "Separation",                 short: "SS",     group: "SUPERB",         enroll: false, var: "sources",     ret: "# one waveform per speaker" },
+  { id: "diarization",                label: "Diarization",                short: "SD",     group: "SUPERB",         enroll: false, var: "activations", ret: "# [T, num_speakers]" },
+  { id: "enhancement",                label: "Enhancement",                short: "SE",     group: "SUPERB",         enroll: false, var: "clean",       ret: "" },
+  { id: "target-speaker-extraction",  label: "Target Speaker Extraction",  short: "TSE",    group: "TS-SUPERB",      enroll: true,  var: "target",      ret: "# target-speaker waveform" },
+  { id: "personalized-vad",           label: "Personalized VAD",           short: "PVAD",   group: "TS-SUPERB",      enroll: true,  var: "activations", ret: "# [T] target-speaker activity" },
+  { id: "target-speaker-asr",         label: "Target-Speaker ASR",         short: "TS-ASR", group: "TS-SUPERB",      enroll: true,  var: "text",        ret: "# transcript string" },
+  { id: "diarization-dihard3",        label: "Diarization",                short: "SD",     group: "Out-of-domain",  enroll: false, var: "activations", ret: "# [T, num_speakers]", ood: true },
+  { id: "separation-wsj",             label: "Separation",                 short: "SS",     group: "Out-of-domain",  enroll: false, var: "sources",     ret: "# one waveform per speaker", ood: true, wsj: true },
 ];
 const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
 const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
@@ -1010,15 +1024,16 @@ features = encoder(wav)`;
 
 const snipTask = (u, d) => {
   const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
-  const taskId = d.wsj ? (u.streams === 3 ? "separation-wsj0-3mix" : "separation-wsj0-2mix") : d.id;
+  const taskId = d.wsj ? `separation-wsj0-${state.qsWsj}mix` : d.id;
   const call = d.id === "enhancement"
     ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav")`
     : d.enroll ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav", enrollment="speaker.wav")` : `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav")`;
+  const note = d.ret ? `   ${d.ret}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
 pipe = SepRQPipeline("${taskId}", ${up})
-${d.var} = ${call}   ${d.ret}`;
+${d.var} = ${call}${note}`;
 };
 
 const QS_TASK_UPS = QS_UPS.filter(u => u.id !== "bestrq" && u.id !== "wavlmlarge");
@@ -1035,7 +1050,17 @@ const qsDownOn = (d) => !qs3spk() || d.ood;
 function syncQsDown() {
   if (qs3spk() && !qsDownOn(qsDown())) state.qsDown = "diarization-dihard3";
 }
-const qsDownsHTML = () => QS_DOWNS.map(d => `<button class="qs-down" data-qsdown="${d.id}" aria-pressed="${d.id === state.qsDown}" ${qsDownOn(d) ? "" : "disabled"}>${esc(d.label)}</button>`).join("");
+function qsDownBtn(d) {
+  const on = qsDownOn(d);
+  const pressed = d.id === state.qsDown;
+  const label = `${esc(d.label)}<span class="qs-init">${esc(d.short)}</span>`;
+  if (!d.wsj) return `<button class="qs-down" data-qsdown="${d.id}" aria-pressed="${pressed}" ${on ? "" : "disabled"}>${label}</button>`;
+  const seg = [2, 3].map(n => `<button class="seg-b" data-qswsj="${n}" aria-pressed="${pressed && state.qsWsj === n}" ${on ? "" : "disabled"}>${n} spk</button>`).join("");
+  return `<div class="qs-down-grp" aria-pressed="${pressed}" ${on ? "" : "aria-disabled=\"true\""}><button class="qs-down" data-qsdown="${d.id}" aria-pressed="${pressed}" ${on ? "" : "disabled"}>${label}</button><span class="seg">${seg}</span></div>`;
+}
+const qsDownsHTML = () => [...new Set(QS_DOWNS.map(d => d.group))].map(g =>
+  `<div class="qs-down-cat"><div class="qs-cat">${esc(g)}</div>${QS_DOWNS.filter(d => d.group === g).map(qsDownBtn).join("")}</div>`
+).join("");
 const pickUp = () => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML()}</div></div>`;
 
 function sideFeatures() {
@@ -1069,9 +1094,11 @@ document.querySelectorAll('.qs-grid .tab').forEach(t => t.addEventListener("clic
 }));
 document.addEventListener("click", (e) => {
   const u = e.target.closest("[data-qsup]");
-  if (u) { state.qsUp = u.dataset.qsup; renderQS(); return; }
+  if (u && !u.disabled) { state.qsUp = u.dataset.qsup; renderQS(); return; }
+  const w = e.target.closest("[data-qswsj]");
+  if (w && !w.disabled) { state.qsWsj = Number(w.dataset.qswsj); state.qsDown = "separation-wsj"; renderQS(); return; }
   const d = e.target.closest("[data-qsdown]");
-  if (d) { state.qsDown = d.dataset.qsdown; renderQS(); }
+  if (d && !d.disabled) { state.qsDown = d.dataset.qsdown; renderQS(); }
 });
 
 /* ---------- decorative waveforms ---------- */

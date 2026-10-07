@@ -10,7 +10,10 @@ import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_sequence, pad_packed_sequence
 
-SUPERB_TASKS = ("separation-2spk", "diarization", "enhancement")
+SUPERB_TASKS = ("separation", "diarization", "enhancement")
+# The SUPERB separation head is the 2-speaker setup. Checkpoints stay in the
+# folder they were uploaded under.
+_HUB_TASK = {"separation": "separation-2spk"}
 SUPERB_UPSTREAMS = ("SepRQ", "HuBERT_BASE", "WavLM_BASE", "WavLM_BASE_PLUS")
 
 
@@ -97,7 +100,7 @@ class SepRQPipeline(nn.Module):
 
     .. code-block:: python
 
-        pipe = SepRQPipeline("separation-2spk", upstream="SepRQ", streams=2)
+        pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
         sources = pipe("mixture.wav")          # one waveform per speaker
 
         pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
@@ -111,6 +114,8 @@ class SepRQPipeline(nn.Module):
         super().__init__()
         from seprq import REPO_ID, SepRQEncoder
 
+        if task == "separation-2spk":
+            task = "separation"
         if task not in SUPERB_TASKS:
             raise ValueError(
                 f"task must be one of {list(SUPERB_TASKS)}, got {task!r}"
@@ -134,7 +139,9 @@ class SepRQPipeline(nn.Module):
 
         from huggingface_hub import hf_hub_download
 
-        path = hf_hub_download(self.repo_id, f"superb/{task}/{upstream}/head.ckpt")
+        path = hf_hub_download(
+            self.repo_id, f"superb/{_HUB_TASK.get(task, task)}/{upstream}/head.ckpt"
+        )
         blob = torch.load(path, map_location="cpu", weights_only=False)
         self.n_states = int(blob["featurizer"].numel())
         self.register_buffer("layer_weights", blob["featurizer"].float())
