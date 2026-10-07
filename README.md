@@ -95,7 +95,7 @@ wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 noisy = "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
 
 # Separation — one waveform per speaker
-pipe = SepRQPipeline("separation-2spk", upstream="SepRQ", streams=2)
+pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
 sources = pipe(wav)
 
 # Diarization — [T, num_speakers]
