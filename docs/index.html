@@ -1009,31 +1009,42 @@ const QS_DOWNS = [
 const qsUp = () => QS_UPS.find(u => u.id === state.qsUp) || QS_UPS[0];
 const qsDown = () => QS_DOWNS.find(d => d.id === state.qsDown) || QS_DOWNS[0];
 
-const snipFeatures = (u) =>
-`from seprq import SepRQEncoder
+function callRows(prefix, args) {
+  const pad = " ".repeat(prefix.length);
+  return args.map((a, i) => `${i === 0 ? prefix : pad}${a}${i === args.length - 1 ? ")" : ","}`).join("\n");
+}
+
+const snipFeatures = (u) => {
+  const encArgs = [`"${u.code}"`];
+  if (u.streams) encArgs.push(`streams=${u.streams}`);
+  return `from seprq import SepRQEncoder
 
 wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 # wav = torchaudio.load("path/to/audio.wav")
 
 # "${u.code}" — see "Available models" for every name
-encoder = SepRQEncoder(${u.streams ? `"${u.code}", streams=${u.streams}` : `"${u.code}"`})
+${callRows("encoder = SepRQEncoder(", encArgs)}
 
 # ❄️ frozen feature extraction
 encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
 features = encoder(wav)`;
+};
 
 const snipTask = (u, d) => {
-  const up = u.streams ? `upstream="${u.code}", streams=${u.streams}` : `upstream="${u.code}"`;
   const taskId = d.wsj ? `separation-wsj0-${state.qsWsj}mix` : d.id;
-  const call = d.id === "enhancement"
-    ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav")`
-    : d.enroll ? `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav", enrollment="speaker.wav")` : `pipe("hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav")`;
+  const ctor = [`"${taskId}"`, `upstream="${u.code}"`];
+  if (u.streams) ctor.push(`streams=${u.streams}`);
+  const wav = d.id === "enhancement"
+    ? "hf.co/SepRQ/SepRQ/blob/main/ex/noisy.wav"
+    : "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav";
+  const callArgs = [`"${wav}"`];
+  if (d.enroll) callArgs.push(`enrollment="speaker.wav"`);
   const note = d.ret ? `\n${d.ret}` : "";
   return `from seprq import SepRQPipeline
 
 # ${u.name} · ${d.label}
-pipe = SepRQPipeline("${taskId}", ${up})
-${d.var} = ${call}${note}`;
+${callRows("pipe = SepRQPipeline(", ctor)}
+${callRows(`${d.var} = pipe(`, callArgs)}${note}`;
 };
 
 const QS_TASK_UPS = QS_UPS.filter(u => u.id !== "bestrq" && u.id !== "wavlmlarge");
@@ -1323,11 +1334,14 @@ function renderDemo() {
   if (keys["blk-out"] !== outKey) { setHTML("blk-out", outKey, outputHTML(mix, up, task, set, cmpUp, mp)); if (task.kind === "text") loadASR(renderToken); fillSampleMetrics(task, mp); }
 
   // reproduce snippet
-  const upArg = { seprq: '"SepRQ"', seprq_k2: '"SepRQ", streams=2', seprq_k3: '"SepRQ", streams=3', hubert: '"HuBERT_BASE"', wavlm: '"WavLM_BASE"', wavlmplus: '"WavLM_BASE_PLUS"' }[up.id];
-  const call = task.enroll ? `pipe("${mix.id}.wav", enrollment="enrollment.wav")` : `pipe("${mix.id}.wav")`;
+  const demoUp = { seprq: ["SepRQ"], seprq_k2: ["SepRQ", 2], seprq_k3: ["SepRQ", 3], hubert: ["HuBERT_BASE"], wavlm: ["WavLM_BASE"], wavlmplus: ["WavLM_BASE_PLUS"] }[up.id];
+  const ctor = [`"${task.api}"`, `upstream="${demoUp[0]}"`];
+  if (demoUp[1]) ctor.push(`streams=${demoUp[1]}`);
+  const callArgs = [`"${mix.id}.wav"`];
+  if (task.enroll) callArgs.push(`enrollment="enrollment.wav"`);
   const ret = task.kind === "audio" ? (task.streams > 1 ? `# list of ${task.streams} waveforms` : "# enhanced / extracted waveform")
             : task.kind === "activation" ? "# frame-level activations" : "# transcription (str)";
-  const code = `from seprq import SepRQPipeline\n\npipe = SepRQPipeline("${task.api}", upstream=${upArg})\nout = ${call}\n${ret}`;
+  const code = `from seprq import SepRQPipeline\n\n${callRows("pipe = SepRQPipeline(", ctor)}\n${callRows("out = pipe(", callArgs)}\n${ret}`;
   $("#repro").innerHTML = `<div class="code-card repro">
       <div class="code-top"><button class="tab" aria-selected="true" tabindex="-1">Reproduce this output</button>
       <button class="copy" data-copy-from="repro-code" aria-label="Copy code">Copy</button></div>
