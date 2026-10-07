@@ -101,13 +101,16 @@ class SepRQPipeline(nn.Module):
     .. code-block:: python
 
         pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
-        sources = pipe("mixture.wav")          # one waveform per speaker
+        sources = pipe("mixture.wav")
+        # one waveform per speaker
 
         pipe = SepRQPipeline("diarization", upstream="HuBERT_BASE")
-        activations = pipe("mixture.wav")      # [T, num_speakers]
+        activations = pipe("mixture.wav")
+        # [T, num_speakers]
 
         pipe = SepRQPipeline("enhancement", upstream="WavLM_BASE")
-        clean = pipe("noisy.wav")              # enhanced waveform
+        clean = pipe("noisy.wav")
+        # enhanced waveform
     """
 
     def __init__(self, task, upstream="SepRQ", streams=2, repo_id=None, device=None):
