@@ -88,10 +88,10 @@ from the torchaudio pipelines, nothing extra to host.
 
 SUPERB separation, diarization, and enhancement, plus target-speaker
 extraction, personalized speech extraction, personalized VAD,
-target-speaker ASR, and DIHARD 3 diarization (local segmentation).
-The head is chosen from the upstream. Published for
-`SepRQ` (`streams=2`, and `streams=3` on DIHARD 3), `HuBERT_BASE`,
-`WavLM_BASE`, and `WavLM_BASE_PLUS`.
+target-speaker ASR, DIHARD 3 diarization (local segmentation), and
+WSJ0-2mix / WSJ0-3mix separation. The head is chosen from the upstream.
+Published for `SepRQ` (`streams=2`, and `streams=3` on DIHARD 3 and WSJ0-mix),
+`HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
 Target-speaker tasks take an enrollment utterance.
 
 ```python
@@ -214,6 +214,39 @@ activations = pipe(mixture, save_to=save_to)
 # ./output/activations.rttm
 # Local segmentation only (EEND).
 # Not intended for long file recordings without clustering.
+
+# WSJ0-2mix separation
+pipe = SepRQPipeline("separation-wsj0-2mix",
+                     upstream="SepRQ",
+                     streams=2)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/WSJ2/mix1.wav"
+
+save_to = "./output"
+
+sources = pipe(mixture, save_to=save_to)
+# [num_speakers, num_samples]
+
+# ./output/source1.wav
+# ./output/source2.wav
+
+# WSJ0-3mix separation
+pipe = SepRQPipeline("separation-wsj0-3mix",
+                     upstream="SepRQ",
+                     streams=3)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/WSJ3/mix1.wav"
+
+save_to = "./output"
+
+sources = pipe(mixture, save_to=save_to)
+# [num_speakers, num_samples]
+
+# ./output/source1.wav
+# ./output/source2.wav
+# ./output/source3.wav
 ```
 
 ## 🔀 SepRQ — separation as the pretext task
