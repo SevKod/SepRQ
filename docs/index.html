@@ -859,9 +859,10 @@ footer .sp{margin-left:auto}
    files can be dropped in without touching the rendering code.
 
    Expected layout (relative to index.html):
-     samples/inputs/<set>/<item>/mix<N>.wav         input (mixture or noisy speech)
+     samples/ex/<SS|SD|SE|TSE|PVAD|TS-ASR>/mix<N>.wav
+     samples/ex/<TSE|PVAD|TS-ASR>/enroll<N>.wav
+     PVAD overlaps other than 0% stay under samples/inputs/slm_in/<item>/ov<NN>/.
      samples/inputs/<set>/<item>/mixture_mel.png   its mel-spectrogram
-     samples/inputs/<set>/<item>/enroll<N>.wav     enrollment (target-speaker tasks)
      samples/inputs/<set>/<item>/enrollment_mel.png
      samples/references/<task>/<item>/...          reference annotations
      samples/outputs/<upstream>/<task>/<item>/...  model outputs
@@ -942,10 +943,20 @@ function clipWav(set, m, kind) {
   if (item && item.n) return kind === "mix" ? `mix${item.n}.wav` : `enroll${item.n}.wav`;
   return kind === "mix" ? "mixture.wav" : "enrollment.wav";
 }
+const SET_EX = { l2m_sep: "SS", l2m_diar: "SD", voicebank: "SE", tse_in: "TSE", slm_in: "PVAD", tsasr_in: "TS-ASR" };
+function demoWav(set, m, kind) {
+  const parts = String(m).split("/");
+  const item = ((INPUT_SETS[set] || {}).items || []).find(x => x.id === parts[0]);
+  const folder = SET_EX[set];
+  if (folder && item && item.n && (!parts[1] || parts[1] === "ov00")) {
+    return `${ROOT}/ex/${folder}/${kind === "mix" ? `mix${item.n}.wav` : `enroll${item.n}.wav`}`;
+  }
+  return `${ROOT}/inputs/${set}/${m}/${clipWav(set, m, kind)}`;
+}
 const PATHS = {
-  mixture:    (set, m) => `${ROOT}/inputs/${set}/${m}/${clipWav(set, m, "mix")}`,
+  mixture:    (set, m) => demoWav(set, m, "mix"),
   mixtureMel: (set, m) => `${ROOT}/inputs/${set}/${m}/mixture_mel.png`,
-  enrollment: (set, m) => `${ROOT}/inputs/${set}/${m}/${clipWav(set, m, "enroll")}`,
+  enrollment: (set, m) => demoWav(set, m, "enroll"),
   enrollMel:  (set, m) => `${ROOT}/inputs/${set}/${m}/enrollment_mel.png`,
   ref:        (t, m, f) => `${ROOT}/references/${t}/${m}/${f}`,
   out:        (u, t, m, f) => `${ROOT}/outputs/${u}/${t}/${m}/${f}`,
