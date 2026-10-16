@@ -1722,7 +1722,9 @@ function scOutput(model, task) {
       h += audioSlot(scOut(model.key, task.dir, `s${i}.wav`));
     }
   } else if (task.kind === "activation") {
-    h += imgSlot(scOut(model.key, task.dir, "activations.png"), `${model.label} activations`, "4/1");
+    const activationPlot = scOut(model.key, task.dir, "activations.png")
+      + (task.dir === "pvad" ? "?v=target-label-centered" : "");
+    h += imgSlot(activationPlot, `${model.label} activations`, "4/1");
   } else {
     h += textSlot(`sc-txt-${task.dir}-${model.key}`, scOut(model.key, task.dir, "hypothesis.txt"));
   }
