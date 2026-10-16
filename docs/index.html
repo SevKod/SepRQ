@@ -542,9 +542,9 @@ footer .sp{margin-left:auto}
 @media (max-width:900px){.sc-schema{flex-direction:column;align-items:stretch}}
 /* LEFT: inputs -> upstream -> downstream, laid out horizontally */
 .sc-left{flex:none;display:flex;width:300px}
-.sc-stack{--sc-connector:34px;--sc-gap:10px;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:0}
+.sc-stack{--sc-connector:48px;--sc-gap:10px;flex:1;display:flex;flex-direction:column;align-items:stretch;gap:0}
 .sc-mid{display:grid;grid-template-columns:minmax(0,1fr) var(--sc-connector) minmax(0,1fr);align-items:stretch;gap:var(--sc-gap)}
-.sc-arrow{align-self:flex-start;margin-left:calc(25% - 13.5px);transform:translateX(-50%)}
+.sc-arrow{align-self:flex-start;margin-left:calc(25% - 17px);transform:translateX(-50%)}
 .sc-inputs{display:flex;flex-direction:column;justify-content:space-between;gap:6px;align-self:stretch}
 .sc-node{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:6px 8px;box-shadow:var(--shadow)}
 .sc-io{padding:10px 12px}
@@ -559,7 +559,7 @@ footer .sp{margin-left:auto}
 .sc-up{background:linear-gradient(135deg,var(--accent-strong),var(--accent))}
 .sc-down{background:var(--ink)}
 .sc-up small,.sc-down small{display:block;margin-top:4px;font:600 13px "JetBrains Mono",ui-monospace,monospace;opacity:.9;line-height:1.25}
-.sc-conn{width:var(--sc-connector);color:var(--accent);font-size:30px;font-weight:800;line-height:1;align-self:center;margin:0;text-align:center}
+.sc-conn{width:var(--sc-connector);color:var(--accent);font-size:42px;font-weight:800;line-height:1;align-self:center;margin:0;text-align:center}
 .sc-conn.dot{color:var(--ink-3)}
 .sc-feed{flex:none;align-self:stretch;height:auto}
 /* RIGHT: task buttons + one detail panel */
