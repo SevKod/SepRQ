@@ -88,10 +88,11 @@ Published for `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
 SepRQ downstream heads are not on the public Hub yet.
 Target-speaker tasks take an enrollment utterance.
 
+### Speech separation
+
 ```python
 from seprq import SepRQPipeline
 
-# Separation
 pipe = SepRQPipeline("separation", upstream="SepRQ", streams=2)
 
 # Input mixture - [num_samples]
@@ -104,8 +105,13 @@ sources = pipe(mixture, save_to=save_to)
 
 # ./output/source1.wav
 # ./output/source2.wav
+```
 
-# Diarization
+### Speaker diarization
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("diarization", upstream="SepRQ", streams=2)
 
 # Input mixture - [num_samples]
@@ -117,8 +123,13 @@ activations = pipe(mixture, save_to=save_to)
 # [time, num_speakers]
 
 # ./output/activations.rttm
+```
 
-# Enhancement
+### Speech enhancement
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("enhancement", upstream="SepRQ", streams=2)
 
 # Input mixture - [num_samples]
@@ -130,8 +141,13 @@ clean = pipe(mixture, save_to=save_to)
 # [num_samples]
 
 # ./output/cleaned.wav
+```
 
-# Target speaker extraction
+### Target-speaker extraction
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("target-speaker-extraction",
                      upstream="SepRQ",
                      streams=2)
@@ -146,8 +162,13 @@ target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
 # ./output/extracted_audio.wav
+```
 
-# Personalized speech extraction
+### Personalized speech extraction
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("personalized-extraction",
                      upstream="SepRQ",
                      streams=2)
@@ -162,8 +183,13 @@ target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [num_samples]
 
 # ./output/extracted_audio.wav
+```
 
-# Personalized VAD
+### Personalized VAD
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("personalized-vad", upstream="SepRQ", streams=2)
 
 # Input mixture - [num_samples]
@@ -176,8 +202,13 @@ activations = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # [time]
 
 # ./output/activations.rttm
+```
 
-# Target-speaker ASR
+### Target-speaker ASR
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("target-speaker-asr",
                      upstream="SepRQ",
                      streams=2)
@@ -191,8 +222,13 @@ save_to = "./output"
 text = pipe(mixture, enrollment=enrollment, save_to=save_to)
 
 # ./output/extracted_transcript.txt
+```
 
-# DIHARD 3 diarization
+### DIHARD 3 diarization
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("diarization-dihard3",
                      upstream="SepRQ",
                      streams=2)
@@ -208,8 +244,13 @@ activations = pipe(mixture, save_to=save_to)
 # ./output/activations.rttm
 # Local segmentation only (EEND).
 # Not intended for long file recordings without clustering.
+```
 
-# WSJ0-2mix separation
+### WSJ0-2mix speech separation
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("separation-wsj0-2mix",
                      upstream="SepRQ",
                      streams=2)
@@ -224,8 +265,13 @@ sources = pipe(mixture, save_to=save_to)
 
 # ./output/source1.wav
 # ./output/source2.wav
+```
 
-# WSJ0-3mix separation
+### WSJ0-3mix speech separation
+
+```python
+from seprq import SepRQPipeline
+
 pipe = SepRQPipeline("separation-wsj0-3mix",
                      upstream="SepRQ",
                      streams=3)
