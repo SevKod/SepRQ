@@ -537,6 +537,63 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
 footer .sp{margin-left:auto}
 @media (max-width:640px){footer .sp{margin-left:0}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* ---------- showcase: compact flow schema ---------- */
+.sc-schema{display:flex;align-items:center;gap:14px}
+@media (max-width:900px){.sc-schema{flex-direction:column;align-items:stretch}}
+/* LEFT: inputs -> upstream -> downstream, laid out horizontally */
+.sc-left{flex:none;display:flex;width:300px}
+.sc-stack{flex:1;display:flex;flex-direction:column;align-items:stretch;gap:0}
+.sc-mid{display:flex;flex-direction:row;align-items:stretch;gap:10px}
+.sc-arrow{align-self:flex-start;margin-left:calc(25% - 7px)}
+.sc-inputs{display:flex;flex-direction:column;justify-content:space-between;gap:6px;align-self:stretch}
+.sc-node{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:6px 8px;box-shadow:var(--shadow)}
+.sc-io{padding:10px 12px}
+.sc-node .nh{display:flex;align-items:center;gap:6px;font:700 11px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-2)}
+.sc-node .nh .sw{width:7px;height:7px;border-radius:2px;flex:none}
+.sc-io .media{margin-top:7px;display:flex;flex-direction:column;gap:3px}
+.sc-io .slot.loaded img{max-height:18px;width:100%;object-fit:cover;border-radius:4px}
+.sc-io .aslot{margin-top:0;min-height:30px}.sc-io .aslot audio{height:30px;width:100%;min-width:0}
+.sc-up,.sc-down{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:16px;color:#fff;padding:10px;min-height:112px;border-radius:12px}
+.sc-up small,.sc-down small{font-weight:600;font-size:13px;opacity:.9;margin-top:4px}
+.sc-up small b{font-weight:800}
+.sc-up{background:linear-gradient(135deg,var(--accent-strong),var(--accent))}
+.sc-down{background:var(--ink)}
+.sc-up small,.sc-down small{display:block;margin-top:4px;font:600 13px "JetBrains Mono",ui-monospace,monospace;opacity:.9;line-height:1.25}
+.sc-conn{color:var(--accent);font-size:30px;font-weight:800;line-height:1;flex:none;align-self:center;margin:0 2px}
+.sc-conn.dot{color:var(--ink-3)}
+.sc-feed{flex:none;align-self:stretch;height:auto}
+/* RIGHT: task buttons + one detail panel */
+.sc-right{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;border-left:2px dotted var(--line-2);padding-left:16px}
+@media (max-width:900px){.sc-right{border-left:0;padding-left:0}}
+.sc-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.sc-tab{appearance:none;cursor:pointer;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:7px 14px;font:700 13px Inter,sans-serif;color:var(--ink);display:flex;align-items:center;gap:8px;transition:.15s}
+.sc-tab small{font:600 11px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-3)}
+.sc-tab:hover{border-color:var(--accent)}
+.sc-tab[aria-selected=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sc-tab[aria-selected=true] small{color:rgba(255,255,255,.7)}
+.sc-detail{border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);padding:16px}
+.sc-detail .dh{font:800 16px Inter,sans-serif;color:var(--ink)}
+.sc-detail .dh small{display:block;font:600 12px Inter,sans-serif;color:var(--ink-3);margin-top:2px}
+.sc-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:620px){.sc-pair{grid-template-columns:1fr}}
+.sc-cell{border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.sc-cell.seprq{background:var(--accent-softer);border:1px solid var(--accent-soft)}
+.sc-cell.wavlm{background:var(--cmp-soft);border:1px solid #d9d2f0}
+.sc-cell .ch{display:flex;align-items:center;gap:7px;font:700 11px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.04em}
+.sc-cell.seprq .ch{color:var(--accent-ink)} .sc-cell.wavlm .ch{color:var(--cmp)}
+.sc-cell .ch .sw{width:9px;height:9px;border-radius:2px;flex:none}
+.sc-cell.seprq .ch .sw{background:var(--accent)} .sc-cell.wavlm .ch .sw{background:var(--cmp)}
+.sc-cell .ch .sc-metric{margin-left:auto;padding:2px 9px;border-radius:999px;color:#fff;font-size:11px;white-space:nowrap}
+.sc-cell.seprq .ch .sc-metric{background:var(--accent)} .sc-cell.wavlm .ch .sc-metric{background:var(--cmp)}
+.sc-cell .ch .sc-metric.win{box-shadow:0 0 0 2px rgba(255,255,255,.75) inset}
+.sc-cell .media{display:flex;flex-direction:column;gap:8px}
+.sc-cell .sc-sub{font:600 10px "JetBrains Mono",ui-monospace,monospace;color:var(--ink-3)}
+.sc-cell .slot{min-height:0;background:#fff;border:1px solid var(--line)}
+.sc-cell .slot.loaded img{max-height:120px;width:100%;object-fit:contain;border-radius:6px;background:#fff}
+.sc-cell .aslot{margin-top:0}
+.sc-cell .txt{font-size:13px;padding:10px 12px;line-height:1.45}
+.sc-ref{margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line);font-size:13px;line-height:1.5;color:var(--ink)}
+.sc-ref .rl{font:700 10px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-right:6px}
 </style>
 </head>
 <body>
@@ -647,6 +704,27 @@ footer .sp{margin-left:auto}
   </div>
 </section>
 
+<!-- ================= SHOWCASE ================= -->
+<section class="block" id="showcase">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">One input, every task</span>
+      <h2>One mixture through the whole stack</h2>
+      <p>A single Libri2Mix mixture and one enrollment feed a frozen upstream, then every downstream head at once. Per task: <b style="color:var(--accent-ink)">SepRQ</b> vs <b style="color:var(--cmp)">WavLM&nbsp;Base</b>.</p>
+    </div>
+
+    <div class="sc-card">
+      <div class="sc-schema">
+        <div class="sc-left" id="sc-left"></div>
+        <div class="sc-right">
+          <div class="sc-tabs" id="sc-tabs"></div>
+          <div class="sc-detail" id="sc-detail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= DEMO ================= -->
 <section class="block" id="demo">
   <div class="wrap">
@@ -696,10 +774,6 @@ footer .sp{margin-left:auto}
           </tbody>
         </table>
       </div>
-    </div>
-    <div class="note">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D8620A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      <div>The SepRQ / BEST-RQ weights repository is private for now: authenticate once with <code>huggingface-cli login</code> (or set <code>HF_TOKEN</code>). The HuBERT / WavLM baselines come from the torchaudio pipelines, with nothing extra to set up.</div>
     </div>
   </div>
 </section>
@@ -773,8 +847,7 @@ footer .sp{margin-left:auto}
         <div class="foot">† Uses oracle speaker embeddings of the target speakers at inference time (shown in grey). Best base-class value among enrollment-free models highlighted.</div>
       </div>
 
-      <div class="tables-2">
-        <div class="card tcard">
+      <div class="card tcard">
           <h3>TS-SUPERB</h3>
           <div class="cap">Target speaker extraction, personalized speech extraction, personalized VAD, target-speaker ASR.</div>
           <div class="tscroll">
@@ -812,7 +885,6 @@ footer .sp{margin-left:auto}
             </table>
           </div>
         </div>
-      </div>
     </div>
   </div>
 </section>
@@ -843,12 +915,19 @@ footer .sp{margin-left:auto}
     </div>
   </div>
 </section>
+
+<section class="block" id="ack" style="padding-top:8px">
+  <div class="wrap">
+    <p style="font-size:13px;line-height:1.6;color:var(--ink-3);max-width:860px;margin:0">
+      <b style="color:var(--ink-2)">Acknowledgments.</b> This work was granted access to the HPC resources of IDRIS under the allocations AD011014044R2, 2024-AD011015163 and AD011016519 made by GENCI, and supported by the Agence de l'Innovation Défense under the grant number 2022&nbsp;65&nbsp;0079. It also benefited from the support of the French National Research Agency through the ANR-20-CE23-0012-01 (MIM) grant.
+    </p>
+  </div>
+</section>
 </main>
 
 <footer>
   <div class="wrap">
     <span>SepRQ · Baroudi, Bredin &amp; Marxer</span>
-    <span>Built on <a href="https://github.com/speechbrain/speechbrain" target="_blank" rel="noopener">SpeechBrain</a></span>
     <span class="sp"><a href="https://github.com/SevKod/SepRQ" target="_blank" rel="noopener">github.com/SevKod/SepRQ</a></span>
   </div>
 </footer>
@@ -1604,8 +1683,133 @@ document.addEventListener("change", (e) => {
 const nav = $("#nav");
 addEventListener("scroll", () => nav.classList.toggle("scrolled", scrollY > 8), { passive: true });
 
+/* ---------- showcase: flow schema, one mixture through every task ----------
+   Fixed target 4077-13754-0001 in Libri2Mix mixture 4077-13754-0001_5142-33396-0065. */
+const SC_ROOT = `${ROOT}/showcase`;
+const SC_IN = {
+  mix:    `${SC_ROOT}/input_libri/mixture.wav`,
+  mixMel: `${SC_ROOT}/input_libri/mixture_mel.png`,
+  enr:    `${SC_ROOT}/input_libri/enrollment.wav`,
+  enrMel: `${SC_ROOT}/input_libri/enrollment_mel.png`,
+};
+const scOut = (model, dir, file) => `${SC_ROOT}/outputs/${model}/${dir}/${file}`;
+let SC_METRICS = {};
+function scMetricBadge(task, key) {
+  const m = SC_METRICS[task.dir];
+  if (!m || m[key] == null) return "";
+  const v = m[key], other = m[key === "seprq" ? "wavlm" : "seprq"];
+  const win = other == null ? false : (m.better === "down" ? v < other : v > other);
+  const txt = v + (m.unit || "");
+  return `<span class="sc-metric${win ? " win" : ""}" title="${esc(m.label)} (${m.better === "down" ? "lower" : "higher"} is better)">${esc(m.label)} ${esc(String(txt))}</span>`;
+}
+const SC_MODELS = [
+  { key: "seprq", label: "SepRQ",      cls: "seprq" },
+  { key: "wavlm", label: "WavLM Base", cls: "wavlm" },
+];
+const SC_TASKS = [
+  { dir: "ss",    name: "Speech separation",             short: "SS",     kind: "audio",      streams: 2 },
+  { dir: "sd",    name: "Speaker diarization",            short: "SD",     kind: "activation" },
+  { dir: "tsasr", name: "Target-speaker ASR",             short: "TS-ASR", kind: "text" },
+  { dir: "pvad",  name: "Personalized VAD",               short: "PVAD",   kind: "activation" },
+  { dir: "pse",   name: "Personalized speech extraction", short: "PSE",    kind: "audio",      streams: 1 },
+  { dir: "tse",   name: "Target speaker extraction",      short: "TSE",    kind: "audio",      streams: 1 },
+];
+/* compact media column for one model+task */
+function scOutput(model, task) {
+  let h = `<div class="media">`;
+  if (task.kind === "audio") {
+    for (let i = 1; i <= task.streams; i++) {
+      h += audioSlot(scOut(model.key, task.dir, `s${i}.wav`));
+    }
+  } else if (task.kind === "activation") {
+    h += imgSlot(scOut(model.key, task.dir, "activations.png"), `${model.label} activations`, "4/1");
+  } else {
+    h += textSlot(`sc-txt-${task.dir}-${model.key}`, scOut(model.key, task.dir, "hypothesis.txt"));
+  }
+  return h + `</div>`;
+}
+function renderShowcase() {
+  const left = $("#sc-left"), tabs = $("#sc-tabs");
+  if (!left || !tabs) return;
+  left.innerHTML = `
+    <div class="sc-stack">
+      <div class="sc-node sc-io">
+        <div class="nh"><span class="sw" style="background:var(--spk2)"></span>Mixture</div>
+        <div class="media">${audioSlot(SC_IN.mix)}</div>
+      </div>
+      <svg class="sc-arrow" width="14" height="24" viewBox="0 0 14 24" aria-hidden="true">
+        <line x1="7" y1="0" x2="7" y2="17" stroke="var(--accent)" stroke-width="2.4"/>
+        <path d="M2.5 14 L7 22 L11.5 14" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="sc-mid">
+        <div class="sc-node sc-up">Upstream<small><b>SepRQ</b> vs WavLM</small></div>
+        <div class="sc-conn">→</div>
+        <div class="sc-node sc-down">Down&shy;stream<small>per task</small></div>
+      </div>
+      <svg class="sc-arrow dot" width="14" height="24" viewBox="0 0 14 24" aria-hidden="true">
+        <line x1="7" y1="24" x2="7" y2="7" stroke="var(--ink-3)" stroke-width="2.2" stroke-dasharray="3 3"/>
+        <path d="M2.5 10 L7 2 L11.5 10" fill="none" stroke="var(--ink-3)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="sc-node sc-io">
+        <div class="nh"><span class="sw" style="background:var(--spk1)"></span>Enrollment</div>
+        <div class="media">${audioSlot(SC_IN.enr)}</div>
+      </div>
+    </div>`;
+  tabs.innerHTML = SC_TASKS.map((task, i) => `
+    <button class="sc-tab" data-sctab="${i}" aria-selected="${i === scActive}">
+      ${esc(task.short)}<small>${esc(task.name)}</small>
+    </button>`).join("");
+  showDetail();
+}
+let scActive = 0;
+function showDetail() {
+  const task = SC_TASKS[scActive];
+  document.querySelectorAll('#sc-tabs .sc-tab').forEach(b =>
+    b.setAttribute("aria-selected", +b.dataset.sctab === scActive));
+  $("#sc-detail").innerHTML = `
+    <div class="dh">${esc(task.short)}<small>${esc(task.name)}</small></div>
+    <div class="sc-pair">
+      ${SC_MODELS.map(m => `
+        <div class="sc-cell ${m.cls}">
+          <div class="ch"><span class="sw"></span>${esc(m.label)}${scMetricBadge(task, m.key)}</div>
+          ${scOutput(m, task)}
+        </div>`).join("")}
+    </div>
+    ${task.kind === "text" ? `<div class="sc-ref" id="sc-ref"><span class="rl">Reference</span> <span id="sc-ref-t">…</span></div>` : ""}`;
+  if (task.kind === "text") {
+    loadShowcaseASR();
+  } else {
+    document.querySelectorAll('#sc-detail .txt[data-src]').forEach(async el => {
+      try { el.textContent = await fetchText(el.dataset.src); }
+      catch { el.classList.add("missing"); el.innerHTML = `<b>Placeholder</b>${esc(el.dataset.src)}`; }
+    });
+  }
+}
+const SC_REF = `${SC_ROOT}/outputs/transcript.txt`;
+async function loadShowcaseASR() {
+  let ref = null;
+  try { ref = await fetchText(SC_REF); } catch {}
+  const rt = $("#sc-ref-t"); if (rt) rt.textContent = ref || "(reference unavailable)";
+  for (const el of document.querySelectorAll('#sc-detail .txt[data-src]')) {
+    let hyp;
+    try { hyp = await fetchText(el.dataset.src); }
+    catch { el.classList.add("missing"); el.innerHTML = `<b>Placeholder</b>${esc(el.dataset.src)}`; continue; }
+    if (!ref) { el.textContent = hyp; continue; }
+    const a = align(ref.split(/\s+/), hyp.split(/\s+/));
+    el.innerHTML = a.ops.map(o => o.t === "ok" ? esc(o.h)
+      : o.t === "sub" ? `<span class="w-sub" title="reference: ${esc(o.r)}">${esc(o.h)}</span>`
+      : o.t === "ins" ? `<span class="w-ins" title="insertion">${esc(o.h)}</span>`
+      : `<span class="w-del" title="deletion">${esc(o.r)}</span>`).join(" ");
+  }
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-sctab]"); if (!b) return;
+  scActive = +b.dataset.sctab; showDetail();
+});
+
 renderQS();
 renderDemo();
+fetch(`${SC_ROOT}/metrics.json`).then(r => r.ok ? r.json() : {}).then(j => { SC_METRICS = j; }).catch(() => {}).finally(renderShowcase);
 </script>
 </body>
 </html>

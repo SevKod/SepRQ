@@ -1,0 +1,44 @@
+{
+  "ss": {
+    "label": "SI-SDRi",
+    "unit": " dB",
+    "better": "up",
+    "seprq": 9.84,
+    "wavlm": 8.78
+  },
+  "sd": {
+    "label": "DER",
+    "unit": "%",
+    "better": "down",
+    "seprq": 2.03,
+    "wavlm": 7.72
+  },
+  "tsasr": {
+    "label": "WER",
+    "unit": "%",
+    "better": "down",
+    "seprq": 36.4,
+    "wavlm": 100.0
+  },
+  "pvad": {
+    "label": "mAP",
+    "unit": "%",
+    "better": "up",
+    "seprq": 95.0,
+    "wavlm": 83.7
+  },
+  "pse": {
+    "label": "SI-SDRi",
+    "unit": " dB",
+    "better": "up",
+    "seprq": 11.8,
+    "wavlm": 8.65
+  },
+  "tse": {
+    "label": "SI-SDRi",
+    "unit": " dB",
+    "better": "up",
+    "seprq": 14.2,
+    "wavlm": 11.2
+  }
+}
