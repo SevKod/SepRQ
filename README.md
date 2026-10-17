@@ -100,13 +100,15 @@ from the torchaudio pipelines, nothing extra to host.
 
 ## Run a task
 
-SUPERB separation, diarization, and enhancement, plus target-speaker
-extraction, personalized speech extraction, personalized VAD,
-target-speaker ASR, DIHARD 3 local diarization, and
-WSJ0-2mix / WSJ0-3mix separation. The head is chosen from the upstream.
-Published for `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
-SepRQ downstream heads are not on the public Hub yet.
-Target-speaker tasks take an enrollment utterance.
+Run a task in three steps:
+
+1. **Choose an upstream.**
+2. **Choose a downstream task** from the [overview above](#quick-navigation).
+3. **Run the pipeline** with the corresponding example below.
+
+Public downstream heads are currently available for `HuBERT_BASE`,
+`WavLM_BASE`, and `WavLM_BASE_PLUS`; SepRQ heads are coming soon. Tasks marked
+**Required** in the overview also take a speaker enrollment utterance.
 
 #### Speech separation
 
