@@ -77,7 +77,7 @@ encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
 features = encoder(wav)
 ```
 
-It accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz)
+The class accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz)
 or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
 `[batch, channel, num_samples]`.
 
