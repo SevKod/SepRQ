@@ -56,7 +56,7 @@ pip install seprq
 | [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | WSJ0-2mix | No |
 | [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | WSJ0-3mix | No |
 
-3. **Learn more.** Explore the [architecture](#architecture), review the [results](#results), or copy the [citation](#citation).
+3. **Learn more.** Explore the [architecture](#architecture).
 
 ## Feature extraction
 
