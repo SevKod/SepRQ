@@ -37,11 +37,9 @@ pip install seprq
 
 ## Quick navigation
 
-| Section | Go straight to |
-|---|---|
-| Feature extraction | [Extract features](#feature-extraction) · [Available models](#available-models) |
+1. **Feature extraction.** [Extract frozen or fine-tunable representations](#feature-extraction) and review the [available encoder models](#available-models).
 
-**Run a task** — [overview and requirements](#run-a-task)
+2. **Run a task.** Choose a [ready-to-use cocktail-party task](#run-a-task); the table links to each example and shows its dataset and enrollment requirement.
 
 | ID | Task name | Dataset | Enrollment |
 |---|---|---|---|
@@ -56,7 +54,7 @@ pip install seprq
 | [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | WSJ0-2mix | No |
 | [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | WSJ0-3mix | No |
 
-**Learn more** — [Architecture](#architecture) · [Results](#results) · [Citation](#citation)
+3. **Learn more.** Explore the [architecture](#architecture), review the [results](#results), or copy the [citation](#citation).
 
 ## Feature extraction
 
