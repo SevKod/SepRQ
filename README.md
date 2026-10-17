@@ -48,10 +48,10 @@ pip install seprq
 | [SS](#speech-separation) | Speech separation | Libri2Mix | No |
 | [SD](#speaker-diarization) | Speaker diarization | Libri2Mix | No |
 | [SE](#speech-enhancement) | Speech enhancement | VoiceBank-DEMAND | No |
-| [TSE](#target-speaker-extraction) | Target-speaker extraction | Libri2Mix | Required |
-| [PSE](#personalized-speech-extraction) | Personalized speech extraction | SparseLibriMix | Required |
-| [PVAD](#personalized-vad) | Personalized VAD | SparseLibriMix | Required |
-| [TS-ASR](#target-speaker-asr) | Target-speaker ASR | Libri2Mix | Required |
+| [TSE](#target-speaker-extraction) | Target-speaker extraction | Libri2Mix | Yes |
+| [PSE](#personalized-speech-extraction) | Personalized speech extraction | SparseLibriMix | Yes |
+| [PVAD](#personalized-vad) | Personalized VAD | SparseLibriMix | Yes |
+| [TS-ASR](#target-speaker-asr) | Target-speaker ASR | Libri2Mix | Yes |
 | [DH3](#dihard-3-local-diarization) | DIHARD 3 local diarization | DIHARD 3 | No |
 | [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | WSJ0-2mix | No |
 | [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | WSJ0-3mix | No |
@@ -108,7 +108,7 @@ Run a task in three steps:
 
 Public downstream heads are currently available for `HuBERT_BASE`,
 `WavLM_BASE`, and `WavLM_BASE_PLUS`; SepRQ heads are coming soon. Tasks marked
-**Required** in the overview also take a speaker enrollment utterance.
+**Yes** in the Enrollment column take a speaker enrollment utterance.
 
 #### Speech separation
 
