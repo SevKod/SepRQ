@@ -68,7 +68,7 @@ from seprq import SepRQEncoder
 wav = "hf.co/SepRQ/SepRQ/blob/main/ex/mix.wav"
 # wav = torchaudio.load("path/to/audio.wav")
 
-# "SepRQ" — see "Available models" for every name
+# "SepRQ"; see "Available models" for every name
 encoder = SepRQEncoder("SepRQ", streams=2)
 
 # ❄️ frozen feature extraction
@@ -77,7 +77,7 @@ encoder.requires_grad_(False).eval()  # or True for 🔥 fine-tuning
 features = encoder(wav)
 ```
 
-The class accepts a **file path** (any format/rate — decoded, mono, resampled to 16 kHz)
+The class accepts a **file path** (any format/rate; decoded, converted to mono, and resampled to 16 kHz)
 or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
 `[batch, channel, num_samples]`.
 
@@ -309,7 +309,7 @@ sources = pipe(mixture, save_to=save_to)
 
 <a id="architecture"></a>
 
-## 🔀 SepRQ — separation as the pretext task
+## 🔀 SepRQ: separation as the pretext task
 
 SepRQ swaps masked prediction for pseudo source separation. It predicts one
 stream of discrete units per speaker in the mixture, at several temporal
@@ -321,13 +321,13 @@ resolutions.
 vector quantizers (RVQs) give speaker-specific discrete labels at several
 resolutions.*
 
-- **Pseudo source separation** — each separation head predicts the frozen
+- **Pseudo source separation:** each separation head predicts the frozen
   BEST-RQ codewords of one clean speaker from the mixture. Utterance-level PIT
   resolves speaker order.
-- **Mask-free** — masking can hide exactly the content needed to disentangle a
+- **Mask-free:** masking can hide exactly the content needed to disentangle a
   mixture. SepRQ predicts units over the full utterance, which uses every frame
   for training.
-- **Multi-resolution** — a separation objective follows every two Conformer
+- **Multi-resolution:** a separation objective follows every two Conformer
   layers, with frame folding going from 20 ms to 320 ms and one codebook per
   scale.
 
