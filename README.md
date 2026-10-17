@@ -39,7 +39,7 @@ pip install seprq
 
 ## Quick navigation
 
-1. **Feature extraction.** [Extract frozen or fine-tunable representations](#feature-extraction) and review the [available encoder models](#available-models).
+1. **Feature extraction.** [Extract frozen or fine-tunable representations](#feature-extraction).
 
 2. **Run a task.** Choose a [ready-to-use cocktail-party task](#run-a-task); the table links to each example and shows its dataset and enrollment requirement.
 
