@@ -94,10 +94,6 @@ The released SepRQ encoder is the 2-speaker model (`streams=2`).
 | `WavLM_BASE_PLUS` | 12 | 768 |
 | `WavLM_LARGE` | 24 | 1024 |
 
-The SepRQ / BEST-RQ weights come from the Hub (private — authenticate once with
-`huggingface-cli login` or `HF_TOKEN`); the HuBERT / WavLM baselines are fetched
-from the torchaudio pipelines, nothing extra to host.
-
 ## Run a task
 
 Run a task in three steps:
