@@ -99,13 +99,14 @@ The released SepRQ encoder is the 2-speaker model (`streams=2`).
 
 Run a task in three steps:
 
-1. **Choose an upstream.**
+1. **Choose an upstream** from the [available models](#available-models).
 2. **Choose a downstream task** from the [overview above](#quick-navigation).
 3. **Run the pipeline** with the corresponding example below (or **your own audio**).
 
 Public downstream heads are currently available for `HuBERT_BASE`,
-`WavLM_BASE`, and `WavLM_BASE_PLUS`; SepRQ heads are coming soon. Tasks marked
-**Yes** in the Enrollment column take a speaker enrollment utterance.
+`WavLM_BASE`, and `WavLM_BASE_PLUS`; SepRQ heads are coming soon.
+
+**Note:** Extraction tasks require a speaker enrollment utterance.
 
 #### Speech separation
 
