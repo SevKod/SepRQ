@@ -46,6 +46,9 @@ pip install seprq
 
 | ID | Task name | Dataset | Enrollment |
 |---|---|---|---|
+| [DH3](#speaker-diarization-dihard-3) | Speaker Diarization (DIHARD 3) | DIHARD 3 | No |
+| [WSJ2](#speech-separation-wsj0-2mix) | Speech Separation (WSJ0-2mix) | WSJ0-2mix | No |
+| [WSJ3](#speech-separation-wsj0-3mix) | Speech Separation (WSJ0-3mix) | WSJ0-3mix | No |
 | [SS](#speech-separation) | Speech separation | Libri2Mix | No |
 | [SD](#speaker-diarization) | Speaker diarization | Libri2Mix | No |
 | [SE](#speech-enhancement) | Speech enhancement | VoiceBank-DEMAND | No |
@@ -53,9 +56,6 @@ pip install seprq
 | [PSE](#personalized-speech-extraction) | Personalized speech extraction | SparseLibriMix | Yes |
 | [PVAD](#personalized-vad) | Personalized VAD | SparseLibriMix | Yes |
 | [TS-ASR](#target-speaker-asr) | Target-speaker ASR | Libri2Mix | Yes |
-| [DH3](#dihard-3-local-diarization) | DIHARD 3 local diarization | DIHARD 3 | No |
-| [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | WSJ0-2mix | No |
-| [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | WSJ0-3mix | No |
 
 3. **Learn more.** Explore the [architecture](#architecture).
 
@@ -107,6 +107,71 @@ Public downstream heads are currently available for `HuBERT_BASE`,
 `WavLM_BASE`, and `WavLM_BASE_PLUS`; SepRQ heads are coming soon.
 
 **Note:** Extraction tasks require a speaker enrollment utterance.
+
+#### Speaker Diarization (DIHARD 3)
+
+```python
+from seprq import SepRQPipeline
+
+pipe = SepRQPipeline("diarization-dihard3",
+                     upstream="SepRQ",
+                     streams=2)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/DH3/mix1.wav"
+
+save_to = "./output"
+
+activations = pipe(mixture, save_to=save_to)
+# [time, num_speakers]
+
+# ./output/activations.rttm
+# Local segmentation only (EEND).
+# Not intended for long file recordings without clustering.
+```
+
+#### Speech Separation (WSJ0-2mix)
+
+```python
+from seprq import SepRQPipeline
+
+pipe = SepRQPipeline("separation-wsj0-2mix",
+                     upstream="SepRQ",
+                     streams=2)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/WSJ2/mix1.wav"
+
+save_to = "./output"
+
+sources = pipe(mixture, save_to=save_to)
+# [num_speakers, num_samples]
+
+# ./output/source1.wav
+# ./output/source2.wav
+```
+
+#### Speech Separation (WSJ0-3mix)
+
+```python
+from seprq import SepRQPipeline
+
+pipe = SepRQPipeline("separation-wsj0-3mix",
+                     upstream="SepRQ",
+                     streams=3)
+
+# Input mixture - [num_samples]
+mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/WSJ3/mix1.wav"
+
+save_to = "./output"
+
+sources = pipe(mixture, save_to=save_to)
+# [num_speakers, num_samples]
+
+# ./output/source1.wav
+# ./output/source2.wav
+# ./output/source3.wav
+```
 
 #### Speech separation
 
@@ -242,71 +307,6 @@ save_to = "./output"
 text = pipe(mixture, enrollment=enrollment, save_to=save_to)
 
 # ./output/extracted_transcript.txt
-```
-
-#### DIHARD 3 local diarization
-
-```python
-from seprq import SepRQPipeline
-
-pipe = SepRQPipeline("diarization-dihard3",
-                     upstream="SepRQ",
-                     streams=2)
-
-# Input mixture - [num_samples]
-mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/DH3/mix1.wav"
-
-save_to = "./output"
-
-activations = pipe(mixture, save_to=save_to)
-# [time, num_speakers]
-
-# ./output/activations.rttm
-# Local segmentation only (EEND).
-# Not intended for long file recordings without clustering.
-```
-
-#### WSJ0-2mix speech separation
-
-```python
-from seprq import SepRQPipeline
-
-pipe = SepRQPipeline("separation-wsj0-2mix",
-                     upstream="SepRQ",
-                     streams=2)
-
-# Input mixture - [num_samples]
-mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/WSJ2/mix1.wav"
-
-save_to = "./output"
-
-sources = pipe(mixture, save_to=save_to)
-# [num_speakers, num_samples]
-
-# ./output/source1.wav
-# ./output/source2.wav
-```
-
-#### WSJ0-3mix speech separation
-
-```python
-from seprq import SepRQPipeline
-
-pipe = SepRQPipeline("separation-wsj0-3mix",
-                     upstream="SepRQ",
-                     streams=3)
-
-# Input mixture - [num_samples]
-mixture = "hf.co/SepRQ/SepRQ/blob/main/ex/WSJ3/mix1.wav"
-
-save_to = "./output"
-
-sources = pipe(mixture, save_to=save_to)
-# [num_speakers, num_samples]
-
-# ./output/source1.wav
-# ./output/source2.wav
-# ./output/source3.wav
 ```
 
 <a id="architecture"></a>
