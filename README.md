@@ -35,19 +35,34 @@ tasks, both with and without speaker enrollment.
 
 ---
 
-## Quick navigation
-
-| Section | Go straight to |
-|---|---|
-| Feature extraction | [Install](#install) · [Extract features](#feature-extraction) · [Available models](#available-models) |
-| Run a task | [Overview](#run-a-task) · [Speech separation](#speech-separation) · [Speaker diarization](#speaker-diarization) · [Speech enhancement](#speech-enhancement) · [Target-speaker extraction](#target-speaker-extraction) · [Personalized speech extraction](#personalized-speech-extraction) · [Personalized VAD](#personalized-vad) · [Target-speaker ASR](#target-speaker-asr) · [DIHARD 3 diarization](#dihard-3-diarization) · [WSJ0-2mix](#wsj0-2mix-speech-separation) · [WSJ0-3mix](#wsj0-3mix-speech-separation) |
-| Understand SepRQ | [Architecture](#architecture) · [Results](#results) · [Citation](#citation) |
-
 ## Install
 
 ```bash
 pip install seprq
 ```
+
+## Quick navigation
+
+| Section | Go straight to |
+|---|---|
+| Feature extraction | [Extract features](#feature-extraction) · [Available models](#available-models) |
+
+**Run a task** — [overview and requirements](#run-a-task)
+
+| ID | Task name | Category | Enrollment |
+|---|---|---|---|
+| [SS](#speech-separation) | Speech separation | SUPERB | No |
+| [SD](#speaker-diarization) | Speaker diarization | SUPERB | No |
+| [SE](#speech-enhancement) | Speech enhancement | SUPERB | No |
+| [TSE](#target-speaker-extraction) | Target-speaker extraction | Target speaker | Required |
+| [PSE](#personalized-speech-extraction) | Personalized speech extraction | Target speaker | Required |
+| [PVAD](#personalized-vad) | Personalized VAD | Target speaker | Required |
+| [TS-ASR](#target-speaker-asr) | Target-speaker ASR | Target speaker | Required |
+| [DH3](#dihard-3-diarization) | DIHARD 3 diarization | Out-of-domain | No |
+| [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | Out-of-domain | No |
+| [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | Out-of-domain | No |
+
+**Learn more** — [Architecture](#architecture) · [Results](#results) · [Citation](#citation)
 
 ## Feature extraction
 
