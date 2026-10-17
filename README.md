@@ -31,6 +31,8 @@ for many cocktail-party speech tasks, both with and without speaker enrollment.
 
 ## Install
 
+Install the SepRQ package from PyPI:
+
 ```bash
 pip install seprq
 ```
