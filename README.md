@@ -20,8 +20,9 @@
 🗣️ This framework is intended to provide an easy, ready-to-use and strong
 **SepRQ** feature extractor for 🍸 cocktail-party 🍸 and multi-talker
 conversational scenarios 🔀 👥, while also facilitating the use of other feature
-extractors from the literature. The framework also provides ready-to-use models
-for many cocktail-party speech tasks, both with and without speaker enrollment.
+extractors from the literature. You can use the ready-to-use models to process
+your own audio across many cocktail-party speech tasks, both with and without
+speaker enrollment.
 
 ---
 
@@ -100,7 +101,7 @@ Run a task in three steps:
 
 1. **Choose an upstream.**
 2. **Choose a downstream task** from the [overview above](#quick-navigation).
-3. **Run the pipeline** with the corresponding example below.
+3. **Run the pipeline** with the corresponding example below (or your own audio).
 
 Public downstream heads are currently available for `HuBERT_BASE`,
 `WavLM_BASE`, and `WavLM_BASE_PLUS`; SepRQ heads are coming soon. Tasks marked
