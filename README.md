@@ -25,8 +25,9 @@ extractors from the literature. We also release a **BEST-RQ** model trained at
 
 SepRQ features are pulled from 🤗
 [SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); a call returns the 12
-Conformer layer features usable for training or cocktail-party representation analysis. Requires **PyTorch** and upstream `speechbrain>=1.0.3`;
-runs on CPU or GPU.
+Conformer layer features usable for training or cocktail-party representation
+analysis. We also provide ready-to-use models for a wide range of speech-mixture
+tasks, both with and without speaker enrollment.
 
 ---
 
