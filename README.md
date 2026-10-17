@@ -20,14 +20,8 @@
 🗣️ This framework is intended to provide an easy, ready-to-use and strong
 **SepRQ** feature extractor for 🍸 cocktail-party 🍸 and multi-talker
 conversational scenarios 🔀 👥, while also facilitating the use of other feature
-extractors from the literature. We also release a **BEST-RQ** model trained at
-50 Hz as a valuable contribution to the community.
-
-SepRQ features are pulled from 🤗
-[SevKod/SepRQ](https://huggingface.co/SevKod/SepRQ); a call returns the 12
-Conformer layer features usable for training or cocktail-party representation
-analysis. We also provide ready-to-use models for a wide range of speech-mixture
-tasks, both with and without speaker enrollment.
+extractors from the literature. The framework also provides ready-to-use models
+for many cocktail-party speech tasks, both with and without speaker enrollment.
 
 ---
 
@@ -49,18 +43,18 @@ pip install seprq
 
 **Run a task** — [overview and requirements](#run-a-task)
 
-| ID | Task name | Category | Enrollment |
+| ID | Task name | Dataset | Enrollment |
 |---|---|---|---|
-| [SS](#speech-separation) | Speech separation | SUPERB | No |
-| [SD](#speaker-diarization) | Speaker diarization | SUPERB | No |
-| [SE](#speech-enhancement) | Speech enhancement | SUPERB | No |
-| [TSE](#target-speaker-extraction) | Target-speaker extraction | Target speaker | Required |
-| [PSE](#personalized-speech-extraction) | Personalized speech extraction | Target speaker | Required |
-| [PVAD](#personalized-vad) | Personalized VAD | Target speaker | Required |
-| [TS-ASR](#target-speaker-asr) | Target-speaker ASR | Target speaker | Required |
-| [DH3](#dihard-3-diarization) | DIHARD 3 diarization | Out-of-domain | No |
-| [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | Out-of-domain | No |
-| [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | Out-of-domain | No |
+| [SS](#speech-separation) | Speech separation | Libri2Mix | No |
+| [SD](#speaker-diarization) | Speaker diarization | Libri2Mix | No |
+| [SE](#speech-enhancement) | Speech enhancement | VoiceBank-DEMAND | No |
+| [TSE](#target-speaker-extraction) | Target-speaker extraction | Libri2Mix | Required |
+| [PSE](#personalized-speech-extraction) | Personalized speech extraction | SparseLibriMix | Required |
+| [PVAD](#personalized-vad) | Personalized VAD | SparseLibriMix | Required |
+| [TS-ASR](#target-speaker-asr) | Target-speaker ASR | Libri2Mix | Required |
+| [DH3](#dihard-3-local-diarization) | DIHARD 3 local diarization | DIHARD 3 | No |
+| [WSJ2](#wsj0-2mix-speech-separation) | WSJ0-2mix speech separation | WSJ0-2mix | No |
+| [WSJ3](#wsj0-3mix-speech-separation) | WSJ0-3mix speech separation | WSJ0-3mix | No |
 
 **Learn more** — [Architecture](#architecture) · [Results](#results) · [Citation](#citation)
 
@@ -108,7 +102,7 @@ from the torchaudio pipelines, nothing extra to host.
 
 SUPERB separation, diarization, and enhancement, plus target-speaker
 extraction, personalized speech extraction, personalized VAD,
-target-speaker ASR, DIHARD 3 diarization (local segmentation), and
+target-speaker ASR, DIHARD 3 local diarization, and
 WSJ0-2mix / WSJ0-3mix separation. The head is chosen from the upstream.
 Published for `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
 SepRQ downstream heads are not on the public Hub yet.
@@ -250,7 +244,7 @@ text = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # ./output/extracted_transcript.txt
 ```
 
-#### DIHARD 3 diarization
+#### DIHARD 3 local diarization
 
 ```python
 from seprq import SepRQPipeline
