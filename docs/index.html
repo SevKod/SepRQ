@@ -557,7 +557,7 @@ footer .sp{margin-left:auto}
 .sc-up small,.sc-down small{font-weight:600;font-size:13px;opacity:.9;margin-top:4px}
 .sc-up small b{font-weight:800}
 .sc-up{background:linear-gradient(135deg,var(--accent-strong),var(--accent))}
-.sc-down{background:var(--ink)}
+.sc-down{background:var(--ink);font-size:15px;white-space:nowrap}
 .sc-up small,.sc-down small{display:block;margin-top:4px;font:600 13px "JetBrains Mono",ui-monospace,monospace;opacity:.9;line-height:1.25}
 .sc-conn{width:var(--sc-connector);color:var(--accent);font-size:42px;font-weight:800;line-height:1;align-self:center;margin:0;text-align:center}
 .sc-conn.dot{color:var(--ink-3)}
@@ -1747,7 +1747,7 @@ function renderShowcase() {
       <div class="sc-mid">
         <div class="sc-node sc-up">Upstream<small><b>SepRQ</b> vs WavLM</small></div>
         <div class="sc-conn">→</div>
-        <div class="sc-node sc-down">Down&shy;stream<small>per task</small></div>
+        <div class="sc-node sc-down">Downstream<small>per task</small></div>
       </div>
       <svg class="sc-arrow dot" width="14" height="24" viewBox="0 0 14 24" aria-hidden="true">
         <line x1="7" y1="24" x2="7" y2="7" stroke="var(--ink-3)" stroke-width="2.2" stroke-dasharray="3 3"/>
