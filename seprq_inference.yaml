@@ -1,0 +1,45 @@
+# Inference hparams for loading a SepRQ pretraining checkpoint --
+# CNN + 12L Conformer only. Uses ONLY upstream speechbrain
+# (github.com/speechbrain/speechbrain, >=1.0.3, which ships RoPEMHA).
+# Weights are loaded by SepRQEncoder; global mean/var normalization is
+# applied inline there (no custom module needed).
+sample_rate: 16000
+
+compute_features: !new:speechbrain.lobes.features.Fbank
+  sample_rate: 16000
+  n_fft: 400
+  n_mels: 80
+  win_length: 25
+  hop_length: 10
+
+CNN: &id_cnn !new:speechbrain.lobes.models.convolution.ConvolutionFrontEnd
+  input_shape: (8, 10, 80)
+  num_blocks: 2
+  num_layers_per_block: 1
+  out_channels: (128, 32)
+  kernel_sizes: (3, 3)
+  strides: (2, 1)
+  residuals: (False, False)
+
+Transformer: &id_tfm !new:speechbrain.lobes.models.transformer.TransformerASR.TransformerASR
+  input_size: 1280
+  tgt_vocab: 5000
+  d_model: 576
+  nhead: 8
+  num_encoder_layers: 12
+  num_decoder_layers: 0
+  d_ffn: 2048
+  # 0.0 at inference: upstream speechbrain applies attention dropout even in
+  # eval mode (dropout_p is passed straight to scaled_dot_product_attention),
+  # so we must disable it here to get deterministic, correct features.
+  dropout: 0.0
+  activation: !name:torch.nn.GELU
+  conformer_activation: !name:torch.nn.GELU
+  encoder_module: conformer
+  attention_type: RoPEMHA
+  normalize_before: true
+  causal: false
+  layerdrop_prob: 0.0
+
+wrapper: &id_wrap !new:speechbrain.lobes.models.transformer.TransformerASR.EncoderWrapper
+  transformer: *id_tfm

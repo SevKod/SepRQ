@@ -30,9 +30,17 @@ runs on CPU or GPU.
 
 ---
 
-**Refer to the [website](https://sevkod.github.io/SepRQ/) for complete usage of the package.**
+**For an interactive overview, examples, and audio results, use the [SepRQ website](https://sevkod.github.io/SepRQ/).**
 
 ---
+
+## Quick navigation
+
+| Section | Go straight to |
+|---|---|
+| Feature extraction | [Install](#install) · [Extract features](#feature-extraction) · [Available models](#available-models) |
+| Run a task | [Overview](#run-a-task) · [Speech separation](#speech-separation) · [Speaker diarization](#speaker-diarization) · [Speech enhancement](#speech-enhancement) · [Target-speaker extraction](#target-speaker-extraction) · [Personalized speech extraction](#personalized-speech-extraction) · [Personalized VAD](#personalized-vad) · [Target-speaker ASR](#target-speaker-asr) · [DIHARD 3 diarization](#dihard-3-diarization) · [WSJ0-2mix](#wsj0-2mix-speech-separation) · [WSJ0-3mix](#wsj0-3mix-speech-separation) |
+| Understand SepRQ | [Architecture](#architecture) · [Results](#results) · [Citation](#citation) |
 
 ## Install
 
@@ -40,7 +48,9 @@ runs on CPU or GPU.
 pip install seprq
 ```
 
-## Usage (frozen ❄️ or fine-tuned 🔥)
+## Feature extraction
+
+Use the encoder frozen ❄️ or fine-tuned 🔥:
 
 ```python
 from seprq import SepRQEncoder
@@ -63,7 +73,7 @@ or a **waveform tensor** `[num_samples]`, `[batch, num_samples]` or
 
 The released SepRQ encoder is the 2-speaker model (`streams=2`).
 
-**Available models**
+### Available models
 
 | name | layers | dim |
 |------|-------:|----:|
@@ -88,7 +98,7 @@ Published for `HuBERT_BASE`, `WavLM_BASE`, and `WavLM_BASE_PLUS`.
 SepRQ downstream heads are not on the public Hub yet.
 Target-speaker tasks take an enrollment utterance.
 
-### Speech separation
+#### Speech separation
 
 ```python
 from seprq import SepRQPipeline
@@ -107,7 +117,7 @@ sources = pipe(mixture, save_to=save_to)
 # ./output/source2.wav
 ```
 
-### Speaker diarization
+#### Speaker diarization
 
 ```python
 from seprq import SepRQPipeline
@@ -125,7 +135,7 @@ activations = pipe(mixture, save_to=save_to)
 # ./output/activations.rttm
 ```
 
-### Speech enhancement
+#### Speech enhancement
 
 ```python
 from seprq import SepRQPipeline
@@ -143,7 +153,7 @@ clean = pipe(mixture, save_to=save_to)
 # ./output/cleaned.wav
 ```
 
-### Target-speaker extraction
+#### Target-speaker extraction
 
 ```python
 from seprq import SepRQPipeline
@@ -164,7 +174,7 @@ target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # ./output/extracted_audio.wav
 ```
 
-### Personalized speech extraction
+#### Personalized speech extraction
 
 ```python
 from seprq import SepRQPipeline
@@ -185,7 +195,7 @@ target = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # ./output/extracted_audio.wav
 ```
 
-### Personalized VAD
+#### Personalized VAD
 
 ```python
 from seprq import SepRQPipeline
@@ -204,7 +214,7 @@ activations = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # ./output/activations.rttm
 ```
 
-### Target-speaker ASR
+#### Target-speaker ASR
 
 ```python
 from seprq import SepRQPipeline
@@ -224,7 +234,7 @@ text = pipe(mixture, enrollment=enrollment, save_to=save_to)
 # ./output/extracted_transcript.txt
 ```
 
-### DIHARD 3 diarization
+#### DIHARD 3 diarization
 
 ```python
 from seprq import SepRQPipeline
@@ -246,7 +256,7 @@ activations = pipe(mixture, save_to=save_to)
 # Not intended for long file recordings without clustering.
 ```
 
-### WSJ0-2mix speech separation
+#### WSJ0-2mix speech separation
 
 ```python
 from seprq import SepRQPipeline
@@ -267,7 +277,7 @@ sources = pipe(mixture, save_to=save_to)
 # ./output/source2.wav
 ```
 
-### WSJ0-3mix speech separation
+#### WSJ0-3mix speech separation
 
 ```python
 from seprq import SepRQPipeline
@@ -288,6 +298,8 @@ sources = pipe(mixture, save_to=save_to)
 # ./output/source2.wav
 # ./output/source3.wav
 ```
+
+<a id="architecture"></a>
 
 ## 🔀 SepRQ — separation as the pretext task
 
@@ -310,6 +322,8 @@ resolutions.*
 - **Multi-resolution** — a separation objective follows every two Conformer
   layers, with frame folding going from 20 ms to 320 ms and one codebook per
   scale.
+
+<a id="results"></a>
 
 ## 👥 Results
 
