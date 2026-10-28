@@ -173,7 +173,8 @@ pre.code{margin:0;padding:22px 24px 24px;overflow:auto;color:var(--code-ink);fon
 .task-ids code{font-size:12px;background:var(--bg-2);border:1px solid var(--line);color:var(--ink);padding:3px 7px;border-radius:7px}
 .planned{margin-top:16px;font-size:13px;color:var(--ink-3);border-top:1px dashed var(--line-2);padding-top:12px}
 .qs-pick{margin:2px 0 14px}
-.qs-pick-lab{font:700 11px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-bottom:7px}
+.qs-pick-lab{font:800 12.5px "JetBrains Mono",ui-monospace,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-ink);margin-bottom:10px;padding:0 0 6px 10px;border-left:3px solid var(--accent);border-bottom:1px solid var(--line)}
+.qs-pick+.qs-pick{margin-top:18px}
 .qs-ups,.qs-downs{display:flex;flex-wrap:wrap;gap:7px}
 .qs-up-grp{display:inline-flex;align-items:center;gap:7px;padding:3px 6px 3px 10px;border-radius:9px;border:1.5px solid var(--accent);background:var(--accent-softer)}
 .qs-up-grp .qs-up-nm{font:700 12px "JetBrains Mono",ui-monospace,monospace;color:var(--accent-ink)}
@@ -682,13 +683,33 @@ footer .sp{margin-left:auto}
   </div>
 </header>
 
+<!-- ================= SHOWCASE ================= -->
+<section class="block" id="showcase">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Quick showcase</span>
+      <h2>One mixture → Multiple mixture tasks</h2>
+    </div>
+
+    <div class="sc-card">
+      <div class="sc-schema">
+        <div class="sc-left" id="sc-left"></div>
+        <div class="sc-right">
+          <div class="sc-tabs" id="sc-tabs"></div>
+          <div class="sc-detail" id="sc-detail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= QUICKSTART ================= -->
 <section class="block" id="quickstart">
   <div class="wrap">
     <div class="sec-head">
       <span class="kicker">Quickstart</span>
       <h2>Two lines to load. One call to run.</h2>
-      <p>Extract the 12 Conformer layer representations of any mixture, or pick a downstream task and let SepRQ do the speech processing end to end.</p>
+      <p>Extract the 12 Conformer layer representations of any mixture, or run a downstream task.</p>
     </div>
     <div class="qs-grid">
       <div class="code-card">
@@ -700,27 +721,6 @@ footer .sp{margin-left:auto}
         <pre class="code" id="qs-code"></pre>
       </div>
       <aside class="card qs-side" id="qs-side"></aside>
-    </div>
-  </div>
-</section>
-
-<!-- ================= SHOWCASE ================= -->
-<section class="block" id="showcase">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="kicker">One input, every task</span>
-      <h2>One mixture → Multiple mixture tasks</h2>
-      <p>A single Libri2Mix mixture and one (optional) enrollment feed a frozen upstream, then every downstream head at once. Per task: <b style="color:var(--accent-ink)">SepRQ</b> vs <b style="color:var(--cmp)">WavLM&nbsp;Base</b>.</p>
-    </div>
-
-    <div class="sc-card">
-      <div class="sc-schema">
-        <div class="sc-left" id="sc-left"></div>
-        <div class="sc-right">
-          <div class="sc-tabs" id="sc-tabs"></div>
-          <div class="sc-detail" id="sc-detail"></div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
@@ -1227,8 +1227,7 @@ const qsDownsHTML = () => [...new Set(QS_DOWNS.map(d => d.group))].map(g =>
 const pickUp = (ups) => `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(ups)}</div></div>`;
 
 function sideFeatures() {
-  return `<h3>How to use</h3>
-    ${pickUp(QS_UPS.filter(u => u.id !== "seprq_k3"))}
+  return `${pickUp(QS_UPS.filter(u => u.id !== "seprq_k3"))}
     <ul>
       <li>Accepts a <b>waveform tensor</b>: <code>[num_samples]</code>, <code>[batch, num_samples]</code> or <code>[batch, channel, num_samples]</code>, or a <code>file_path</code>. Audio is downmixed to mono and resampled to 16 kHz.</li>
       <li>Returns the <b>per-layer features</b> (12 Conformer layers for SepRQ), usable frozen ❄️ or fine-tuned 🔥.</li>
@@ -1236,12 +1235,11 @@ function sideFeatures() {
     </ul>`;
 }
 function sideTask() {
-  return `<h3>Run a task</h3>
-    <div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(QS_TASK_UPS)}</div></div>
+  return `<div class="qs-pick"><div class="qs-pick-lab">Select the upstream</div><div class="qs-ups">${qsUpsHTML(QS_TASK_UPS)}</div></div>
     <div class="qs-pick"><div class="qs-pick-lab">Select the downstream</div><div class="qs-downs">${qsDownsHTML()}</div></div>
     <ul>
       <li>Run the selected pipeline on the example or <b>your own audio</b>.</li>
-      <li>Target-speaker tasks take an <code>enrollment</code> utterance.</li>
+      <li>Target-speaker tasks <b>require</b> an <code>enrollment</code> utterance.</li>
     </ul>`;
 }
 function renderQS() {
